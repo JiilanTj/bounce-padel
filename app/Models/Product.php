@@ -15,7 +15,8 @@ class Product extends Model
         'price_rent',
         'stock_buy',
         'stock_rent',
-        'image_url',
+        'image_path',
+        'type',
     ];
 
     public function category()
@@ -25,6 +26,6 @@ class Product extends Model
 
     public function inventoryLogs()
     {
-        return $this->hasMany(InventoryLog::class);
+        return $this->morphMany(InventoryLog::class, 'reference');
     }
 }

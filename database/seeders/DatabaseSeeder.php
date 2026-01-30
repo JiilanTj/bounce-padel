@@ -17,11 +17,21 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Owner Bounce',
-            'email' => 'owner@bounce.com',
-            'role' => 'owner',
-            'password' => bcrypt('password'),
+        User::firstOrCreate(
+            ['email' => 'owner@bounce.com'],
+            [
+                'name' => 'Owner Bounce',
+                'role' => 'owner',
+                'password' => bcrypt('password'),
+            ]
+        );
+
+        // Seed categories, tables, menus, and menu items
+        $this->call([
+            CategorySeeder::class,
+            TableSeeder::class,
+            MenuSeeder::class,
+            MenuItemSeeder::class,
         ]);
     }
 }

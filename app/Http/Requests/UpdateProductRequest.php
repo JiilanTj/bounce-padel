@@ -26,7 +26,8 @@ class UpdateProductRequest extends FormRequest
             // Stock updates might be allowed here or ignored, but validating them ensures integrity if sent
             'stock_buy' => ['required', 'integer', 'min:0'],
             'stock_rent' => ['required', 'integer', 'min:0'],
-            'image_url' => ['nullable', 'string', 'max:2048'],
+            'image' => ['nullable', 'image', 'max:8192'],
+            'type' => ['required', 'in:sale,rent'],
         ];
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreCourtRequest;
 use App\Http\Requests\UpdateCourtRequest;
 use App\Models\Court;
+use Illuminate\Support\Facades\Storage;
 
 class CourtController extends Controller
 {
@@ -64,7 +65,16 @@ class CourtController extends Controller
      */
     public function store(StoreCourtRequest $request)
     {
-        $court = Court::create($request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('image')) {
+            // Using 'r2' disk configured in filesystems.php
+            $path = $request->file('image')->store('courts', 'r2');
+            // Store FULL URL as requested
+            $data['image_path'] = Storage::disk('r2')->url($path);
+        }
+
+        $court = Court::create($data);
 
         // Initialize default operating hours (Monday to Sunday)
         $operatingHours = [];
@@ -103,7 +113,24 @@ class CourtController extends Controller
      */
     public function update(UpdateCourtRequest $request, Court $court)
     {
-        $court->update($request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($court->image_path) {
+                // Parse path from URL if needed, or if it is already a path
+                $oldPath = str_replace(env('R2_PUBLIC_URL') . '/', '', $court->image_path);
+                // Also handle case where it might be a partial path from before migration
+                // Usually Storage::delete handles missing files gracefully or we wrap in try-catch
+                if (Storage::disk('r2')->exists($oldPath)) {
+                     Storage::disk('r2')->delete($oldPath);
+                }
+            }
+            $path = $request->file('image')->store('courts', 'r2');
+            $data['image_path'] = Storage::disk('r2')->url($path);
+        }
+
+        $court->update($data);
         return redirect()->back()->with('success', 'Court updated successfully.');
     }
 
@@ -112,6 +139,13 @@ class CourtController extends Controller
      */
     public function destroy(Court $court)
     {
+        if ($court->image_path) {
+            $oldPath = str_replace(env('R2_PUBLIC_URL') . '/', '', $court->image_path);
+            if (Storage::disk('r2')->exists($oldPath)) {
+                Storage::disk('r2')->delete($oldPath);
+            }
+        }
+        
         $court->delete();
         return redirect()->back()->with('success', 'Court deleted successfully.');
     }

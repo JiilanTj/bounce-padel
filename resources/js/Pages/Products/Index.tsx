@@ -37,7 +37,9 @@ type Product = {
     price_rent: number;
     stock_buy: number;
     stock_rent: number;
-    image_url: string | null;
+    image_path?: string | null;
+    image_url?: string | null;
+    type: 'sale' | 'rent';
     category?: Category;
 };
 
@@ -60,6 +62,7 @@ interface ProductsIndexProps extends PageProps {
     filters: {
         search: string | null;
         category_id: string | null;
+        type: string | null;
         sort_by: string;
         sort_order: 'asc' | 'desc';
     };
@@ -81,6 +84,7 @@ export default function Index() {
     const [selectedCategory, setSelectedCategory] = useState(
         filters.category_id || 'all',
     );
+    const [selectedType, setSelectedType] = useState(filters.type || 'all');
     const [showModal, setShowModal] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(
         null,
@@ -110,6 +114,7 @@ export default function Index() {
                 search: searchQuery || undefined,
                 category_id:
                     selectedCategory !== 'all' ? selectedCategory : undefined,
+                type: selectedType !== 'all' ? selectedType : undefined,
                 sort_by: filters.sort_by,
                 sort_order: filters.sort_order,
             },
@@ -128,6 +133,27 @@ export default function Index() {
             {
                 search: searchQuery || undefined,
                 category_id: categoryId !== 'all' ? categoryId : undefined,
+                type: selectedType !== 'all' ? selectedType : undefined,
+                sort_by: filters.sort_by,
+                sort_order: filters.sort_order,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
+    };
+
+    // Type filter
+    const handleTypeFilter = (type: string) => {
+        setSelectedType(type);
+        router.get(
+            route('products.index'),
+            {
+                search: searchQuery || undefined,
+                category_id:
+                    selectedCategory !== 'all' ? selectedCategory : undefined,
+                type: type !== 'all' ? type : undefined,
                 sort_by: filters.sort_by,
                 sort_order: filters.sort_order,
             },
@@ -151,6 +177,7 @@ export default function Index() {
                 search: searchQuery || undefined,
                 category_id:
                     selectedCategory !== 'all' ? selectedCategory : undefined,
+                type: selectedType !== 'all' ? selectedType : undefined,
                 sort_by: column,
                 sort_order: newOrder,
             },
@@ -206,9 +233,19 @@ export default function Index() {
             sortable: true,
             render: (product: Product) => (
                 <div className="flex items-center">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 text-white">
-                        <Package className="h-5 w-5" />
-                    </div>
+                    {product.image_path ? (
+                        <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg border border-gray-200">
+                            <img
+                                src={product.image_path}
+                                alt={product.name}
+                                className="h-full w-full object-cover"
+                            />
+                        </div>
+                    ) : (
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 text-white">
+                            <Package className="h-5 w-5" />
+                        </div>
+                    )}
                     <div className="ml-3">
                         <p className="text-sm font-medium text-gray-900">
                             {product.name}
@@ -223,6 +260,22 @@ export default function Index() {
             ),
         },
         {
+            key: 'type',
+            label: 'Type',
+            sortable: true,
+            render: (product: Product) => (
+                <span
+                    className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                        product.type === 'sale'
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-orange-100 text-orange-800'
+                    }`}
+                >
+                    {product.type === 'sale' ? 'Sale' : 'Rent'}
+                </span>
+            ),
+        },
+        {
             key: 'category',
             label: 'Category',
             sortable: false,
@@ -234,43 +287,45 @@ export default function Index() {
         },
         {
             key: 'price',
-            label: 'Price (Buy / Rent)',
+            label: 'Price',
             sortable: false,
             className: 'text-right',
             render: (product: Product) => (
-                <div className="text-sm text-gray-900">
-                    <div>{formatCurrency(product.price_buy)}</div>
-                    <div className="text-gray-500">
-                        {formatCurrency(product.price_rent)}
-                    </div>
+                <div className="text-sm font-medium text-gray-900">
+                    {product.type === 'sale'
+                        ? formatCurrency(product.price_buy)
+                        : formatCurrency(product.price_rent)}
                 </div>
             ),
         },
         {
             key: 'stock',
-            label: 'Stock (Buy / Rent)',
+            label: 'Stock',
             sortable: false,
             className: 'text-right',
             render: (product: Product) => (
                 <div className="text-sm">
-                    <div
-                        className={
-                            product.stock_buy < 5
-                                ? 'font-medium text-red-600'
-                                : 'text-gray-900'
-                        }
-                    >
-                        {product.stock_buy}
-                    </div>
-                    <div
-                        className={
-                            product.stock_rent < 5
-                                ? 'font-medium text-red-600'
-                                : 'text-gray-500'
-                        }
-                    >
-                        {product.stock_rent}
-                    </div>
+                    {product.type === 'sale' ? (
+                        <span
+                            className={
+                                product.stock_buy < 5
+                                    ? 'font-bold text-red-600'
+                                    : 'text-gray-900'
+                            }
+                        >
+                            {product.stock_buy}
+                        </span>
+                    ) : (
+                        <span
+                            className={
+                                product.stock_rent < 5
+                                    ? 'font-bold text-red-600'
+                                    : 'text-gray-900'
+                            }
+                        >
+                            {product.stock_rent}
+                        </span>
+                    )}
                 </div>
             ),
         },
@@ -362,8 +417,18 @@ export default function Index() {
                     </div>
                 </form>
 
-                {/* Category Filter & Add Button */}
-                <div className="flex items-center gap-3">
+                {/* Filters & Add Button */}
+                <div className="flex flex-wrap items-center gap-3">
+                    <select
+                        value={selectedType}
+                        onChange={(e) => handleTypeFilter(e.target.value)}
+                        className="rounded-lg border-gray-300 py-2 pl-3 pr-10 text-sm focus:border-blue-500 focus:ring-blue-500"
+                    >
+                        <option value="all">All Types</option>
+                        <option value="sale">Sale</option>
+                        <option value="rent">Rent</option>
+                    </select>
+
                     <select
                         value={selectedCategory}
                         onChange={(e) => handleCategoryFilter(e.target.value)}

@@ -1,3 +1,4 @@
+import FileInput from '@/Components/FileInput';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import Modal from '@/Components/Modal';
@@ -23,6 +24,8 @@ type Court = {
     status: 'active' | 'maintenance' | 'closed';
     price_per_hour: number;
     operating_hours?: OperatingHour[];
+    image_path?: string | null;
+    image_url?: string | null;
 };
 
 type Props = {
@@ -35,7 +38,7 @@ export default function CourtForm({ show, onClose, court }: Props) {
     const isEdit = !!court;
     const [activeTab, setActiveTab] = useState<'basic' | 'hours'>('basic');
 
-    const { data, setData, post, put, processing, errors, reset, clearErrors } =
+    const { data, setData, post, processing, errors, reset, clearErrors } =
         useForm({
             name: '',
             type: 'indoor',
@@ -43,6 +46,8 @@ export default function CourtForm({ show, onClose, court }: Props) {
             status: 'active',
             price_per_hour: '',
             operating_hours: [] as OperatingHour[],
+            image: null as File | null,
+            _method: 'POST',
         });
 
     useEffect(() => {
@@ -55,22 +60,22 @@ export default function CourtForm({ show, onClose, court }: Props) {
                     status: court.status,
                     price_per_hour: court.price_per_hour.toString(),
                     operating_hours: court.operating_hours || [],
+                    image: null,
+                    _method: 'PUT',
                 });
             } else {
                 reset();
-                // Initialize default operating hours for new court if needed,
-                // but backend usually handles this on create.
-                // For UI preview, we might want to show defaults.
+                setData((prev) => ({ ...prev, _method: 'POST' }));
             }
             clearErrors();
             setActiveTab('basic');
         }
-    }, [show, court, setData, reset, clearErrors]);
+    }, [show, court]);
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
         if (isEdit && court?.id) {
-            put(route('courts.update', court.id), {
+            post(route('courts.update', court.id), {
                 onSuccess: () => {
                     onClose();
                     reset();
@@ -102,12 +107,6 @@ export default function CourtForm({ show, onClose, court }: Props) {
         value: string | boolean,
     ) => {
         const newHours = [...data.operating_hours];
-        // If we are in Create mode, operating_hours might be empty until saved.
-        // For simplicity, managing hours usually happens AFTER creation in the strict backend sense,
-        // unless we built a "nested create".
-        // Let's assume for this Phase 1.2, we only edit hours on UPDATE.
-        // If create, we just show a note "Default hours will be set".
-
         if (newHours[index]) {
             // @ts-expect-error - value type is dynamic based on field
             newHours[index][field] = value;
@@ -144,6 +143,14 @@ export default function CourtForm({ show, onClose, court }: Props) {
                 <form onSubmit={submit} className="mt-6">
                     {activeTab === 'basic' && (
                         <div className="space-y-4">
+                            <FileInput
+                                label="Court Image"
+                                onChange={(file) => setData('image', file)}
+                                error={errors.image}
+                                previewUrl={court?.image_path}
+                                className="w-full"
+                            />
+
                             <div>
                                 <InputLabel htmlFor="name" value="Court Name" />
                                 <TextInput

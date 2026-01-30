@@ -31,6 +31,8 @@ type Court = {
     status: 'active' | 'maintenance' | 'closed';
     price_per_hour: number;
     operating_hours?: OperatingHour[];
+    image_path?: string | null;
+    image_url?: string | null;
 };
 
 interface CourtsIndexProps extends PageProps {
@@ -216,9 +218,19 @@ export default function Index() {
             sortable: true,
             render: (court: Court) => (
                 <div className="flex items-center">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 text-white">
-                        <CircleDot className="h-5 w-5" />
-                    </div>
+                    {court.image_path ? (
+                        <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg border border-gray-200">
+                            <img
+                                src={court.image_path}
+                                alt={court.name}
+                                className="h-full w-full object-cover"
+                            />
+                        </div>
+                    ) : (
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 text-white">
+                            <CircleDot className="h-5 w-5" />
+                        </div>
+                    )}
                     <div className="ml-3">
                         <p className="text-sm font-medium text-gray-900">
                             {court.name}

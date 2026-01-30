@@ -8,6 +8,7 @@ class MenuItem extends Model
 {
     protected $fillable = [
         'menu_id',
+        'category_id',
         'name',
         'description',
         'price',
@@ -18,6 +19,11 @@ class MenuItem extends Model
     public function menu()
     {
         return $this->belongsTo(Menu::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 
     public function orderItems()

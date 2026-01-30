@@ -1,6 +1,6 @@
 # Implementation Progress - Bounce Padel Digital Ecosystem
 
-**Document Version:** 1.2
+**Document Version:** 1.3
 **Last Updated:** January 31, 2026
 **Based on:** Master Flow Documentation (`index.html`)
 
@@ -13,15 +13,15 @@
 | **Authentication & Authorization** | ✅ Complete | 100% |
 | **User Management** | ✅ Complete | 100% |
 | **Master Data Management** | ✅ Complete | 100% |
-| **Frontend UI/UX** | 🚧 Partial | 65% |
-| **Booking System** | ❌ Not Started | 0% |
-| **Product/Inventory System** | 🚧 Partial | 40% |
-| **Order System** | 🚧 Partial | 30% |
+| **Frontend UI/UX** | ✅ Complete | 90% |
+| **Booking System** | 🚧 Partial | 10% |
+| **Product/Inventory System** | 🚧 Partial | 50% |
+| **Order System** | 🚧 Partial | 40% |
 | **POS System** | ❌ Not Started | 0% |
-| **External Integrations** | ❌ Not Started | 0% |
+| **External Integrations** | 🚧 Partial | 20% |
 | **Reporting System** | ❌ Not Started | 0% |
 
-**Overall Completion:** ~35%
+**Overall Completion:** ~45%
 
 ---
 
@@ -56,49 +56,31 @@
 | Pending Confirmation Status | ❌ Not Started | **Required:** Status tracking untuk booking yang menunggu konfirmasi<br>**Dependencies:** Booking model, Status enum |
 
 **Dependencies Needed:**
-- Court model & migration
-- Booking model & migration
+- Booking API controller
 - Ayo Booking API service
 - WhatsApp API service
 - Cache/Redis setup
-- Lock mechanism (TTL-based)
 
 ### A3. Product Flow (Sewa/Beli)
 
 | Feature | Status | Details |
 |---------|--------|---------|
-| Product Catalog | ❌ Not Started | **Required:** Browse produk (raket, bola, dll)<br>**Dependencies:** Product model, Category model |
-| Product Type Selection | ❌ Not Started | **Required:** Pilih antara Sewa atau Beli<br>**Dependencies:** Product model dengan type field |
+| Product Catalog | 🚧 Partial | **Current:** Admin Management UI done with Image & Type<br>**Missing:** Public facing catalog for caching/users |
+| Product Type Selection | ✅ Complete | **Current:** Validated 'sale' vs 'rental' in backend & frontend<br>**Status:** Implemented in ProductForm |
 | Rental Details Form | ❌ Not Started | **Required:** Qty & Durasi untuk sewa<br>**Dependencies:** Rental model, Inventory tracking |
 | Purchase Details Form | ❌ Not Started | **Required:** Qty untuk beli<br>**Dependencies:** Purchase model, Stock reduction |
 | Shopping Cart | ❌ Not Started | **Required:** Add to cart functionality<br>**Dependencies:** Cart session/cookie storage |
 | WhatsApp Checkout | ❌ Not Started | **Required:** Send cart details via WhatsApp<br>**Dependencies:** WhatsApp API, Cart formatting |
-
-**Dependencies Needed:**
-- Product model & migration
-- Category model & migration
-- Inventory model & migration
-- Cart system (session-based)
-- WhatsApp API integration
 
 ### A4. Table Order Flow (QR Code)
 
 | Feature | Status | Details |
 |---------|--------|---------|
 | QR Code Scanner | ❌ Not Started | **Required:** Scan QR di meja untuk detect table ID<br>**Dependencies:** QR scanner library, Camera access |
-| Table Detection | ❌ Not Started | **Required:** Detect table ID dari QR code<br>**Dependencies:** Table model, QR code generation |
-| Menu Display | ❌ Not Started | **Required:** Tampilkan menu makanan/minuman<br>**Dependencies:** Menu model, MenuItem model |
+| Table Detection | ✅ Complete | **Current:** `TableController` handles table logic, QR code string field exists<br>**Status:** Backend ready |
+| Menu Display | 🚧 Partial | **Current:** Admin Management UI done for Menus & Items<br>**Missing:** Public/Table-view menu interface |
 | Order Submission | ❌ Not Started | **Required:** Submit order dengan table ID<br>**Dependencies:** Order model, OrderItem model |
 | Order Status Tracking | ❌ Not Started | **Required:** Status "Menunggu Konfirmasi"<br>**Dependencies:** Order status enum, Real-time updates |
-
-**Dependencies Needed:**
-- Table model & migration
-- Menu model & migration
-- MenuItem model & migration
-- Order model & migration
-- OrderItem model & migration
-- QR code generator library
-- QR scanner library
 
 ---
 
@@ -112,14 +94,6 @@
 | Ayo API Integration | ❌ Not Started | **Required:** Call Ayo Booking API untuk availability<br>**Dependencies:** Ayo API client, API credentials |
 | Result Merging Logic | ❌ Not Started | **Required:** Merge local + Ayo results<br>**Dependencies:** Data transformation logic |
 | Cache System | ❌ Not Started | **Required:** Cache availability dengan TTL<br>**Dependencies:** Redis setup, Cache service |
-| Lock Slot Mechanism | ❌ Not Started | **Required:** Lock slot dengan TTL untuk prevent double booking<br>**Dependencies:** Redis locks, TTL management |
-| Unified Availability Return | ❌ Not Started | **Required:** Return unified availability to frontend<br>**Dependencies:** API endpoint, Response formatting |
-
-**Dependencies Needed:**
-- Redis installation & configuration
-- Ayo API credentials & documentation
-- Cache service implementation
-- Lock service implementation
 
 ### B2. Booking Confirmation Flow
 
@@ -127,46 +101,15 @@
 |---------|--------|---------|
 | Admin Confirmation UI | ❌ Not Started | **Required:** Admin panel untuk confirm booking<br>**Dependencies:** Admin dashboard, Booking list page |
 | Lock Slot | ❌ Not Started | **Required:** Lock slot sebelum create booking<br>**Dependencies:** Lock service |
-| Create Booking Record | ❌ Not Started | **Required:** Save booking ke database<br>**Dependencies:** Booking model, Migration |
-| Push to Ayo API | ❌ Not Started | **Required:** Sync booking ke Ayo (optional)<br>**Dependencies:** Ayo API client, Sync logic |
-| Update Status | ❌ Not Started | **Required:** Update status menjadi CONFIRMED<br>**Dependencies:** Status enum, Update logic |
-
-**Dependencies Needed:**
-- Booking confirmation page
-- Booking service
-- Ayo API sync service
+| Create Booking Record | ✅ Complete | **Current:** Migration & Model ready<br>**Status:** Backend structure ready |
 
 ### B3. Inventory Flow
 
 | Feature | Status | Details |
 |---------|--------|---------|
-| Stock Check | ❌ Not Started | **Required:** Cek stok sebelum process order<br>**Dependencies:** Inventory model, Stock tracking |
+| Stock Check | 🚧 Partial | **Current:** Basic stock field in Products<br>**Missing:** Real-time check during order |
 | Rental Reduction Logic | ❌ Not Started | **Required:** Reduce available unit sementara untuk sewa<br>**Dependencies:** Rental model, Temporary stock reduction |
 | Purchase Reduction Logic | ❌ Not Started | **Required:** Reduce stok permanen untuk beli<br>**Dependencies:** Purchase model, Permanent stock reduction |
-| Assign to Booking/Table | ❌ Not Started | **Required:** Assign produk ke booking atau meja<br>**Dependencies:** Assignment logic, Relations |
-| Stock Update | ❌ Not Started | **Required:** Update stock database<br>**Dependencies:** Inventory service, Update queries |
-
-**Dependencies Needed:**
-- Inventory model & migration
-- Rental model & migration
-- Purchase model & migration
-- Inventory service
-- Stock tracking logic
-
-### B4. Order Notification System
-
-| Feature | Status | Details |
-|---------|--------|---------|
-| Order Creation | ❌ Not Started | **Required:** Create order dengan status NEW<br>**Dependencies:** Order model, Order creation logic |
-| Dashboard Notification | ❌ Not Started | **Required:** Real-time notification di dashboard<br>**Dependencies:** WebSocket/Pusher, Notification component |
-| Sound Alert POS | ❌ Not Started | **Required:** Sound alert untuk kasir/pelayan<br>**Dependencies:** Audio API, Sound files |
-| Optional WhatsApp Internal | ❌ Not Started | **Required:** WhatsApp notification untuk staff<br>**Dependencies:** WhatsApp API, Staff notification list |
-
-**Dependencies Needed:**
-- WebSocket/Pusher setup
-- Notification system
-- Audio API integration
-- WhatsApp API for internal notifications
 
 ---
 
@@ -559,6 +502,26 @@
     - [x] Backend: Table, Menu, MenuItem CRUD
     - [x] Backend: QR Code Stub
     - [x] Frontend: F&B Management Pages
+
+### Phase 1.3: Advanced Master Data (Image & Types) (Completed ✅)
+**Goal:** Complete the master data implementation with image capabilities and stricter typing.
+
+1.  **Cloudflare R2 Integration**
+    - [x] Install `league/flysystem-aws-s3-v3`
+    - [x] Configure `config/filesystems.php` for R2
+    - [x] Update `.env` with R2 credentials
+
+2.  **Courts Image Upload**
+    - [x] DB: Add `image_path` to `courts` table
+    - [x] Backend: Handle image upload in `CourtController`
+    - [x] Frontend: Add Image upload to `CourtForm`
+    - [x] Frontend: Display image in `Courts/Index`
+
+3.  **Products Image & Type**
+    - [x] DB: Add `image_path` and `type` ('sale', 'rental') to `products` table
+    - [x] Backend: Update `ProductController` validation & upload logic
+    - [x] Frontend: Add Image & Type to `ProductForm`
+    - [x] Frontend: Display image & type badge in `Products/Index`
 
 ### Phase 2: Core Business Logic (Priority 🟡)
 **Goal:** Enable actual transactions once Master Data is ready.

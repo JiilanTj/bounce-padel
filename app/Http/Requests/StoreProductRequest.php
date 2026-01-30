@@ -25,7 +25,8 @@ class StoreProductRequest extends FormRequest
             'price_rent' => ['nullable', 'numeric', 'min:0'],
             'stock_buy' => ['required', 'integer', 'min:0'],
             'stock_rent' => ['required', 'integer', 'min:0'],
-            'image_url' => ['nullable', 'string', 'max:2048'], // Or URL validation
+            'image' => ['nullable', 'image', 'max:8192'],
+            'type' => ['required', 'in:sale,rent'],
         ];
     }
 }

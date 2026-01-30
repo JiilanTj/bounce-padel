@@ -91,13 +91,35 @@ export default function Table<T extends { id: number | string }>({
                                     {column.sortable && onSort ? (
                                         <button
                                             onClick={() => onSort(column.key)}
-                                            className="flex items-center text-xs font-medium uppercase tracking-wide text-gray-500 hover:text-gray-700"
+                                            className={`flex w-full items-center text-xs font-medium uppercase tracking-wide text-gray-500 hover:text-gray-700 ${
+                                                column.className?.includes(
+                                                    'text-right',
+                                                )
+                                                    ? 'justify-end'
+                                                    : column.className?.includes(
+                                                            'text-center',
+                                                        )
+                                                      ? 'justify-center'
+                                                      : 'justify-start'
+                                            }`}
                                         >
                                             {column.label}
                                             <SortIcon column={column.key} />
                                         </button>
                                     ) : (
-                                        <span className="text-xs font-medium uppercase tracking-wide text-gray-500">
+                                        <span
+                                            className={`block w-full text-xs font-medium uppercase tracking-wide text-gray-500 ${
+                                                column.className?.includes(
+                                                    'text-right',
+                                                )
+                                                    ? 'text-right'
+                                                    : column.className?.includes(
+                                                            'text-center',
+                                                        )
+                                                      ? 'text-center'
+                                                      : 'text-left'
+                                            }`}
+                                        >
                                             {column.label}
                                         </span>
                                     )}

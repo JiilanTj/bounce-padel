@@ -10,16 +10,16 @@ class Court extends Model
 {
     protected $fillable = [
         'name',
-        'type',
+        'type', // indoor, outdoor
         'surface',
-        'status',
+        'status', // active, maintenance, closed
         'price_per_hour',
+        'image_path',
     ];
 
-    public function bookings()
-    {
-        return $this->hasMany(Booking::class);
-    }
+    protected $casts = [
+        'price_per_hour' => 'decimal:2',
+    ];
 
     public function operatingHours()
     {

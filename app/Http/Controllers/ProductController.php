@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -24,6 +25,11 @@ class ProductController extends Controller
         // Category filter
         if (request('category_id')) {
             $query->where('category_id', request('category_id'));
+        }
+
+        // Type filter
+        if (request('type')) {
+            $query->where('type', request('type'));
         }
 
         // Sorting
@@ -63,6 +69,11 @@ class ProductController extends Controller
     {
         $data = $request->validated();
         
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('products', 'r2');
+            $data['image_path'] = Storage::disk('r2')->url($path);
+        }
+
         \Illuminate\Support\Facades\DB::transaction(function () use ($data) {
             $product = Product::create($data);
 
@@ -111,6 +122,18 @@ class ProductController extends Controller
     {
         $data = $request->validated();
 
+        if ($request->hasFile('image')) {
+            // Delete old image
+            if ($product->image_path) {
+                $oldPath = str_replace(env('R2_PUBLIC_URL') . '/', '', $product->image_path);
+                if (Storage::disk('r2')->exists($oldPath)) {
+                    Storage::disk('r2')->delete($oldPath);
+                }
+            }
+            $path = $request->file('image')->store('products', 'r2');
+            $data['image_path'] = Storage::disk('r2')->url($path);
+        }
+
         \Illuminate\Support\Facades\DB::transaction(function () use ($data, $product) {
             // Calculate differences
             $diffBuy = $data['stock_buy'] - $product->stock_buy;
@@ -144,6 +167,12 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
+        if ($product->image_path) {
+             $oldPath = str_replace(env('R2_PUBLIC_URL') . '/', '', $product->image_path);
+             if (Storage::disk('r2')->exists($oldPath)) {
+                 Storage::disk('r2')->delete($oldPath);
+             }
+        }
         $product->delete();
         return redirect()->back()->with('success', 'Product deleted successfully.');
     }

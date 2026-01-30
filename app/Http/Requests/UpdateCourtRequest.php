@@ -22,6 +22,8 @@ class UpdateCourtRequest extends FormRequest
             'surface' => ['nullable', 'string', 'max:50'],
             'status' => ['required', 'in:active,maintenance,closed'],
             'price_per_hour' => ['required', 'numeric', 'min:0'],
+            'operating_hours' => ['nullable', 'array'],
+            'image' => ['nullable', 'image', 'max:8192'],
         ];
     }
 }
