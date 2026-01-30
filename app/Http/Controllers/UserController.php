@@ -53,8 +53,23 @@ class UserController extends Controller
         $perPage = min($request->get('per_page', 10), 100); // Max 100 per page
         $users = $query->paginate($perPage)->withQueryString();
 
+        // Calculate statistics
+        $stats = [
+            'total' => User::count(),
+            'by_role' => [
+                'owner' => User::where('role', 'owner')->count(),
+                'admin' => User::where('role', 'admin')->count(),
+                'kasir' => User::where('role', 'kasir')->count(),
+                'pelayan' => User::where('role', 'pelayan')->count(),
+                'user' => User::where('role', 'user')->count(),
+            ],
+            'recent' => User::where('created_at', '>=', now()->subDays(30))->count(),
+            'active_today' => User::whereDate('updated_at', today())->count(),
+        ];
+
         return Inertia::render('Users/Index', [
             'users' => $users,
+            'stats' => $stats,
             'filters' => [
                 'search' => $request->search,
                 'role' => $request->role,

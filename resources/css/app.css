@@ -1,3 +1,5 @@
+@import 'sonner/dist/styles.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,23 +9,23 @@
         /* Primary Colors */
         --primary: 217 91% 60%;
         --primary-foreground: 0 0% 100%;
-        
+
         /* Neutral Colors */
         --background: 210 20% 98%;
         --foreground: 222 47% 11%;
         --muted: 210 40% 96%;
         --muted-foreground: 215 16% 47%;
-        
+
         /* Accent Colors */
         --accent: 210 40% 96%;
         --accent-foreground: 222 47% 11%;
-        
+
         /* Success/Warning/Danger */
         --success: 142 76% 36%;
         --warning: 38 92% 50%;
         --danger: 0 72% 51%;
     }
-    
+
     body {
         @apply antialiased;
     }

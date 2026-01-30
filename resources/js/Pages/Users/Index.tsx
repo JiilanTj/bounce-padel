@@ -1,6 +1,7 @@
 import ConfirmationModal from '@/Components/ConfirmationModal';
 import Pagination from '@/Components/Pagination';
 import RoleBadge from '@/Components/RoleBadge';
+import StatCard from '@/Components/StatCard';
 import Table from '@/Components/Table';
 import UserAvatar from '@/Components/UserAvatar';
 import UserFormModal from '@/Components/UserFormModal';
@@ -14,6 +15,7 @@ import {
     TrashIcon,
 } from '@heroicons/react/24/outline';
 import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Activity, UserCheck, UserPlus, Users } from 'lucide-react';
 import { FormEvent, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -38,11 +40,24 @@ interface UsersIndexProps extends PageProps {
         sort_by: string;
         sort_order: 'asc' | 'desc';
     };
+    stats: {
+        total: number;
+        by_role: {
+            owner: number;
+            admin: number;
+            kasir: number;
+            pelayan: number;
+            user: number;
+        };
+        recent: number;
+        active_today: number;
+    };
     availableRoles: Record<string, string>;
 }
 
 export default function Index() {
-    const { users, filters, availableRoles } = usePage<UsersIndexProps>().props;
+    const { users, filters, availableRoles, stats } =
+        usePage<UsersIndexProps>().props;
     const { flash } = usePage<PageProps>().props;
 
     // State
@@ -236,6 +251,42 @@ export default function Index() {
             }
         >
             <Head title="User Management" />
+
+            {/* Stats Cards */}
+            <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <StatCard
+                    title="Total Users"
+                    value={stats.total}
+                    icon={Users}
+                    description="All registered users"
+                    color="blue"
+                />
+                <StatCard
+                    title="Admins & Staff"
+                    value={
+                        stats.by_role.admin +
+                        stats.by_role.kasir +
+                        stats.by_role.pelayan
+                    }
+                    icon={UserCheck}
+                    description={`${stats.by_role.admin} admins, ${stats.by_role.kasir} kasir, ${stats.by_role.pelayan} pelayan`}
+                    color="purple"
+                />
+                <StatCard
+                    title="New This Month"
+                    value={stats.recent}
+                    icon={UserPlus}
+                    description="Registered in last 30 days"
+                    color="green"
+                />
+                <StatCard
+                    title="Active Today"
+                    value={stats.active_today}
+                    icon={Activity}
+                    description="Users active today"
+                    color="orange"
+                />
+            </div>
 
             {/* Filters & Actions */}
             <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
