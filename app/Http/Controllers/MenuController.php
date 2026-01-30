@@ -13,9 +13,44 @@ class MenuController extends Controller
      */
     public function index()
     {
-        $menus = Menu::withCount('items')->latest()->paginate(10);
+        $query = Menu::query()->withCount('items');
+
+        // Search
+        if (request('search')) {
+            $query->where('name', 'like', '%' . request('search') . '%')
+                  ->orWhere('description', 'like', '%' . request('search') . '%');
+        }
+
+        // Status filter
+        if (request('status')) {
+            $isActive = request('status') === 'active';
+            $query->where('is_active', $isActive);
+        }
+
+        // Sorting
+        $sortBy = request('sort_by', 'created_at');
+        $sortOrder = request('sort_order', 'desc');
+        $query->orderBy($sortBy, $sortOrder);
+
+        $menus = $query->paginate(10)->withQueryString();
+
+        // Stats
+        $stats = [
+            'total' => Menu::count(),
+            'active' => Menu::where('is_active', true)->count(),
+            'inactive' => Menu::where('is_active', false)->count(),
+            'total_items' => \App\Models\MenuItem::count(),
+        ];
+
         return inertia('Menus/Index', [
-            'menus' => $menus
+            'menus' => $menus,
+            'filters' => [
+                'search' => request('search'),
+                'status' => request('status'),
+                'sort_by' => $sortBy,
+                'sort_order' => $sortOrder,
+            ],
+            'stats' => $stats,
         ]);
     }
 

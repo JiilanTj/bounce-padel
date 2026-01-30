@@ -13,9 +13,43 @@ class TableController extends Controller
      */
     public function index()
     {
-        $tables = Table::latest()->paginate(10);
+        $query = Table::query();
+
+        // Search
+        if (request('search')) {
+            $query->where('number', 'like', '%' . request('search') . '%')
+                  ->orWhere('qr_code', 'like', '%' . request('search') . '%');
+        }
+
+        // Status filter
+        if (request('status')) {
+            $query->where('status', request('status'));
+        }
+
+        // Sorting
+        $sortBy = request('sort_by', 'number');
+        $sortOrder = request('sort_order', 'asc');
+        $query->orderBy($sortBy, $sortOrder);
+
+        $tables = $query->paginate(10)->withQueryString();
+
+        // Stats
+        $stats = [
+            'total' => Table::count(),
+            'available' => Table::where('status', 'available')->count(),
+            'occupied' => Table::where('status', 'occupied')->count(),
+            'reserved' => Table::where('status', 'reserved')->count(),
+        ];
+
         return inertia('Tables/Index', [
-            'tables' => $tables
+            'tables' => $tables,
+            'filters' => [
+                'search' => request('search'),
+                'status' => request('status'),
+                'sort_by' => $sortBy,
+                'sort_order' => $sortOrder,
+            ],
+            'stats' => $stats,
         ]);
     }
 

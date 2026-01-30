@@ -13,9 +13,49 @@ class CourtController extends Controller
      */
     public function index()
     {
-        $courts = Court::with('operatingHours')->latest()->paginate(10);
+        $query = Court::query()->with('operatingHours');
+
+        // Search
+        if (request('search')) {
+            $query->where('name', 'like', '%' . request('search') . '%')
+                  ->orWhere('surface', 'like', '%' . request('search') . '%');
+        }
+
+        // Status filter
+        if (request('status')) {
+            $query->where('status', request('status'));
+        }
+
+        // Type filter
+        if (request('type')) {
+            $query->where('type', request('type'));
+        }
+
+        // Sorting
+        $sortBy = request('sort_by', 'created_at');
+        $sortOrder = request('sort_order', 'desc');
+        $query->orderBy($sortBy, $sortOrder);
+
+        $courts = $query->paginate(10)->withQueryString();
+
+        // Stats
+        $stats = [
+            'total' => Court::count(),
+            'active' => Court::where('status', 'active')->count(),
+            'maintenance' => Court::where('status', 'maintenance')->count(),
+            'closed' => Court::where('status', 'closed')->count(),
+        ];
+
         return inertia('Courts/Index', [
-            'courts' => $courts
+            'courts' => $courts,
+            'filters' => [
+                'search' => request('search'),
+                'status' => request('status'),
+                'type' => request('type'),
+                'sort_by' => $sortBy,
+                'sort_order' => $sortOrder,
+            ],
+            'stats' => $stats,
         ]);
     }
 

@@ -13,11 +13,46 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::with('category', 'inventoryLogs')->latest()->paginate(10);
-        $categories = \App\Models\Category::all(); // Fetch all categories for the form
+        $query = Product::query()->with('category');
+
+        // Search
+        if (request('search')) {
+            $query->where('name', 'like', '%' . request('search') . '%')
+                  ->orWhere('sku', 'like', '%' . request('search') . '%');
+        }
+
+        // Category filter
+        if (request('category_id')) {
+            $query->where('category_id', request('category_id'));
+        }
+
+        // Sorting
+        $sortBy = request('sort_by', 'created_at');
+        $sortOrder = request('sort_order', 'desc');
+        $query->orderBy($sortBy, $sortOrder);
+
+        $products = $query->paginate(10)->withQueryString();
+
+        // Stats
+        $stats = [
+            'total' => Product::count(),
+            'low_stock_buy' => Product::where('stock_buy', '<', 5)->count(),
+            'low_stock_rent' => Product::where('stock_rent', '<', 5)->count(),
+            'total_value' => Product::sum(\Illuminate\Support\Facades\DB::raw('(stock_buy * price_buy) + (stock_rent * price_rent)')),
+        ];
+
+        $categories = \App\Models\Category::where('type', 'product')->get();
+
         return inertia('Products/Index', [
             'products' => $products,
-            'categories' => $categories
+            'categories' => $categories,
+            'filters' => [
+                'search' => request('search'),
+                'category_id' => request('category_id'),
+                'sort_by' => $sortBy,
+                'sort_order' => $sortOrder,
+            ],
+            'stats' => $stats,
         ]);
     }
 

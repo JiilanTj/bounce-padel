@@ -13,9 +13,41 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::latest()->paginate(10);
+        $query = Category::query()->withCount(['products', 'menuItems']);
+
+        // Search
+        if (request('search')) {
+            $query->where('name', 'like', '%' . request('search') . '%');
+        }
+
+        // Type filter
+        if (request('type')) {
+            $query->where('type', request('type'));
+        }
+
+        // Sorting
+        $sortBy = request('sort_by', 'created_at');
+        $sortOrder = request('sort_order', 'desc');
+        $query->orderBy($sortBy, $sortOrder);
+
+        $categories = $query->paginate(10)->withQueryString();
+
+        // Stats
+        $stats = [
+            'total' => Category::count(),
+            'product_categories' => Category::where('type', 'product')->count(),
+            'menu_categories' => Category::where('type', 'menu')->count(),
+        ];
+
         return inertia('Categories/Index', [
-            'categories' => $categories
+            'categories' => $categories,
+            'filters' => [
+                'search' => request('search'),
+                'type' => request('type'),
+                'sort_by' => $sortBy,
+                'sort_order' => $sortOrder,
+            ],
+            'stats' => $stats,
         ]);
     }
 

@@ -8,34 +8,26 @@ import {
     MagnifyingGlassIcon,
     PencilIcon,
     PlusIcon,
+    QrCodeIcon,
     TrashIcon,
 } from '@heroicons/react/24/outline';
 import { Head, router, usePage } from '@inertiajs/react';
-import { Activity, AlertCircle, CheckCircle, CircleDot } from 'lucide-react';
+import { CheckCircle, Clock, Layers, XCircle } from 'lucide-react';
 import { FormEvent, useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import CourtForm from './Components/CourtForm';
+import TableForm from './Components/TableForm';
 
-type OperatingHour = {
-    day_of_week: number;
-    open_time: string;
-    close_time: string;
-    is_closed: boolean;
-};
-
-type Court = {
+type TableData = {
     id: number;
-    name: string;
-    type: 'indoor' | 'outdoor';
-    surface: string;
-    status: 'active' | 'maintenance' | 'closed';
-    price_per_hour: number;
-    operating_hours?: OperatingHour[];
+    number: string;
+    capacity: number;
+    status: 'available' | 'occupied' | 'reserved';
+    qr_code: string;
 };
 
-interface CourtsIndexProps extends PageProps {
-    courts: {
-        data: Court[];
+interface TablesIndexProps extends PageProps {
+    tables: {
+        data: TableData[];
         current_page: number;
         last_page: number;
         per_page: number;
@@ -51,20 +43,19 @@ interface CourtsIndexProps extends PageProps {
     filters: {
         search: string | null;
         status: string | null;
-        type: string | null;
         sort_by: string;
         sort_order: 'asc' | 'desc';
     };
     stats: {
         total: number;
-        active: number;
-        maintenance: number;
-        closed: number;
+        available: number;
+        occupied: number;
+        reserved: number;
     };
 }
 
 export default function Index() {
-    const { courts, filters, stats } = usePage<CourtsIndexProps>().props;
+    const { tables, filters, stats } = usePage<TablesIndexProps>().props;
     const { flash } = usePage<PageProps>().props;
 
     // State
@@ -72,13 +63,12 @@ export default function Index() {
     const [selectedStatus, setSelectedStatus] = useState(
         filters.status || 'all',
     );
-    const [selectedType, setSelectedType] = useState(filters.type || 'all');
     const [showModal, setShowModal] = useState(false);
-    const [selectedCourt, setSelectedCourt] = useState<Court | null>(null);
+    const [selectedTable, setSelectedTable] = useState<TableData | null>(null);
     const [deleteModal, setDeleteModal] = useState<{
         show: boolean;
-        court: Court | null;
-    }>({ show: false, court: null });
+        table: TableData | null;
+    }>({ show: false, table: null });
     const [deleting, setDeleting] = useState(false);
 
     // Show flash messages as toast
@@ -95,11 +85,10 @@ export default function Index() {
     const handleSearch = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         router.get(
-            route('courts.index'),
+            route('tables.index'),
             {
                 search: searchQuery || undefined,
                 status: selectedStatus !== 'all' ? selectedStatus : undefined,
-                type: selectedType !== 'all' ? selectedType : undefined,
                 sort_by: filters.sort_by,
                 sort_order: filters.sort_order,
             },
@@ -114,30 +103,10 @@ export default function Index() {
     const handleStatusFilter = (status: string) => {
         setSelectedStatus(status);
         router.get(
-            route('courts.index'),
+            route('tables.index'),
             {
                 search: searchQuery || undefined,
                 status: status !== 'all' ? status : undefined,
-                type: selectedType !== 'all' ? selectedType : undefined,
-                sort_by: filters.sort_by,
-                sort_order: filters.sort_order,
-            },
-            {
-                preserveState: true,
-                preserveScroll: true,
-            },
-        );
-    };
-
-    // Type filter
-    const handleTypeFilter = (type: string) => {
-        setSelectedType(type);
-        router.get(
-            route('courts.index'),
-            {
-                search: searchQuery || undefined,
-                status: selectedStatus !== 'all' ? selectedStatus : undefined,
-                type: type !== 'all' ? type : undefined,
                 sort_by: filters.sort_by,
                 sort_order: filters.sort_order,
             },
@@ -156,11 +125,10 @@ export default function Index() {
                 : 'asc';
 
         router.get(
-            route('courts.index'),
+            route('tables.index'),
             {
                 search: searchQuery || undefined,
                 status: selectedStatus !== 'all' ? selectedStatus : undefined,
-                type: selectedType !== 'all' ? selectedType : undefined,
                 sort_by: column,
                 sort_order: newOrder,
             },
@@ -173,118 +141,98 @@ export default function Index() {
 
     // Modal handlers
     const openCreateModal = () => {
-        setSelectedCourt(null);
+        setSelectedTable(null);
         setShowModal(true);
     };
 
-    const openEditModal = (court: Court) => {
-        setSelectedCourt(court);
+    const openEditModal = (table: TableData) => {
+        setSelectedTable(table);
         setShowModal(true);
     };
 
     const closeModal = () => {
         setShowModal(false);
-        setSelectedCourt(null);
+        setSelectedTable(null);
     };
 
-    // Delete court
+    // Delete table
     const handleDelete = () => {
-        if (!deleteModal.court) return;
+        if (!deleteModal.table) return;
 
         setDeleting(true);
-        router.delete(route('courts.destroy', deleteModal.court.id), {
+        router.delete(route('tables.destroy', deleteModal.table.id), {
             onFinish: () => {
                 setDeleting(false);
-                setDeleteModal({ show: false, court: null });
+                setDeleteModal({ show: false, table: null });
             },
         });
-    };
-
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-            minimumFractionDigits: 0,
-        }).format(amount);
     };
 
     // Table columns configuration
     const columns = [
         {
-            key: 'name',
-            label: 'Court',
+            key: 'number',
+            label: 'Table',
             sortable: true,
-            render: (court: Court) => (
+            render: (table: TableData) => (
                 <div className="flex items-center">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 text-white">
-                        <CircleDot className="h-5 w-5" />
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 text-white">
+                        <Layers className="h-5 w-5" />
                     </div>
                     <div className="ml-3">
                         <p className="text-sm font-medium text-gray-900">
-                            {court.name}
+                            Table {table.number}
                         </p>
-                        <p className="text-xs text-gray-500">{court.surface}</p>
+                        <p className="text-xs text-gray-500">
+                            Capacity: {table.capacity} people
+                        </p>
                     </div>
                 </div>
-            ),
-        },
-        {
-            key: 'type',
-            label: 'Type',
-            sortable: true,
-            render: (court: Court) => (
-                <span
-                    className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                        court.type === 'indoor'
-                            ? 'bg-indigo-100 text-indigo-800'
-                            : 'bg-sky-100 text-sky-800'
-                    }`}
-                >
-                    {court.type === 'indoor' ? 'Indoor' : 'Outdoor'}
-                </span>
             ),
         },
         {
             key: 'status',
             label: 'Status',
             sortable: true,
-            render: (court: Court) => (
+            render: (table: TableData) => (
                 <span
                     className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                        court.status === 'active'
+                        table.status === 'available'
                             ? 'bg-green-100 text-green-800'
-                            : court.status === 'maintenance'
-                              ? 'bg-yellow-100 text-yellow-800'
-                              : 'bg-red-100 text-red-800'
+                            : table.status === 'occupied'
+                              ? 'bg-red-100 text-red-800'
+                              : 'bg-yellow-100 text-yellow-800'
                     }`}
                 >
-                    {court.status === 'active'
-                        ? 'Active'
-                        : court.status === 'maintenance'
-                          ? 'Maintenance'
-                          : 'Closed'}
+                    {table.status === 'available'
+                        ? 'Available'
+                        : table.status === 'occupied'
+                          ? 'Occupied'
+                          : 'Reserved'}
                 </span>
             ),
         },
         {
-            key: 'price_per_hour',
-            label: 'Price/Hour',
-            sortable: true,
-            className: 'text-right',
-            render: (court: Court) => (
-                <p className="text-sm font-medium text-gray-900">
-                    {formatCurrency(court.price_per_hour)}
-                </p>
+            key: 'qr_code',
+            label: 'QR Code',
+            sortable: false,
+            render: (table: TableData) => (
+                <div className="flex items-center">
+                    <QrCodeIcon className="mr-2 h-5 w-5 text-gray-400" />
+                    <span className="font-mono text-xs text-gray-600">
+                        {table.qr_code}
+                    </span>
+                </div>
             ),
         },
         {
             key: 'actions',
             label: 'Actions',
             className: 'text-right',
-            render: (court: Court) => (
+            render: (table: TableData) => (
                 <div className="flex items-center justify-end space-x-2">
                     <button
-                        onClick={() => openEditModal(court)}
+                        onClick={() => openEditModal(table)}
                         className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-blue-600"
                         title="Edit"
                     >
@@ -294,7 +242,7 @@ export default function Index() {
                         onClick={() =>
                             setDeleteModal({
                                 show: true,
-                                court,
+                                table,
                             })
                         }
                         className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
@@ -311,41 +259,41 @@ export default function Index() {
         <AuthenticatedLayout
             header={
                 <h1 className="text-xl font-semibold text-gray-900">
-                    Court Management
+                    Table Management
                 </h1>
             }
         >
-            <Head title="Courts" />
+            <Head title="Tables" />
 
             {/* Stats Cards */}
             <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <StatCard
-                    title="Total Courts"
+                    title="Total Tables"
                     value={stats.total}
-                    icon={CircleDot}
-                    description="All courts"
+                    icon={Layers}
+                    description="All tables"
                     color="blue"
                 />
                 <StatCard
-                    title="Active Courts"
-                    value={stats.active}
+                    title="Available"
+                    value={stats.available}
                     icon={CheckCircle}
-                    description="Ready for booking"
+                    description="Ready for customers"
                     color="green"
                 />
                 <StatCard
-                    title="Under Maintenance"
-                    value={stats.maintenance}
-                    icon={Activity}
-                    description="Being serviced"
-                    color="orange"
+                    title="Occupied"
+                    value={stats.occupied}
+                    icon={XCircle}
+                    description="Currently in use"
+                    color="red"
                 />
                 <StatCard
-                    title="Closed Courts"
-                    value={stats.closed}
-                    icon={AlertCircle}
-                    description="Not available"
-                    color="red"
+                    title="Reserved"
+                    value={stats.reserved}
+                    icon={Clock}
+                    description="Booked ahead"
+                    color="orange"
                 />
             </div>
 
@@ -359,32 +307,20 @@ export default function Index() {
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Search courts..."
+                            placeholder="Search tables..."
                             className="block w-full rounded-lg border-gray-300 pl-10 pr-4 shadow-sm transition-colors focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                         />
                     </div>
                 </form>
 
-                {/* Type Filter & Add Button */}
-                <div className="flex items-center gap-3">
-                    <select
-                        value={selectedType}
-                        onChange={(e) => handleTypeFilter(e.target.value)}
-                        className="rounded-lg border-gray-300 py-2 pl-3 pr-10 text-sm focus:border-blue-500 focus:ring-blue-500"
-                    >
-                        <option value="all">All Types</option>
-                        <option value="indoor">Indoor</option>
-                        <option value="outdoor">Outdoor</option>
-                    </select>
-
-                    <button
-                        onClick={openCreateModal}
-                        className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                    >
-                        <PlusIcon className="mr-2 h-5 w-5" />
-                        Add Court
-                    </button>
-                </div>
+                {/* Add Button */}
+                <button
+                    onClick={openCreateModal}
+                    className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                >
+                    <PlusIcon className="mr-2 h-5 w-5" />
+                    Add Table
+                </button>
             </div>
 
             {/* Status Filter Tabs */}
@@ -399,48 +335,48 @@ export default function Index() {
                                     : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                             }`}
                         >
-                            All Courts
+                            All Tables
                             <span className="ml-2 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-900">
                                 {stats.total}
                             </span>
                         </button>
                         <button
-                            onClick={() => handleStatusFilter('active')}
+                            onClick={() => handleStatusFilter('available')}
                             className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors ${
-                                selectedStatus === 'active'
+                                selectedStatus === 'available'
                                     ? 'border-blue-500 text-blue-600'
                                     : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                             }`}
                         >
-                            Active
+                            Available
                             <span className="ml-2 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-900">
-                                {stats.active}
+                                {stats.available}
                             </span>
                         </button>
                         <button
-                            onClick={() => handleStatusFilter('maintenance')}
+                            onClick={() => handleStatusFilter('occupied')}
                             className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors ${
-                                selectedStatus === 'maintenance'
+                                selectedStatus === 'occupied'
                                     ? 'border-blue-500 text-blue-600'
                                     : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                             }`}
                         >
-                            Maintenance
+                            Occupied
                             <span className="ml-2 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-900">
-                                {stats.maintenance}
+                                {stats.occupied}
                             </span>
                         </button>
                         <button
-                            onClick={() => handleStatusFilter('closed')}
+                            onClick={() => handleStatusFilter('reserved')}
                             className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors ${
-                                selectedStatus === 'closed'
+                                selectedStatus === 'reserved'
                                     ? 'border-blue-500 text-blue-600'
                                     : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                             }`}
                         >
-                            Closed
+                            Reserved
                             <span className="ml-2 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-900">
-                                {stats.closed}
+                                {stats.reserved}
                             </span>
                         </button>
                     </nav>
@@ -450,39 +386,39 @@ export default function Index() {
             {/* Table */}
             <Table
                 columns={columns}
-                data={courts.data}
+                data={tables.data}
                 onSort={handleSort}
                 sortBy={filters.sort_by}
                 sortOrder={filters.sort_order}
-                emptyMessage="No courts found"
-                emptyDescription="Get started by adding a new court"
+                emptyMessage="No tables found"
+                emptyDescription="Get started by adding a new table"
             />
 
             {/* Pagination */}
             <Pagination
-                currentPage={courts.current_page}
-                lastPage={courts.last_page}
-                perPage={courts.per_page}
-                from={courts.from}
-                to={courts.to}
-                total={courts.total}
-                links={courts.links}
+                currentPage={tables.current_page}
+                lastPage={tables.last_page}
+                perPage={tables.per_page}
+                from={tables.from}
+                to={tables.to}
+                total={tables.total}
+                links={tables.links}
             />
 
-            {/* Court Form Modal */}
-            <CourtForm
+            {/* Table Form Modal */}
+            <TableForm
                 show={showModal}
                 onClose={closeModal}
-                court={selectedCourt}
+                table={selectedTable}
             />
 
             {/* Delete Confirmation Modal */}
             <ConfirmationModal
                 show={deleteModal.show}
-                onClose={() => setDeleteModal({ show: false, court: null })}
+                onClose={() => setDeleteModal({ show: false, table: null })}
                 onConfirm={handleDelete}
-                title="Delete Court"
-                message={`Are you sure you want to delete "${deleteModal.court?.name}"? This action cannot be undone.`}
+                title="Delete Table"
+                message={`Are you sure you want to delete Table ${deleteModal.table?.number}? This action cannot be undone.`}
                 confirmText="Delete"
                 cancelText="Cancel"
                 variant="danger"
