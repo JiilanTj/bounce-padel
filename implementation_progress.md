@@ -403,26 +403,23 @@
 | Model | Status | Migration | Notes |
 |-------|--------|-----------|-------|
 | User | ✅ Complete | ✅ Complete | Has role enum, auth ready |
+| Court | ✅ Complete | ✅ Complete | Core booking entity |
+| Booking | ✅ Complete | ✅ Complete | Main reservation entity |
+| OperatingHour | ✅ Complete | ✅ Complete | Court availability rules |
+| Category | ✅ Complete | ✅ Complete | Product/Menu categories |
+| Product | ✅ Complete | ✅ Complete | Inventory items |
+| InventoryLog | ✅ Complete | ✅ Complete | Stock movement tracking |
+| Table | ✅ Complete | ✅ Complete | Dining/QR tables |
+| Menu | ✅ Complete | ✅ Complete | Menu groupings |
+| MenuItem | ✅ Complete | ✅ Complete | F&B items |
+| Order | ✅ Complete | ✅ Complete | Transaction header |
+| OrderItem | ✅ Complete | ✅ Complete | Transaction details |
+| Payment | ✅ Complete | ✅ Complete | Polymorphic payments |
 
 ### Required Models (Not Yet Created)
 
 | Model | Priority | Dependencies | Estimated Complexity |
 |-------|----------|--------------|---------------------|
-| Court | 🔴 High | - | Medium |
-| Booking | 🔴 High | Court, User | High |
-| Product | 🔴 High | Category | Medium |
-| Category | 🟡 Medium | - | Low |
-| Inventory | 🔴 High | Product | Medium |
-| Order | 🔴 High | User, Table | High |
-| OrderItem | 🔴 High | Order, MenuItem | Medium |
-| Table | 🟡 Medium | - | Low |
-| Menu | 🟡 Medium | - | Low |
-| MenuItem | 🟡 Medium | Menu, Category | Medium |
-| Payment | 🔴 High | Order, Booking | Medium |
-| Rental | 🟡 Medium | Product, Booking | Medium |
-| Purchase | 🟡 Medium | Product, Order | Medium |
-| OperatingHours | 🟡 Medium | Court | Low |
-| Pricing | 🟡 Medium | Court | Low |
 | Shift | 🟢 Low | User | Low |
 | Notification | 🟢 Low | User | Low |
 
@@ -512,54 +509,54 @@
 
 ## 📝 Next Steps & Recommendations
 
-### Phase 1: Foundation (Priority 🔴)
-1.  **Database Setup**
-    - Create all required migrations (Court, Booking, Product, Order, etc.)
-    - Set up Redis for cache & locks
-    - Create all models with relationships
+### Phase 1.1: Foundation - Database (Completed ✅)
+1.  **Database Setup** (Finished)
+    - All migrations created and run
+    - Models with relationships defined
 
-2.  **Core Booking Flow**
-    - Implement Court model & CRUD
-    - Implement Booking model & basic flow
-    - Create booking form & list pages
-    - Basic availability check (local only first)
+### Phase 1.2: Foundation - Master Data Management (Priority 🔴)
+**Goal:** Provide UI for Admin/Owner to manage essential data. Without this, Booking/POS cannot function.
 
-3.  **Basic POS**
-    - Create Order model
-    - Implement basic order creation
-    - Create POS dashboard skeleton
+1.  **Court & Schedule Management**
+    - [x] Backend: Court CRUD & Validation
+    - [x] Backend: Operating Hours Logic
+    - [ ] Frontend: Management Pages
 
-### Phase 2: Integrations (Priority 🟡)
-1.  **Ayo API Integration**
-    - Set up Ayo API client
-    - Implement availability sync
-    - Implement booking sync
+2.  **Product & Inventory Management**
+    - [x] Backend: Category & Product CRUD
+    - [x] Backend: Inventory Log Logic
+    - [ ] Frontend: Product Management Pages
 
-2.  **WhatsApp Integration**
-    - Set up WhatsApp API
-    - Implement booking via WhatsApp
-    - Implement order notifications
+3.  **F&B Master Data**
+    - [x] Backend: Table, Menu, MenuItem CRUD
+    - [x] Backend: QR Code Stub
+    - [ ] Frontend: F&B Management Pages
 
-3.  **QR Code System**
-    - Implement QR generation for tables
-    - Implement QR scanner
-    - Implement table-based ordering
+### Phase 2: Core Business Logic (Priority 🟡)
+**Goal:** Enable actual transactions once Master Data is ready.
 
-### Phase 3: Advanced Features (Priority 🟢)
-1.  **Inventory Management**
-    - Product CRUD
-    - Stock tracking
-    - Rental vs Purchase logic
+1.  **Booking System Core**
+    - Booking Form (Frontend)
+    - Availability Check Logic (Backend)
+    - Booking Creation & Confirmation Flow
 
-2.  **Reporting System**
-    - Report queries
-    - Report generation
-    - Export functionality
+2.  **Point of Sales (POS)**
+    - Order Creation Logic
+    - POS Interface for Cashier
+    - Payment Processing
 
-3.  **Exception Handling**
-    - Implement all edge cases
-    - Error handling & notifications
-    - Conflict resolution
+### Phase 3: Advanced Integrations (Priority 🟢)
+**Goal:** Enhance system with external services.
+
+1.  **External Services**
+    - Ayo Booking API Sync
+    - WhatsApp Notifications
+    - Payment Gateway Integration
+
+2.  **Reporting & Analytics**
+    - Financial Reports
+    - Shift Management
+    - Export Tools
 
 ---
 

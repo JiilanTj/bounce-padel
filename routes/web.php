@@ -4,6 +4,13 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\CourtController;
+use App\Http\Controllers\OperatingHourController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\TableController;
+use App\Http\Controllers\MenuController;
+use App\Http\Controllers\MenuItemController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -26,6 +33,31 @@ Route::middleware('auth')->group(function () {
     // User Management Routes (Owner & Admin only)
     Route::middleware('role:owner,admin')->group(function () {
         Route::resource('users', \App\Http\Controllers\UserController::class);
+    });
+
+    // Master Data - Read Only (All internal users: Owner, Admin, Kasir, Pelayan)
+    // Assuming 'auth' is sufficient for now, or we can restrict to specific roles.
+    // For now, we allow any logged in user to VIEW master data to facilitate operations.
+    Route::middleware('auth')->group(function () {
+        Route::resource('courts', CourtController::class)->only(['index', 'show']);
+        Route::resource('categories', CategoryController::class)->only(['index', 'show']);
+        Route::resource('products', ProductController::class)->only(['index', 'show']);
+        Route::resource('tables', TableController::class)->only(['index', 'show']);
+        Route::resource('menus', MenuController::class)->only(['index', 'show']);
+        Route::resource('menu-items', MenuItemController::class)->only(['index', 'show']);
+    });
+
+    // Master Data - Write Access (Owner & Admin only)
+    Route::middleware('role:owner,admin')->group(function () {
+        Route::resource('courts', CourtController::class)->except(['index', 'show']);
+        Route::put('operating-hours/{court}', [OperatingHourController::class, 'update'])->name('operating-hours.update');
+        
+        Route::resource('categories', CategoryController::class)->except(['index', 'show']);
+        Route::resource('products', ProductController::class)->except(['index', 'show']);
+        
+        Route::resource('tables', TableController::class)->except(['index', 'show']);
+        Route::resource('menus', MenuController::class)->except(['index', 'show']);
+        Route::resource('menu-items', MenuItemController::class)->except(['index', 'show']);
     });
 });
 
