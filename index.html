@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Flow – Padel Arena Digital Ecosystem</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        forest: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                            950: '#052e16',
+                        },
+                        gold: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            200: '#fde68a',
+                            300: '#fcd34d',
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                        },
+                        cream: '#fdfbf7',
+                    },
+                    fontFamily: {
+                        'display': ['Plus Jakarta Sans', 'sans-serif'],
+                        'body': ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .font-display { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #052e16; }
+        ::-webkit-scrollbar-thumb { background: #166534; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #15803d; }
+        
+        /* Mermaid diagram styling */
+        .mermaid { 
+            background: linear-gradient(135deg, #fdfbf7 0%, #f0fdf4 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        /* Navigation active state */
+        .nav-link.active {
+            background: linear-gradient(135deg, #166534 0%, #14532d 100%);
+            color: #fde68a;
+        }
+        
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #fde68a 0%, #fbbf24 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Section fade in */
+        .section-content {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Card hover effect */
+        .flow-card {
+            transition: all 0.3s ease;
+        }
+        .flow-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* Print styles */
+        @media print {
+            .no-print { display: none !important; }
+            .mermaid { break-inside: avoid; page-break-inside: avoid; }
+            body { background: white !important; }
+        }
+        
+        /* Modal Fullscreen */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 46, 22, 0.95);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active {
+            display: flex;
+            flex-direction: column;
+            opacity: 1;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: rgba(22, 101, 52, 0.5);
+            border-bottom: 1px solid rgba(34, 197, 94, 0.2);
+        }
+        .modal-content {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+            cursor: grab;
+        }
+        .modal-content:active {
+            cursor: grabbing;
+        }
+        .modal-content .mermaid-container {
+            position: absolute;
+            transform-origin: center center;
+            transition: transform 0.1s ease-out;
+            min-width: 100%;
+            min-height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .modal-content .mermaid-container .mermaid {
+            background: linear-gradient(135deg, #fdfbf7 0%, #f0fdf4 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .zoom-controls {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .zoom-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: rgba(22, 101, 52, 0.8);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #fde68a;
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .zoom-btn:hover {
+            background: rgba(22, 101, 52, 1);
+            border-color: rgba(34, 197, 94, 0.5);
+        }
+        .zoom-level {
+            color: #86efac;
+            font-size: 0.875rem;
+            min-width: 50px;
+            text-align: center;
+        }
+        .close-modal {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .close-modal:hover {
+            background: rgba(239, 68, 68, 0.4);
+        }
+        
+        /* Clickable mermaid hint */
+        .mermaid-wrapper {
+            position: relative;
+            cursor: pointer;
+        }
+        .mermaid-wrapper::after {
+            content: 'Klik untuk memperbesar';
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            background: rgba(22, 101, 52, 0.9);
+            color: #fde68a;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .mermaid-wrapper:hover::after {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-forest-950 text-gray-100 min-h-screen">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-forest-900 via-forest-800 to-forest-900 border-b border-forest-700 sticky top-0 z-50 no-print">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="font-display text-2xl md:text-3xl font-bold gradient-text">PADEL ARENA</h1>
+                    <p class="text-forest-300 text-xs md:text-sm">Digital Ecosystem Master Flow</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-gold-300 text-sm font-medium">Document Version 1.0</p>
+                    <p class="text-forest-400 text-xs">26 Januari 2026</p>
+                    <p class="text-forest-500 text-xs">Dibuat oleh <a href="https://sapacode.id" target="_blank" class="text-gold-400 hover:text-gold-300 transition-colors">sapacode.id</a></p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex">
+        <!-- Sidebar Navigation -->
+        <nav class="w-64 bg-forest-900/50 backdrop-blur-sm min-h-screen sticky top-[72px] h-[calc(100vh-72px)] overflow-y-auto no-print hidden lg:block border-r border-forest-800">
+            <div class="p-4">
+                <p class="text-forest-400 text-xs uppercase tracking-wider mb-4 font-semibold">Navigation</p>
+                <ul class="space-y-2">
+                    <li>
+                        <a href="#overview" class="nav-link block px-4 py-3 rounded-lg text-forest-200 hover:bg-forest-800 transition-all duration-200">
+                            <span class="text-gold-400 mr-2">◆</span> Overview
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#user-flow" class="nav-link block px-4 py-3 rounded-lg text-forest-200 hover:bg-forest-800 transition-all duration-200">
+                            <span class="text-gold-400 mr-2">A</span> User Flow
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#system-flow" class="nav-link block px-4 py-3 rounded-lg text-forest-200 hover:bg-forest-800 transition-all duration-200">
+                            <span class="text-gold-400 mr-2">B</span> System Flow
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#staff-admin-flow" class="nav-link block px-4 py-3 rounded-lg text-forest-200 hover:bg-forest-800 transition-all duration-200">
+                            <span class="text-gold-400 mr-2">C</span> Staff & Admin Flow
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#role-matrix" class="nav-link block px-4 py-3 rounded-lg text-forest-200 hover:bg-forest-800 transition-all duration-200">
+                            <span class="text-gold-400 mr-2">D</span> Role Matrix
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#exception-flow" class="nav-link block px-4 py-3 rounded-lg text-forest-200 hover:bg-forest-800 transition-all duration-200">
+                            <span class="text-gold-400 mr-2">E</span> Exception Flow
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#architecture" class="nav-link block px-4 py-3 rounded-lg text-forest-200 hover:bg-forest-800 transition-all duration-200">
+                            <span class="text-gold-400 mr-2">F</span> Architecture
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Mobile Navigation -->
+        <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-forest-900/95 backdrop-blur-sm border-t border-forest-700 z-50 no-print">
+            <div class="flex overflow-x-auto py-2 px-2 gap-2">
+                <a href="#overview" class="flex-shrink-0 px-3 py-2 bg-forest-800 rounded-lg text-xs text-forest-200">Overview</a>
+                <a href="#user-flow" class="flex-shrink-0 px-3 py-2 bg-forest-800 rounded-lg text-xs text-forest-200">User</a>
+                <a href="#system-flow" class="flex-shrink-0 px-3 py-2 bg-forest-800 rounded-lg text-xs text-forest-200">System</a>
+                <a href="#staff-admin-flow" class="flex-shrink-0 px-3 py-2 bg-forest-800 rounded-lg text-xs text-forest-200">Staff</a>
+                <a href="#role-matrix" class="flex-shrink-0 px-3 py-2 bg-forest-800 rounded-lg text-xs text-forest-200">Role</a>
+                <a href="#exception-flow" class="flex-shrink-0 px-3 py-2 bg-forest-800 rounded-lg text-xs text-forest-200">Exception</a>
+                <a href="#architecture" class="flex-shrink-0 px-3 py-2 bg-forest-800 rounded-lg text-xs text-forest-200">Arch</a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-4 md:p-8 pb-24 lg:pb-8">
+            <!-- Overview Section -->
+            <section id="overview" class="mb-16 pt-8 md:pt-12 section-content">
+                <div class="max-w-4xl mx-auto text-center mb-12">
+                    <h2 class="font-display text-4xl md:text-5xl font-bold mb-6 gradient-text">
+                        Master Flow Documentation
+                    </h2>
+                    <p class="text-forest-300 text-lg leading-relaxed mb-8">
+                        Dokumentasi lengkap sistem booking lapangan padel yang terintegrasi dengan Ayo Booking API, 
+                        sistem POS, inventory management, dan multi-channel ordering.
+                    </p>
+                    
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+                        <div class="flow-card bg-gradient-to-br from-forest-800 to-forest-900 rounded-xl p-4 border border-forest-700">
+                            <p class="text-gold-400 text-3xl font-bold">6</p>
+                            <p class="text-forest-300 text-sm">Flow Diagrams</p>
+                        </div>
+                        <div class="flow-card bg-gradient-to-br from-forest-800 to-forest-900 rounded-xl p-4 border border-forest-700">
+                            <p class="text-gold-400 text-3xl font-bold">5</p>
+                            <p class="text-forest-300 text-sm">User Roles</p>
+                        </div>
+                        <div class="flow-card bg-gradient-to-br from-forest-800 to-forest-900 rounded-xl p-4 border border-forest-700">
+                            <p class="text-gold-400 text-3xl font-bold">4</p>
+                            <p class="text-forest-300 text-sm">Main Modules</p>
+                        </div>
+                        <div class="flow-card bg-gradient-to-br from-forest-800 to-forest-900 rounded-xl p-4 border border-forest-700">
+                            <p class="text-gold-400 text-3xl font-bold">∞</p>
+                            <p class="text-forest-300 text-sm">Scalability</p>
+                        </div>
+                    </div>
+
+                    <!-- Document Purpose -->
+                    <div class="bg-forest-900/50 rounded-2xl p-6 border border-forest-700 text-left">
+                        <h3 class="text-gold-400 font-semibold mb-4 flex items-center">
+                            <i class="bx bx-info-circle text-xl mr-2"></i>
+                            Tujuan Dokumen Ini
+                        </h3>
+                        <ul class="grid md:grid-cols-2 gap-3 text-forest-300">
+                            <li class="flex items-start">
+                                <i class="bx bx-check text-gold-400 mr-2 text-lg"></i>
+                                Untuk presentasi ke klien & stakeholder
+                            </li>
+                            <li class="flex items-start">
+                                <i class="bx bx-check text-gold-400 mr-2 text-lg"></i>
+                                Pegangan tim developer
+                            </li>
+                            <li class="flex items-start">
+                                <i class="bx bx-check text-gold-400 mr-2 text-lg"></i>
+                                Dasar pembuatan SOP operasional (jika diperlukan)
+                            </li>
+                            <li class="flex items-start">
+                                <i class="bx bx-check text-gold-400 mr-2 text-lg"></i>
+                                Bahan kontrak & scope pekerjaan (jika diperlukan)
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- A. User Flow -->
+            <section id="user-flow" class="mb-16 section-content">
+                <div class="flow-card bg-gradient-to-br from-forest-900 to-forest-950 rounded-2xl p-6 md:p-8 border border-forest-700">
+                    <div class="flex items-center mb-6">
+                        <span class="bg-gold-400 text-forest-950 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg mr-4">A</span>
+                        <div>
+                            <h2 class="font-display text-2xl md:text-3xl font-bold text-white">User Flow</h2>
+                            <p class="text-forest-400">Pengunjung / Pemain</p>
+                        </div>
+                    </div>
+                    
+                    <p class="text-forest-300 mb-6 leading-relaxed">
+                        Flow utama untuk user yang mengakses website: mulai dari landing page, booking lapangan (terintegrasi Ayo), 
+                        sewa/beli produk, hingga order makanan dari meja via QR code.
+                    </p>
+
+                    <div class="bg-forest-800/30 rounded-xl p-4 mb-6">
+                        <h4 class="text-gold-300 font-semibold mb-3 text-sm uppercase tracking-wide">Fitur Utama</h4>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1 bg-forest-700 rounded-full text-xs text-forest-200">Booking Lapangan</span>
+                            <span class="px-3 py-1 bg-forest-700 rounded-full text-xs text-forest-200">Sewa Produk</span>
+                            <span class="px-3 py-1 bg-forest-700 rounded-full text-xs text-forest-200">Beli Produk</span>
+                            <span class="px-3 py-1 bg-forest-700 rounded-full text-xs text-forest-200">Order dari Meja</span>
+                            <span class="px-3 py-1 bg-forest-700 rounded-full text-xs text-forest-200">WhatsApp Integration</span>
+                        </div>
+                    </div>
+
+                    <div class="mermaid-wrapper" onclick="openModal('user-flow-diagram')">
+                    <div class="mermaid" id="user-flow-diagram">
+---
+config:
+  theme: redux
+  layout: dagre
+---
+flowchart TB
+    Start(["User Buka Website"]) --> Landing["Landing Page"]
+    Landing --> Choice{"Pilih Menu"}
+    Choice -- 1 --> BookingFlow["Booking Lapangan"]
+    Choice -- 2 --> ShopFlow["Menu Sewa/Beli Produk"]
+    Choice -- 3 --> TableOrder["Order dari Meja"]
+    Choice -- 4 --> WhatsApp["Floating Action Button<br>Direct WhatsApp"]
+    BookingFlow --> PickDate["Pilih Tanggal"]
+    PickDate --> PickTime["Pilih Jam"]
+    PickTime --> CheckAvail{"Cek Availability"}
+    CheckAvail -- Query --> LocalDB[("Local DB")]
+    CheckAvail -- API Call --> AyoAPI["Ayo Booking API"]
+    LocalDB --> Merge["Merge Results"]
+    AyoAPI --> Merge
+    Merge --> Available{"Slot Tersedia?"}
+    Available -- NO --> ShowFull["Tampilkan Slot Penuh"]
+    Available -- YES --> ShowDetails["Tampilkan Detail:<br>Jam, Harga, Durasi"]
+    ShowDetails --> BookWA["Book via WhatsApp"]
+    BookWA --> WAMsg1["WhatsApp Message:<br>Tanggal, Jam, Nama, HP"]
+    WAMsg1 --> PendingConfirm["Status: Pending Confirmation"]
+    ShopFlow --> BrowseProduct["Lihat Produk"]
+    BrowseProduct --> SelectProduct["Pilih Produk"]
+    SelectProduct --> ProductType{"Pilih Tipe"}
+    ProductType -- Sewa --> RentalDetails["Pilih Qty & Durasi"]
+    ProductType -- Beli --> BuyDetails["Pilih Qty"]
+    RentalDetails --> AddCart["Add to Cart"]
+    BuyDetails --> AddCart
+    AddCart --> CheckoutWA["Checkout via WhatsApp"]
+    CheckoutWA --> WAMsg2["WhatsApp Message:<br>Detail Produk"]
+    TableOrder --> ScanQR["Scan QR di Meja"]
+    ScanQR --> DetectTable["Detect Table ID"]
+    DetectTable --> ShowMenu["Tampilkan Menu"]
+    ShowMenu --> SelectFood["Pilih Makanan/Minuman"]
+    SelectFood --> SubmitOrder["Submit Order"]
+    SubmitOrder --> OrderPending["Status: Menunggu Konfirmasi"]
+    PendingConfirm --> AdminPanel["Admin Panel/POS"]
+    WAMsg2 --> AdminPanel
+    OrderPending --> StaffNotif["Staff Notification"]
+
+    style Start fill:#e1f5ff
+    style Landing fill:#fff4e6
+    style BookingFlow fill:#e8f5e9
+    style ShopFlow fill:#f3e5f5
+    style TableOrder fill:#fff3e0
+    style AyoAPI fill:#e0f2f1
+    style AdminPanel fill:#ffebee
+                    </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- B. System Flow -->
+            <section id="system-flow" class="mb-16 section-content">
+                <div class="flow-card bg-gradient-to-br from-forest-900 to-forest-950 rounded-2xl p-6 md:p-8 border border-forest-700">
+                    <div class="flex items-center mb-6">
+                        <span class="bg-gold-400 text-forest-950 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg mr-4">B</span>
+                        <div>
+                            <h2 class="font-display text-2xl md:text-3xl font-bold text-white">Backend System Flow</h2>
+                            <p class="text-forest-400">Logic & Processing</p>
+                        </div>
+                    </div>
+                    
+                    <p class="text-forest-300 mb-6 leading-relaxed">
+                        Alur sistem backend yang menangani sinkronisasi booking dengan Ayo API, konfirmasi booking, 
+                        manajemen inventory (sewa & beli), serta sistem notifikasi untuk order meja.
+                    </p>
+
+                    <div class="grid md:grid-cols-2 gap-4 mb-6">
+                        <div class="bg-forest-800/30 rounded-xl p-4">
+                            <h4 class="text-gold-300 font-semibold mb-2">B1. Booking Sync Engine</h4>
+                            <p class="text-forest-400 text-sm">Anti double-booking dengan cache + lock slot TTL</p>
+                        </div>
+                        <div class="bg-forest-800/30 rounded-xl p-4">
+                            <h4 class="text-gold-300 font-semibold mb-2">B2. Confirmation Flow</h4>
+                            <p class="text-forest-400 text-sm">Lock → Create Record → Push to Ayo → Update Status</p>
+                        </div>
+                        <div class="bg-forest-800/30 rounded-xl p-4">
+                            <h4 class="text-gold-300 font-semibold mb-2">B3. Inventory Flow</h4>
+                            <p class="text-forest-400 text-sm">Sewa = reduce sementara, Beli = reduce permanen</p>
+                        </div>
+                        <div class="bg-forest-800/30 rounded-xl p-4">
+                            <h4 class="text-gold-300 font-semibold mb-2">B4. Order Notification</h4>
+                            <p class="text-forest-400 text-sm">Dashboard + Sound Alert + Optional WhatsApp</p>
+                        </div>
+                    </div>
+
+                    <div class="mermaid-wrapper" onclick="openModal('system-flow-diagram')">
+                    <div class="mermaid" id="system-flow-diagram">
+graph TD
+    %% BOOKING SYNC ENGINE
+    subgraph BookingSync[B1. Booking Sync Engine]
+        ReqAvail[Request Availability] --> QueryLocal[Query Local Booking]
+        ReqAvail --> CallAyo[Call Ayo API]
+        QueryLocal --> MergeResult[Merge Results]
+        CallAyo --> MergeResult
+        MergeResult --> Cache[Cache + Lock Slot TTL]
+        Cache --> ReturnUnified[Return Unified Availability]
+    end
+    
+    %% BOOKING CONFIRMATION
+    subgraph BookingConfirm[B2. Booking Confirmation Flow]
+        AdminConfirm[Admin Klik Confirm] --> LockSlot[Lock Slot]
+        LockSlot --> CreateRecord[Create Booking Record]
+        CreateRecord --> PushAyo{Push to Ayo?}
+        PushAyo -->|If Needed| AyoSync[Sync to Ayo API]
+        PushAyo -->|Skip| UpdateStatus
+        AyoSync --> UpdateStatus[Update Status: CONFIRMED]
+    end
+    
+    %% INVENTORY FLOW
+    subgraph InventoryFlow[B3. Inventory Flow]
+        OrderIn[Order Masuk] --> CheckStock{Cek Stok}
+        CheckStock --> OrderType{Tipe Order}
+        
+        OrderType -->|Sewa| ReduceTemp[Reduce Available Unit<br/>Sementara]
+        OrderType -->|Beli| ReducePerm[Reduce Stok<br/>Permanen]
+        
+        ReduceTemp --> AssignBooking[Assign ke Booking/Meja]
+        ReducePerm --> StockUpdate[(Update Stock DB)]
+    end
+    
+    %% ORDER NOTIFICATION
+    subgraph OrderNotif[B4. Order Meja Notification]
+        UserSubmit[User Submit Order] --> CreateOrder[Create Order<br/>Status: NEW]
+        CreateOrder --> TriggerNotif{Trigger Notifications}
+        
+        TriggerNotif --> DashAlert[Dashboard Notification]
+        TriggerNotif --> SoundAlert[Sound Alert POS]
+        TriggerNotif --> WAInternal[Optional WhatsApp<br/>Internal]
+    end
+    
+    ReturnUnified -.-> AdminConfirm
+    UpdateStatus --> InventoryFlow
+    OrderIn -.-> CreateOrder
+    
+    style BookingSync fill:#e3f2fd
+    style BookingConfirm fill:#e8f5e9
+    style InventoryFlow fill:#fff3e0
+    style OrderNotif fill:#fce4ec
+                    </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- C. Staff & Admin Flow -->
+            <section id="staff-admin-flow" class="mb-16 section-content">
+                <div class="flow-card bg-gradient-to-br from-forest-900 to-forest-950 rounded-2xl p-6 md:p-8 border border-forest-700">
+                    <div class="flex items-center mb-6">
+                        <span class="bg-gold-400 text-forest-950 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg mr-4">C</span>
+                        <div>
+                            <h2 class="font-display text-2xl md:text-3xl font-bold text-white">Staff & Admin Flow</h2>
+                            <p class="text-forest-400">Kasir, Pelayan, Owner, Manager</p>
+                        </div>
+                    </div>
+                    
+                    <p class="text-forest-300 mb-6 leading-relaxed">
+                        Alur kerja untuk staff operasional: kasir dengan POS system, pelayan untuk order meja, 
+                        dan admin/owner untuk dashboard management, master data, dan reporting.
+                    </p>
+
+                    <div class="grid md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-forest-800/30 rounded-xl p-4 text-center">
+                            <div class="text-3xl mb-2 text-gold-400"><i class="bx bx-store"></i></div>
+                            <h4 class="text-gold-300 font-semibold">Kasir</h4>
+                            <p class="text-forest-400 text-xs mt-1">POS, Payment, Manual Booking</p>
+                        </div>
+                        <div class="bg-forest-800/30 rounded-xl p-4 text-center">
+                            <div class="text-3xl mb-2 text-gold-400"><i class="bx bx-dish"></i></div>
+                            <h4 class="text-gold-300 font-semibold">Pelayan</h4>
+                            <p class="text-forest-400 text-xs mt-1">Order Meja, Konfirmasi, Payment</p>
+                        </div>
+                        <div class="bg-forest-800/30 rounded-xl p-4 text-center">
+                            <div class="text-3xl mb-2 text-gold-400"><i class="bx bx-user-circle"></i></div>
+                            <h4 class="text-gold-300 font-semibold">Admin/Owner</h4>
+                            <p class="text-forest-400 text-xs mt-1">Dashboard, Master Data, Reports</p>
+                        </div>
+                    </div>
+
+                    <div class="mermaid-wrapper" onclick="openModal('staff-admin-flow-diagram')">
+                    <div class="mermaid" id="staff-admin-flow-diagram">
+graph TD
+    %% KASIR POS FLOW
+    subgraph KasirFlow[C1. Kasir POS Flow]
+        KasirLogin[Kasir Login POS] --> Dashboard[Dashboard]
+        Dashboard --> DashItems{Menu Dashboard}
+        
+        DashItems --> BookingToday[Booking Hari Ini]
+        DashItems --> OrderMeja[Order Meja]
+        DashItems --> WalkIn[Walk-in Customer]
+        DashItems --> ManualBook[Manual Booking]
+    end
+    
+    %% PELAYAN FLOW
+    subgraph PelayanFlow[C2. Pelayan - Order Meja]
+        OrderMasuk[Order Masuk] --> LihatDetail[Lihat Detail Order]
+        LihatDetail --> DatangMeja[Datang ke Meja]
+        DatangMeja --> KonfirmasiPesanan[Konfirmasi Pesanan]
+        KonfirmasiPesanan --> Payment{Pilih Pembayaran}
+        
+        Payment --> Cash[Cash]
+        Payment --> Transfer[Transfer]
+        Payment --> QRStatis[QR Statis]
+        
+        Cash --> UpdatePaid[Update Status: PAID]
+        Transfer --> UpdatePaid
+        QRStatis --> UpdatePaid
+    end
+    
+    %% WALK-IN FLOW
+    subgraph WalkInFlow[C3. Walk-in Customer]
+        CustDatang[Customer Datang] --> CekSlot[Kasir Cek Slot]
+        CekSlot --> InputManual[Input Booking Manual]
+        InputManual --> KonfirmasiPayment[Konfirmasi Pembayaran]
+        KonfirmasiPayment --> AssignLapangan[Assign Lapangan]
+    end
+    
+    %% ADMIN DASHBOARD
+    subgraph AdminDash[D1. Dashboard Owner]
+        AdminLogin[Admin Login] --> AdminDashboard[Dashboard Utama]
+        AdminDashboard --> Metrics{Metrics}
+        
+        Metrics --> TotalBooking[Total Booking]
+        Metrics --> Revenue[Revenue]
+        Metrics --> Utilisasi[Utilisasi Lapangan]
+        Metrics --> ProdukTerlaris[Produk Terlaris]
+        Metrics --> OrderMejaAdmin[Order Meja]
+    end
+    
+    %% MASTER DATA
+    subgraph MasterData[D2. Master Data Management]
+        AdminManage[Admin Manage] --> DataTypes{Jenis Data}
+        
+        DataTypes --> Lapangan[Lapangan]
+        DataTypes --> JamOps[Jam Operasional]
+        DataTypes --> Harga[Harga]
+        DataTypes --> Produk[Produk]
+        DataTypes --> MenuCafe[Menu Cafe]
+        DataTypes --> MejaQR[Meja QR]
+        DataTypes --> StaffRole[Staff & Role]
+    end
+    
+    %% REPORTING
+    subgraph Reporting[D3. Reporting Flow]
+        PilihPeriode[Pilih Periode] --> GenReport[Generate Laporan]
+        GenReport --> ReportTypes{Tipe Laporan}
+        
+        ReportTypes --> RepBooking[Booking]
+        ReportTypes --> RepPenjualan[Penjualan]
+        ReportTypes --> RepSewa[Sewa]
+        ReportTypes --> RepOrderMeja[Order Meja]
+        ReportTypes --> RepKasirShift[Kasir Shift]
+    end
+    
+    Dashboard -.-> OrderMasuk
+    WalkIn -.-> CustDatang
+    AdminDashboard -.-> AdminManage
+    AdminDashboard -.-> PilihPeriode
+    
+    style KasirFlow fill:#e1f5fe
+    style PelayanFlow fill:#f3e5f5
+    style WalkInFlow fill:#fff9c4
+    style AdminDash fill:#ffebee
+    style MasterData fill:#e0f2f1
+    style Reporting fill:#fce4ec
+                    </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- D. Role Matrix -->
+            <section id="role-matrix" class="mb-16 section-content">
+                <div class="flow-card bg-gradient-to-br from-forest-900 to-forest-950 rounded-2xl p-6 md:p-8 border border-forest-700">
+                    <div class="flex items-center mb-6">
+                        <span class="bg-gold-400 text-forest-950 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg mr-4">D</span>
+                        <div>
+                            <h2 class="font-display text-2xl md:text-3xl font-bold text-white">Role & Permission Matrix</h2>
+                            <p class="text-forest-400">Access Control</p>
+                        </div>
+                    </div>
+                    
+                    <p class="text-forest-300 mb-6 leading-relaxed">
+                        Matrix permission untuk setiap role dalam sistem. Memastikan setiap user hanya dapat mengakses fitur sesuai dengan role-nya.
+                    </p>
+
+                    <!-- Permission Table -->
+                    <div class="overflow-x-auto mb-8">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b border-forest-700">
+                                    <th class="text-left py-3 px-4 text-gold-400 font-semibold">Role</th>
+                                    <th class="text-left py-3 px-4 text-gold-400 font-semibold">Akses Utama</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-forest-300">
+                                <tr class="border-b border-forest-800">
+                                    <td class="py-3 px-4 font-medium"><i class="bx bx-user text-lg mr-2"></i>User</td>
+                                    <td class="py-3 px-4">Booking, Order, Browse Menu/Produk</td>
+                                </tr>
+                                <tr class="border-b border-forest-800">
+                                    <td class="py-3 px-4 font-medium"><i class="bx bx-store text-lg mr-2"></i>Kasir</td>
+                                    <td class="py-3 px-4">POS, Payment, Manual Booking, Receipt</td>
+                                </tr>
+                                <tr class="border-b border-forest-800">
+                                    <td class="py-3 px-4 font-medium"><i class="bx bx-dish text-lg mr-2"></i>Pelayan</td>
+                                    <td class="py-3 px-4">Order Meja, Update Status, Table View</td>
+                                </tr>
+                                <tr class="border-b border-forest-800">
+                                    <td class="py-3 px-4 font-medium"><i class="bx bx-cog text-lg mr-2"></i>Admin</td>
+                                    <td class="py-3 px-4">Full Access + System Settings</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 font-medium"><i class="bx bx-briefcase text-lg mr-2"></i>Owner</td>
+                                    <td class="py-3 px-4">Read-only + All Reports + Financial</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mermaid-wrapper" onclick="openModal('role-matrix-diagram')">
+                    <div class="mermaid" id="role-matrix-diagram">
+graph LR
+    subgraph Roles[System Roles]
+        User["👤 User/Customer"]
+        Kasir["🏪 Kasir"]
+        Pelayan["🍽️ Pelayan"]
+        Admin["⚙️ Admin"]
+        Owner["👔 Owner"]
+    end
+    
+    subgraph UserPerm[User Permissions]
+        U1[View Landing Page]
+        U2[Browse Menu/Produk]
+        U3[Check Availability]
+        U4[Book via WhatsApp]
+        U5[Scan QR Order Meja]
+        U6[Submit Order]
+    end
+    
+    subgraph KasirPerm[Kasir Permissions]
+        K1[Access POS]
+        K2[View Bookings]
+        K3[Manual Booking]
+        K4[Process Payment]
+        K5[View Order Meja]
+        K6[Update Order Status]
+        K7[Print Receipt]
+    end
+    
+    subgraph PelayanPerm[Pelayan Permissions]
+        P1[View Order Meja]
+        P2[Update Order Status]
+        P3[Confirm Payment]
+        P4[View Table Status]
+    end
+    
+    subgraph AdminPerm[Admin Permissions]
+        A1[Full System Access]
+        A2[Manage Master Data]
+        A3[Manage Staff & Roles]
+        A4[Confirm Bookings]
+        A5[Sync Ayo API]
+        A6[Manage Inventory]
+        A7[Manage Menu & Produk]
+        A8[View All Reports]
+        A9[System Settings]
+    end
+    
+    subgraph OwnerPerm[Owner Permissions]
+        O1[View Dashboard]
+        O2[View All Reports]
+        O3[Read-only Access]
+        O4[Financial Reports]
+        O5[Performance Metrics]
+    end
+    
+    User --> UserPerm
+    Kasir --> KasirPerm
+    Pelayan --> PelayanPerm
+    Admin --> AdminPerm
+    Owner --> OwnerPerm
+    
+    style User fill:#dcfce7,color:#052e16
+    style Kasir fill:#fef3c7,color:#052e16
+    style Pelayan fill:#fde68a,color:#052e16
+    style Admin fill:#fbbf24,color:#052e16
+    style Owner fill:#bbf7d0,color:#052e16
+    
+    style UserPerm fill:#dcfce7,color:#052e16
+    style KasirPerm fill:#fef3c7,color:#052e16
+    style PelayanPerm fill:#fde68a,color:#052e16
+    style AdminPerm fill:#fbbf24,color:#052e16
+    style OwnerPerm fill:#bbf7d0,color:#052e16
+                    </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- E. Exception Flow -->
+            <section id="exception-flow" class="mb-16 section-content">
+                <div class="flow-card bg-gradient-to-br from-forest-900 to-forest-950 rounded-2xl p-6 md:p-8 border border-forest-700">
+                    <div class="flex items-center mb-6">
+                        <span class="bg-gold-400 text-forest-950 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg mr-4">E</span>
+                        <div>
+                            <h2 class="font-display text-2xl md:text-3xl font-bold text-white">Exception & Edge Cases Flow</h2>
+                            <p class="text-forest-400">Error Handling & Prevention</p>
+                        </div>
+                    </div>
+                    
+                    <p class="text-forest-300 mb-6 leading-relaxed">
+                        Penanganan kasus-kasus edge case yang mungkin terjadi: slot bentrok dengan Ayo, no-show customer, 
+                        stok habis, double booking prevention, dan konflik pembayaran.
+                    </p>
+
+                    <div class="grid md:grid-cols-5 gap-3 mb-6">
+                        <div class="bg-red-900/20 border border-red-800/30 rounded-xl p-3 text-center">
+                            <p class="text-red-400 font-semibold text-sm">E1</p>
+                            <p class="text-forest-300 text-xs">Slot Bentrok</p>
+                        </div>
+                        <div class="bg-orange-900/20 border border-orange-800/30 rounded-xl p-3 text-center">
+                            <p class="text-orange-400 font-semibold text-sm">E2</p>
+                            <p class="text-forest-300 text-xs">No Show</p>
+                        </div>
+                        <div class="bg-yellow-900/20 border border-yellow-800/30 rounded-xl p-3 text-center">
+                            <p class="text-yellow-400 font-semibold text-sm">E3</p>
+                            <p class="text-forest-300 text-xs">Over Order</p>
+                        </div>
+                        <div class="bg-blue-900/20 border border-blue-800/30 rounded-xl p-3 text-center">
+                            <p class="text-blue-400 font-semibold text-sm">E4</p>
+                            <p class="text-forest-300 text-xs">Double Booking</p>
+                        </div>
+                        <div class="bg-purple-900/20 border border-purple-800/30 rounded-xl p-3 text-center">
+                            <p class="text-purple-400 font-semibold text-sm">E5</p>
+                            <p class="text-forest-300 text-xs">Payment Conflict</p>
+                        </div>
+                    </div>
+
+                    <div class="mermaid-wrapper" onclick="openModal('exception-flow-diagram')">
+                    <div class="mermaid" id="exception-flow-diagram">
+graph TD
+    subgraph SlotBentrok["E1. Slot Bentrok"]
+        UserPilih[User Pilih Slot] --> AdminDelay{Admin Telat Confirm?}
+        AdminDelay -->|YES| CheckAyo[Cek Ayo Booking]
+        CheckAyo --> SlotStatus{Status Slot}
+        
+        SlotStatus -->|Sudah Booked di Ayo| RejectConfirm[Reject Confirmation]
+        SlotStatus -->|Masih Available| ProceedBook[Proceed Booking]
+        
+        RejectConfirm --> NotifyAdmin["Notify Admin: Slot Tidak Tersedia"]
+        NotifyAdmin --> SuggestAlternate[Suggest Slot Alternatif]
+    end
+    
+    subgraph NoShow["E2. No Show"]
+        BookingConfirmed[Booking Confirmed] --> WaitTime[Tunggu Waktu Booking]
+        WaitTime --> UserCheck{User Datang?}
+        
+        UserCheck -->|NO| GracePeriod[Grace Period 15 menit]
+        GracePeriod --> StillNo{Masih Tidak Datang?}
+        
+        StillNo -->|YES| MarkNoShow[Admin Mark NO-SHOW]
+        StillNo -->|NO| CheckIn[User Check In]
+        
+        MarkNoShow --> SlotHangus[Slot Dianggap Hangus]
+        SlotHangus --> ReleaseSlot["Release Slot untuk Walk-in"]
+        
+        UserCheck -->|YES| CheckIn
+        CheckIn --> StartPlay[Mulai Bermain]
+    end
+    
+    subgraph OverOrder["E3. Over Order Menu"]
+        OrderBaru[Order Baru Masuk] --> CekStokMenu{Cek Stok Menu}
+        
+        CekStokMenu -->|Stok Tersedia| ProcessOrder[Process Order]
+        CekStokMenu -->|Stok Habis| AutoReject[Auto Reject Order]
+        
+        AutoReject --> AlertKasir["Alert Kasir: Stok Habis"]
+        AlertKasir --> NotifyUser["Notify User: Menu Tidak Tersedia"]
+        NotifyUser --> SuggestAlternative[Suggest Menu Alternatif]
+        
+        ProcessOrder --> UpdateStok[Update Stok Menu]
+    end
+    
+    subgraph DoubleBooking["E4. Anti Double Booking"]
+        MultipleUser["Multiple Users Pilih Slot Sama"] --> LockMechanism[Lock Mechanism FCFS]
+        
+        LockMechanism --> User1Lock{User 1 Lock Slot}
+        User1Lock --> TTLTimer[TTL Timer: 10 menit]
+        
+        TTLTimer --> User1Confirm{User 1 Confirm?}
+        User1Confirm -->|YES| BookingSuccess[Booking Success User 1]
+        User1Confirm -->|NO| ReleaseLock[Release Lock]
+        
+        ReleaseLock --> User2Chance[User 2 Dapat Kesempatan]
+        
+        BookingSuccess --> OtherUserReject["Other Users: Slot Tidak Tersedia"]
+    end
+    
+    subgraph PaymentConflict["E5. Payment Conflict"]
+        MultiplePayment["Multiple Payment untuk 1 Order"] --> FirstPayment[First Payment Recorded]
+        
+        FirstPayment --> LockOrder[Lock Order Status]
+        LockOrder --> SecondAttempt{Second Payment Attempt?}
+        
+        SecondAttempt --> BlockSecond[Block Second Payment]
+        BlockSecond --> AlertStaff["Alert Staff: Duplicate Payment"]
+        AlertStaff --> ManualCheck[Manual Check Required]
+    end
+    
+    style SlotBentrok fill:#fecaca,color:#052e16
+    style NoShow fill:#fed7aa,color:#052e16
+    style OverOrder fill:#fef08a,color:#052e16
+    style DoubleBooking fill:#bfdbfe,color:#052e16
+    style PaymentConflict fill:#e9d5ff,color:#052e16
+                    </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- F. Architecture -->
+            <section id="architecture" class="mb-16 section-content">
+                <div class="flow-card bg-gradient-to-br from-forest-900 to-forest-950 rounded-2xl p-6 md:p-8 border border-forest-700">
+                    <div class="flex items-center mb-6">
+                        <span class="bg-gold-400 text-forest-950 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg mr-4">F</span>
+                        <div>
+                            <h2 class="font-display text-2xl md:text-3xl font-bold text-white">Complete System Architecture</h2>
+                            <p class="text-forest-400">Technical Overview</p>
+                        </div>
+                    </div>
+                    
+                    <p class="text-forest-300 mb-6 leading-relaxed">
+                        Arsitektur sistem secara keseluruhan: Frontend Layer, API Gateway, Backend Services, 
+                        External Integrations (Ayo, WhatsApp), dan Database Layer.
+                    </p>
+
+                    <div class="grid md:grid-cols-4 gap-4 mb-6">
+                        <div class="bg-forest-800/30 rounded-xl p-4">
+                            <h4 class="text-gold-300 font-semibold mb-2 text-sm">Frontend</h4>
+                            <ul class="text-forest-400 text-xs space-y-1">
+                                <li>• Landing Page</li>
+                                <li>• POS Terminal</li>
+                                <li>• Admin Dashboard</li>
+                                <li>• QR Menu System</li>
+                            </ul>
+                        </div>
+                        <div class="bg-forest-800/30 rounded-xl p-4">
+                            <h4 class="text-gold-300 font-semibold mb-2 text-sm">Backend</h4>
+                            <ul class="text-forest-400 text-xs space-y-1">
+                                <li>• Booking Service</li>
+                                <li>• Order Service</li>
+                                <li>• Inventory Service</li>
+                                <li>• Payment Service</li>
+                            </ul>
+                        </div>
+                        <div class="bg-forest-800/30 rounded-xl p-4">
+                            <h4 class="text-gold-300 font-semibold mb-2 text-sm">External</h4>
+                            <ul class="text-forest-400 text-xs space-y-1">
+                                <li>• Ayo Booking API</li>
+                                <li>• WhatsApp API</li>
+                                <li>• Static QR Payment</li>
+                            </ul>
+                        </div>
+                        <div class="bg-forest-800/30 rounded-xl p-4">
+                            <h4 class="text-gold-300 font-semibold mb-2 text-sm">Database</h4>
+                            <ul class="text-forest-400 text-xs space-y-1">
+                                <li>• PostgreSQL</li>
+                                <li>• Redis Cache</li>
+                                <li>• File Storage</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mermaid-wrapper" onclick="openModal('architecture-diagram')">
+                    <div class="mermaid" id="architecture-diagram">
+graph TB
+    subgraph Frontend[FRONTEND LAYER]
+        Landing["Landing Page (Public)"]
+        POS["POS Terminal (Kasir)"]
+        Admin["Admin Dashboard"]
+        QR["QR Menu System"]
+    end
+    
+    subgraph APIGateway[API GATEWAY]
+        Gateway["API Gateway + Rate Limiting + Auth"]
+    end
+    
+    subgraph Backend[BACKEND SERVICES]
+        BookingService[Booking Service]
+        OrderService[Order Service]
+        InventoryService[Inventory Service]
+        PaymentService[Payment Service]
+        NotificationService[Notification Service]
+        ReportService[Report Service]
+    end
+    
+    subgraph External[EXTERNAL INTEGRATIONS]
+        AyoAPI["Ayo Booking API (Third-party)"]
+        WhatsApp["WhatsApp Contact"]
+        StaticQR["QR Payment"]
+    end
+    
+    subgraph Database[DATABASE LAYER]
+        MainDB[("PostgreSQL (Main DB)")]
+        CacheDB[("Redis (Cache & Locks)")]
+        FileStorage[("File Storage")]
+    end
+    
+    Landing --> Gateway
+    POS --> Gateway
+    Admin --> Gateway
+    QR --> Gateway
+    
+    Gateway --> BookingService
+    Gateway --> OrderService
+    Gateway --> InventoryService
+    Gateway --> PaymentService
+    Gateway --> NotificationService
+    Gateway --> ReportService
+    
+    BookingService --> MainDB
+    BookingService --> CacheDB
+    BookingService --> AyoAPI
+    
+    OrderService --> MainDB
+    OrderService --> InventoryService
+    OrderService --> NotificationService
+    
+    InventoryService --> MainDB
+    
+    PaymentService --> MainDB
+    PaymentService --> StaticQR
+    
+    NotificationService --> WhatsApp
+    
+    ReportService --> MainDB
+    
+    Admin --> FileStorage
+    
+    style Frontend fill:#dcfce7,color:#052e16
+    style APIGateway fill:#fef3c7,color:#052e16
+    style Backend fill:#bbf7d0,color:#052e16
+    style External fill:#fde68a,color:#052e16
+    style Database fill:#fbbf24,color:#052e16
+    
+    style Landing fill:#166534,color:#fef3c7
+    style POS fill:#166534,color:#fef3c7
+    style Admin fill:#166534,color:#fef3c7
+    style QR fill:#166534,color:#fef3c7
+    
+    style AyoAPI fill:#fbbf24,color:#052e16
+    style WhatsApp fill:#22c55e,color:#fff
+    style MainDB fill:#166534,color:#fef3c7
+    style CacheDB fill:#14532d,color:#fef3c7
+                    </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Closing Section -->
+            <section id="closing" class="mb-16 section-content">
+                <div class="max-w-3xl mx-auto">
+                    <div class="bg-gradient-to-br from-gold-400/10 to-gold-500/5 rounded-2xl p-8 border border-gold-400/20 text-center">
+                        <i class="bx bx-bulb text-5xl text-gold-400 mb-4"></i>
+                        <h3 class="font-display text-2xl font-bold text-gold-400 mb-4"><a href="https://sapacode.id" target="_blank" class="hover:text-gold-300 transition-colors">Sapacode.id</a></h3>
+                        <blockquote class="text-forest-200 text-lg italic leading-relaxed">
+                            "Flow ini kami desain bukan hanya untuk hari ini, tapi <span class="text-gold-400 font-semibold">kalau besok venue punya 10 lapangan dan 5 cabang, sistemnya tetap relevan.</span>"
+                        </blockquote>
+                    </div>
+
+                    <!-- Future Scalability -->
+                    <div class="mt-8 grid md:grid-cols-3 gap-4">
+                        <div class="bg-forest-900/50 rounded-xl p-4 border border-forest-700 text-center">
+                            <i class="bx bx-buildings text-3xl text-gold-400 mb-2"></i>
+                            <p class="text-gold-400 font-semibold">Multi-Venue</p>
+                            <p class="text-forest-400 text-sm">Ready untuk ekspansi cabang</p>
+                        </div>
+                        <div class="bg-forest-900/50 rounded-xl p-4 border border-forest-700 text-center">
+                            <i class="bx bx-trending-up text-3xl text-gold-400 mb-2"></i>
+                            <p class="text-gold-400 font-semibold">Scalable</p>
+                            <p class="text-forest-400 text-sm">Arsitektur Jelas dan Mudah dikembangkan</p>
+                        </div>
+                        <div class="bg-forest-900/50 rounded-xl p-4 border border-forest-700 text-center">
+                            <i class="bx bx-link text-3xl text-gold-400 mb-2"></i>
+                            <p class="text-gold-400 font-semibold">Integrated</p>
+                            <p class="text-forest-400 text-sm">API-first design</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal Fullscreen Viewer -->
+    <div id="diagramModal" class="modal-overlay">
+        <div class="modal-header">
+            <div class="zoom-controls">
+                <button class="zoom-btn" onclick="zoomOut()" title="Zoom Out">−</button>
+                <span class="zoom-level" id="zoomLevel">100%</span>
+                <button class="zoom-btn" onclick="zoomIn()" title="Zoom In">+</button>
+                <button class="zoom-btn" onclick="resetZoom()" title="Reset" style="font-size: 0.875rem;">↺</button>
+            </div>
+            <div class="text-center flex-1">
+                <h3 class="text-gold-400 font-semibold" id="modalTitle">Flow Diagram</h3>
+                <p class="text-forest-400 text-xs">Scroll untuk zoom • Drag untuk geser</p>
+            </div>
+            <button class="close-modal" onclick="closeModal()" title="Tutup (ESC)">✕</button>
+        </div>
+        <div class="modal-content" id="modalContent">
+            <div class="mermaid-container" id="mermaidContainer">
+                <!-- Diagram will be cloned here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-forest-900 border-t border-forest-800 py-8 no-print">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-forest-400 text-sm">
+                <span class="text-gold-400 font-semibold">PADEL ARENA</span> Digital Ecosystem Documentation
+            </p>
+            <p class="text-forest-500 text-xs mt-2">
+                Version 1.0 • January 2026
+            </p>
+            <p class="text-forest-600 text-xs mt-3">
+                Crafted with <i class="bx bxs-heart text-red-500"></i> by <a href="https://sapacode.id" target="_blank" class="text-gold-400 hover:text-gold-300 transition-colors font-semibold">sapacode.id</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Initialize Mermaid -->
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#166534',
+                primaryTextColor: '#052e16',
+                primaryBorderColor: '#14532d',
+                lineColor: '#15803d',
+                secondaryColor: '#fef3c7',
+                tertiaryColor: '#dcfce7',
+                background: '#fdfbf7',
+                mainBkg: '#dcfce7',
+                nodeBorder: '#166534',
+                clusterBkg: '#f0fdf4',
+                clusterBorder: '#166534',
+                titleColor: '#052e16',
+                edgeLabelBackground: '#fef3c7'
+            },
+            flowchart: {
+                curve: 'basis',
+                padding: 20,
+                nodeSpacing: 50,
+                rankSpacing: 50,
+                htmlLabels: true,
+                useMaxWidth: true
+            }
+        });
+
+        // Active nav link highlighting
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollY >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Modal Fullscreen Viewer
+        let currentZoom = 1;
+        let panX = 0;
+        let panY = 0;
+        let isDragging = false;
+        let startX, startY;
+
+        const modal = document.getElementById('diagramModal');
+        const modalContent = document.getElementById('modalContent');
+        const mermaidContainer = document.getElementById('mermaidContainer');
+        const zoomLevelEl = document.getElementById('zoomLevel');
+        const modalTitle = document.getElementById('modalTitle');
+
+        const diagramTitles = {
+            'user-flow-diagram': 'A. User Flow',
+            'system-flow-diagram': 'B. Backend System Flow',
+            'staff-admin-flow-diagram': 'C. Staff & Admin Flow',
+            'role-matrix-diagram': 'D. Role & Permission Matrix',
+            'exception-flow-diagram': 'E. Exception & Edge Cases',
+            'architecture-diagram': 'F. System Architecture'
+        };
+
+        function openModal(diagramId) {
+            const originalDiagram = document.getElementById(diagramId);
+            if (!originalDiagram) return;
+
+            // Clone the diagram
+            const clone = originalDiagram.cloneNode(true);
+            clone.removeAttribute('id');
+            mermaidContainer.innerHTML = '';
+            mermaidContainer.appendChild(clone);
+
+            // Set title
+            modalTitle.textContent = diagramTitles[diagramId] || 'Flow Diagram';
+
+            // Reset zoom and pan
+            currentZoom = 1;
+            panX = 0;
+            panY = 0;
+            updateTransform();
+
+            // Show modal
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function zoomIn() {
+            currentZoom = Math.min(currentZoom + 0.25, 4);
+            updateTransform();
+        }
+
+        function zoomOut() {
+            currentZoom = Math.max(currentZoom - 0.25, 0.25);
+            updateTransform();
+        }
+
+        function resetZoom() {
+            currentZoom = 1;
+            panX = 0;
+            panY = 0;
+            updateTransform();
+        }
+
+        function updateTransform() {
+            mermaidContainer.style.transform = `translate(${panX}px, ${panY}px) scale(${currentZoom})`;
+            zoomLevelEl.textContent = Math.round(currentZoom * 100) + '%';
+        }
+
+        // Mouse wheel zoom
+        modalContent.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? -0.1 : 0.1;
+            currentZoom = Math.max(0.25, Math.min(4, currentZoom + delta));
+            updateTransform();
+        });
+
+        // Pan with mouse drag
+        modalContent.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.clientX - panX;
+            startY = e.clientY - panY;
+            modalContent.style.cursor = 'grabbing';
+        });
+
+        modalContent.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            panX = e.clientX - startX;
+            panY = e.clientY - startY;
+            updateTransform();
+        });
+
+        modalContent.addEventListener('mouseup', () => {
+            isDragging = false;
+            modalContent.style.cursor = 'grab';
+        });
+
+        modalContent.addEventListener('mouseleave', () => {
+            isDragging = false;
+            modalContent.style.cursor = 'grab';
+        });
+
+        // Touch support for mobile
+        let lastTouchDistance = 0;
+        let lastTouchX = 0;
+        let lastTouchY = 0;
+
+        modalContent.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 1) {
+                isDragging = true;
+                lastTouchX = e.touches[0].clientX;
+                lastTouchY = e.touches[0].clientY;
+            } else if (e.touches.length === 2) {
+                lastTouchDistance = getTouchDistance(e.touches);
+            }
+        });
+
+        modalContent.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (e.touches.length === 1 && isDragging) {
+                const deltaX = e.touches[0].clientX - lastTouchX;
+                const deltaY = e.touches[0].clientY - lastTouchY;
+                panX += deltaX;
+                panY += deltaY;
+                lastTouchX = e.touches[0].clientX;
+                lastTouchY = e.touches[0].clientY;
+                updateTransform();
+            } else if (e.touches.length === 2) {
+                const distance = getTouchDistance(e.touches);
+                const delta = (distance - lastTouchDistance) * 0.01;
+                currentZoom = Math.max(0.25, Math.min(4, currentZoom + delta));
+                lastTouchDistance = distance;
+                updateTransform();
+            }
+        });
+
+        modalContent.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        function getTouchDistance(touches) {
+            return Math.hypot(
+                touches[0].clientX - touches[1].clientX,
+                touches[0].clientY - touches[1].clientY
+            );
+        }
+
+        // Close modal with ESC key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        // Close modal when clicking overlay (outside content)
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
