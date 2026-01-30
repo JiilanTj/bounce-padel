@@ -50,7 +50,7 @@ class UserController extends Controller
         $query->orderBy($sortBy, $sortOrder);
 
         // Pagination
-        $perPage = min($request->get('per_page', 15), 100); // Max 100 per page
+        $perPage = min($request->get('per_page', 10), 100); // Max 100 per page
         $users = $query->paginate($perPage)->withQueryString();
 
         return Inertia::render('Users/Index', [

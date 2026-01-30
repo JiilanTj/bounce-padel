@@ -4,6 +4,8 @@ export interface User {
     email: string;
     email_verified_at?: string;
     role: 'user' | 'kasir' | 'pelayan' | 'admin' | 'owner';
+    created_at: string;
+    updated_at: string;
 }
 
 export type PageProps<
@@ -11,5 +13,9 @@ export type PageProps<
 > = T & {
     auth: {
         user: User;
+    };
+    flash?: {
+        success?: string;
+        error?: string;
     };
 };

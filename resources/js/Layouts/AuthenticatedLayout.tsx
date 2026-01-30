@@ -13,6 +13,7 @@ import {
     useRef,
     useState,
 } from 'react';
+import { Toaster } from 'sonner';
 
 export default function Authenticated({
     header,
@@ -38,6 +39,7 @@ export default function Authenticated({
 
     return (
         <div className="flex h-screen overflow-hidden bg-gray-50">
+            <Toaster position="top-right" richColors closeButton />
             {/* Sidebar */}
             <Sidebar />
 

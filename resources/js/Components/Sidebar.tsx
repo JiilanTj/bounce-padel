@@ -47,9 +47,9 @@ export default function Sidebar({ className = '' }: { className?: string }) {
             roles: ['pelayan', 'kasir', 'owner'],
         },
         {
-            name: 'Members',
-            href: '#',
-            routeName: 'members.*',
+            name: 'User Management',
+            href: route('users.index'),
+            routeName: 'users.*',
             icon: UserGroupIcon,
             roles: ['admin', 'owner'],
         },
