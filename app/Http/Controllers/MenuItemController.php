@@ -15,8 +15,10 @@ class MenuItemController extends Controller
     {
         // Usually filtered by menu, but for master list:
         $menuItems = MenuItem::with('menu')->latest()->paginate(10);
+        $menus = \App\Models\Menu::all();
         return inertia('MenuItems/Index', [
-            'menuItems' => $menuItems
+            'menuItems' => $menuItems,
+            'menus' => $menus,
         ]);
     }
 

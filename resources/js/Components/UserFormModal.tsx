@@ -50,7 +50,7 @@ export default function UserFormModal({
         } else if (show && !user) {
             reset();
         }
-    }, [show, user]);
+    }, [show, user, setData, reset]);
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();

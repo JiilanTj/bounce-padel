@@ -14,8 +14,10 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::with('category', 'inventoryLogs')->latest()->paginate(10);
+        $categories = \App\Models\Category::all(); // Fetch all categories for the form
         return inertia('Products/Index', [
-            'products' => $products
+            'products' => $products,
+            'categories' => $categories
         ]);
     }
 
