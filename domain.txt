@@ -1,0 +1,4 @@
+- Booking Domain
+- Product & Inventory Domain
+- F&B / Order Domain
+- Finance Domain

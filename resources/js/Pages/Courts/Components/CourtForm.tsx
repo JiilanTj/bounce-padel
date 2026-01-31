@@ -70,7 +70,7 @@ export default function CourtForm({ show, onClose, court }: Props) {
             clearErrors();
             setActiveTab('basic');
         }
-    }, [show, court]);
+    }, [show, court, clearErrors, reset, setData]);
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();

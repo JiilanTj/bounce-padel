@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Bounce Padel - Premium Courts &amp; Gear</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Material Symbols -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Theme Configuration -->
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0fbd49",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#112217",
+                        "surface-dark": "#1a3324",
+                        "text-dim": "#92c9a4",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"],
+                        "body": ["Manrope", "sans-serif"],
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white transition-colors duration-300">
+    <!-- Top Navigation -->
+    <nav class="sticky top-0 z-50 w-full border-b border-[#23482f] bg-background-dark/95 backdrop-blur-md">
+        <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3 text-white">
+                <div class="text-primary">
+                    <span class="material-symbols-outlined text-3xl">sports_tennis</span>
+                </div>
+                <h2 class="text-white text-xl font-bold tracking-tight">Bounce Padel</h2>
+            </div>
+            <div class="hidden md:flex items-center gap-10">
+                <a class="text-gray-300 hover:text-primary transition-colors text-sm font-medium" href="#">Courts</a>
+                <a class="text-gray-300 hover:text-primary transition-colors text-sm font-medium" href="#">Shop</a>
+                <a class="text-gray-300 hover:text-primary transition-colors text-sm font-medium" href="#">Lessons</a>
+                <a class="text-gray-300 hover:text-primary transition-colors text-sm font-medium" href="#">Contact</a>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="hidden sm:flex text-white hover:text-primary">
+                    <span class="material-symbols-outlined">search</span>
+                </button>
+                <button
+                    class="flex items-center justify-center rounded-lg h-10 px-5 bg-primary hover:bg-green-600 transition-colors text-[#112217] text-sm font-bold">
+                    <span>Book Court</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+    <!-- Hero Section -->
+    <header class="relative w-full h-[85vh] min-h-[600px] flex items-center justify-center overflow-hidden">
+        <!-- Background Image with Gradient Overlay -->
+        <div class="absolute inset-0 z-0 bg-cover bg-center"
+            data-alt="Dark moody cinematic shot of a professional indoor padel court with glass walls"
+            style='background-image: linear-gradient(to bottom, rgba(17, 34, 23, 0.3) 0%, rgba(17, 34, 23, 0.8) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuAOnW-epr9MoxJ8I2Ta3O1prVPte_4rqrgYc8AMuKLSx6bopyZoIXWaZwfgVpMWwcXP9t4yg8lioRTIQ4oq7SqIWz9uwcm5D20A_aal3lfQ7jBhgTZFg6ZvQ05QJXDMOjtukj6rLBZ-p8VSdryj9qXl8-p7wQfMOBwcj08B1y1GaFYHFZBS4Bb1Q3FyJV8nLkRE2HvhYcYCSkRK1GwJ0MJaOmnbdkrOpyrZuxAcDlziK25GV2A7DaxtOimKc1yO0nIaPcjDIU9bBG0");'>
+        </div>
+        <div class="relative z-10 container mx-auto px-6 text-center max-w-4xl">
+            <span
+                class="inline-block py-1 px-3 rounded-full bg-white/10 border border-white/20 text-xs font-semibold tracking-wider text-primary mb-6 uppercase">
+                The City's Premier Club
+            </span>
+            <h1 class="text-white text-5xl md:text-7xl font-extrabold leading-[1.1] tracking-tight mb-6">
+                Elevate Your Game<br />in Pure Luxury
+            </h1>
+            <p class="text-gray-300 text-lg md:text-xl font-light mb-10 max-w-2xl mx-auto leading-relaxed">
+                Experience world-class WPT standard courts, premium amenities, and a vibrant community designed for the
+                modern player.
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <button
+                    class="w-full sm:w-auto h-12 px-8 rounded-lg bg-primary hover:bg-green-600 text-[#112217] font-bold text-base transition-all transform hover:scale-105">
+                    Book a Court
+                </button>
+                <button
+                    class="w-full sm:w-auto h-12 px-8 rounded-lg bg-transparent border border-white/30 hover:bg-white/10 text-white font-semibold text-base transition-all flex items-center justify-center gap-2 group">
+                    <span>View Memberships</span>
+                    <span
+                        class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                </button>
+            </div>
+        </div>
+    </header>
+    <!-- Stats / Trust Section -->
+    <div class="w-full bg-surface-dark border-b border-[#23482f]">
+        <div class="max-w-[1280px] mx-auto px-6 py-12">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-white/10">
+                <div class="flex flex-col gap-1">
+                    <span class="text-3xl md:text-4xl font-bold text-white">12</span>
+                    <span class="text-text-dim text-sm uppercase tracking-wide">Indoor Courts</span>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <span class="text-3xl md:text-4xl font-bold text-white">4</span>
+                    <span class="text-text-dim text-sm uppercase tracking-wide">VIP Suites</span>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <span class="text-3xl md:text-4xl font-bold text-white">24/7</span>
+                    <span class="text-text-dim text-sm uppercase tracking-wide">Access</span>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <span class="text-3xl md:text-4xl font-bold text-white">500+</span>
+                    <span class="text-text-dim text-sm uppercase tracking-wide">Members</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Facilities Section -->
+    <section class="py-24 bg-background-light dark:bg-background-dark">
+        <div class="max-w-[1280px] mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+                <div class="max-w-xl">
+                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">World-Class
+                        Facilities</h2>
+                    <p class="text-slate-600 dark:text-gray-400 text-lg">Designed for peak performance and ultimate
+                        relaxation. Every detail at Bounce Padel is curated for the discerning athlete.</p>
+                </div>
+                <a class="text-primary hover:text-green-400 font-semibold flex items-center gap-1 group" href="#">
+                    Explore all facilities
+                    <span
+                        class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                </a>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Facility Card 1 -->
+                <div class="group relative overflow-hidden rounded-xl h-[400px] cursor-pointer">
+                    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                        data-alt="Modern indoor padel court with blue turf and high quality glass walls"
+                        style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAWlE-9UDhnPPYTmQb0VHg__XUkAnTXCthkpo9ZkfiKNRmIC7CQUcyKlnsJXP235wYvaGqewFFJ6HS--YbNjQeYE2x3zY2ZDkRAONMAB_vpQQE2vIrmZcxaQNBvlY1vScM2u7xObOEwAR4FH36sqXxgM13S30u2rFJlhKTFMZJQdSRa4dR52rgZPUZuuv4bOvFYYeL8oEaywrg-IRdz3tBHtoia3Bq3TAGivjgtI6ebmZiNrCk0Bw41S1hx4qBFbHuBUg_gv9b5Rko");'>
+                    </div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 p-8 w-full">
+                        <div
+                            class="bg-primary w-12 h-12 rounded-lg flex items-center justify-center mb-4 text-[#112217]">
+                            <span class="material-symbols-outlined">stadium</span>
+                        </div>
+                        <h3 class="text-white text-xl font-bold mb-2">Pro Indoor Courts</h3>
+                        <p
+                            class="text-gray-300 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 group-hover:translate-y-0">
+                            Panoramic glass, Mondo turf, and professional lighting for the perfect game.
+                        </p>
+                    </div>
+                </div>
+                <!-- Facility Card 2 -->
+                <div class="group relative overflow-hidden rounded-xl h-[400px] cursor-pointer">
+                    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                        data-alt="Luxury lounge area with comfortable seating and warm lighting"
+                        style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDgl66a98RU0fzBjt1ltPkrPH-XPRCBoh9QCA9dAYr6GYL6QYW5Rfwo3tcWj0yrIornNJ39rzpVrYzSfp9WS5DX8H6-kdA40c11RYFpfWLg9klYJHARCRDXfDQZOg8ZGkWrOuoJkiy7M8PSGL-fQ6dzi0k-UzO80hNlkvV4JtWwhnPUR8YCh56cLYlgyUc0nFhfSdDmbgTyg5HyNMWq1JxG0YAcGXP7OD9szU01TBGvbxdlgYXZsUKJeA4hd522iSVEgXuMjsknNXs");'>
+                    </div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 p-8 w-full">
+                        <div
+                            class="bg-primary w-12 h-12 rounded-lg flex items-center justify-center mb-4 text-[#112217]">
+                            <span class="material-symbols-outlined">coffee</span>
+                        </div>
+                        <h3 class="text-white text-xl font-bold mb-2">The Members Lounge</h3>
+                        <p
+                            class="text-gray-300 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 group-hover:translate-y-0">
+                            Relax pre or post-match in our exclusive lounge serving organic refreshments.
+                        </p>
+                    </div>
+                </div>
+                <!-- Facility Card 3 -->
+                <div class="group relative overflow-hidden rounded-xl h-[400px] cursor-pointer">
+                    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                        data-alt="Modern clean locker room with spa-like aesthetic"
+                        style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBZQUbakj-Y2WTQR6g7xtXEWAG9Z-42yQDUJ4fIyYut5SBglKLL_WGDCfTebYzry-MyopQjVfBAb_F8BQZxULjvJi10OxKgZPCFRAgf8xBjaw2T4MI_yLytjdMuIHFuXKRbJrsuvQMo2w2MBA5JDGOe99f_GkhbPL1b8I5YWn7d7L5vr8KgA0O5lxdl7GBArX2OIFZ9-yVzZJ18T-p2iAm_95PEGhyR7W-1D4KJSt_ksVaT_O06YfGn0QWE7d2MlYjgi7CGRhy69GM");'>
+                    </div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 p-8 w-full">
+                        <div
+                            class="bg-primary w-12 h-12 rounded-lg flex items-center justify-center mb-4 text-[#112217]">
+                            <span class="material-symbols-outlined">checkroom</span>
+                        </div>
+                        <h3 class="text-white text-xl font-bold mb-2">Luxury Changing Rooms</h3>
+                        <p
+                            class="text-gray-300 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 group-hover:translate-y-0">
+                            Spa-inspired showers, sauna access, and premium grooming products.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- The Pro Shop Section -->
+    <section class="py-24 bg-surface-dark relative overflow-hidden">
+        <!-- Abstract Background Pattern -->
+        <div
+            class="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-[#152e20] to-transparent pointer-events-none">
+        </div>
+        <div class="max-w-[1280px] mx-auto px-6 relative z-10">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-16">
+                <div>
+                    <span class="text-primary text-sm font-bold tracking-widest uppercase mb-2 block">Official
+                        Retailer</span>
+                    <h2 class="text-3xl md:text-5xl font-bold text-white">The Pro Shop</h2>
+                </div>
+                <div class="flex gap-4 mt-6 md:mt-0">
+                    <button
+                        class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-surface-dark transition-colors">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                    </button>
+                    <button
+                        class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-surface-dark transition-colors">
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </button>
+                </div>
+            </div>
+            <!-- Shop Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Product 1 -->
+                <div
+                    class="group bg-[#112217] rounded-xl p-4 border border-white/5 hover:border-primary/50 transition-all duration-300">
+                    <div
+                        class="aspect-square bg-[#1a2c21] rounded-lg mb-4 flex items-center justify-center overflow-hidden relative">
+                        <span
+                            class="absolute top-3 left-3 bg-white text-black text-xs font-bold px-2 py-1 rounded">NEW</span>
+                        <img alt="Padel Racket"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 mix-blend-overlay opacity-80"
+                            data-alt="High end padel racket close up on dark background"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2b8iIcSdsnvF_Xk3wkGTIYrdcOlPCpm3CxosbR9OvOXlnWBCJgXd93pVuop5_3kHL83JPyIHqXEWBFhNYhT_HOvYQEVBD_n9zX46rZtStS9cdMVPorxPVkEoreiOOPRfl3WCyzKspyPD7cHmg463G5aUbltnGaAgs6TCuHLGWViq3AssBIKmuE03Yp8pUEmVmrkr4DcAyXHYvC_3Q4mOfGCjsx9dFabHsHvnTc6n7gHRWP14iuGJIsziBE4QZ0dsJQtImnsrHY-o" />
+                    </div>
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h3 class="text-white font-semibold text-lg">Nox AT10 Luxury</h3>
+                            <p class="text-gray-400 text-sm">Professional Series</p>
+                        </div>
+                        <span class="text-primary font-bold">$320</span>
+                    </div>
+                    <button
+                        class="w-full mt-4 py-2 rounded border border-white/20 text-white text-sm font-medium hover:bg-white hover:text-black transition-colors">
+                        Add to Cart
+                    </button>
+                </div>
+                <!-- Product 2 -->
+                <div
+                    class="group bg-[#112217] rounded-xl p-4 border border-white/5 hover:border-primary/50 transition-all duration-300">
+                    <div
+                        class="aspect-square bg-[#1a2c21] rounded-lg mb-4 flex items-center justify-center overflow-hidden relative">
+                        <img alt="Padel Balls"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 mix-blend-overlay opacity-80"
+                            data-alt="Three yellow padel balls in a tube"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcP4gaYsK-qbYkqyLjEzVtkn5OA_csCQt3sagYgR707L3O-S0SJSPGK4FwwQRVfX4vs0HNpWZiooHXTVyR5-5lF4eWcoW_YWSshqi96SYVwMWNcKyiRJ-dR4Ca0yldKnZ1mEWIFAQlbJIYrcEQM-SbGmz-IAnNKltdDYl8-Uo8IMSLxqrEKOwKRM_2tEGKlQWadH8j92YTRUvdq8foe7eYc_a2gK-xl-it5plQTD96oGbXSLSA5e9JoGPHr6Dnv7zbUHiKUIdARC0" />
+                    </div>
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h3 class="text-white font-semibold text-lg">Head Pro S Balls</h3>
+                            <p class="text-gray-400 text-sm">3-Ball Can</p>
+                        </div>
+                        <span class="text-primary font-bold">$8.50</span>
+                    </div>
+                    <button
+                        class="w-full mt-4 py-2 rounded border border-white/20 text-white text-sm font-medium hover:bg-white hover:text-black transition-colors">
+                        Add to Cart
+                    </button>
+                </div>
+                <!-- Product 3 -->
+                <div
+                    class="group bg-[#112217] rounded-xl p-4 border border-white/5 hover:border-primary/50 transition-all duration-300">
+                    <div
+                        class="aspect-square bg-[#1a2c21] rounded-lg mb-4 flex items-center justify-center overflow-hidden relative">
+                        <img alt="Apparel"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 mix-blend-overlay opacity-80"
+                            data-alt="Elegant sport clothing folded neatly"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSEYSeHhDE3Irg1C5tbRLgDfMNZHRirewmKYhMC5EnEFy1RYiodtvuYznwqpQNyat0ZjR5p40jEVuonDlG86vbVvts7udBMwFEuYANChbl_zyzIcd9-reDZO_kKMp0_wARUQ_pdjnENWpBCdln815_piG25Q7M-2aHE9Yf_xEh86V-MP57Cn419Nom8C63_oVvlwQQALeqismZEh3EBvODNKZunY4eKZUGrZxWP7HymAnK5oQL2turs80dy_hTsGEtAqhrJyT9M30" />
+                    </div>
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h3 class="text-white font-semibold text-lg">Bounce Tech Tee</h3>
+                            <p class="text-gray-400 text-sm">Breathable Fabric</p>
+                        </div>
+                        <span class="text-primary font-bold">$45</span>
+                    </div>
+                    <button
+                        class="w-full mt-4 py-2 rounded border border-white/20 text-white text-sm font-medium hover:bg-white hover:text-black transition-colors">
+                        Add to Cart
+                    </button>
+                </div>
+                <!-- Product 4 -->
+                <div
+                    class="group bg-[#112217] rounded-xl p-4 border border-white/5 hover:border-primary/50 transition-all duration-300">
+                    <div
+                        class="aspect-square bg-[#1a2c21] rounded-lg mb-4 flex items-center justify-center overflow-hidden relative">
+                        <img alt="Footwear"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 mix-blend-overlay opacity-80"
+                            data-alt="High performance padel shoes side view"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3pXBPgMawfEfgq2yETVzdlu7RR4lG0L2GRBTgIFECLLcBDpp1Hi7R-jqp4WCd_cdl1a6z3q2wDfVI1j8wgIS07otEZ8IAjmaH3mE_-cO55iFZowYLH3Tw8lsXWyzj79aYU5p4kyaQ2Zungmq4YsA7ylb3_atGVgXg1-l2exzj9klR0n1c5VQ1OfAldzuqcnLomAi-eIwoOLhFVLfXulxmwEXU9-Kk0xn45K3ZvkKY5Ue8D00Q5NDZBqtb8BxXBccDU1i0Wu1X5Xk" />
+                    </div>
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h3 class="text-white font-semibold text-lg">Bullpadel Hack</h3>
+                            <p class="text-gray-400 text-sm">Hybrid Fly</p>
+                        </div>
+                        <span class="text-primary font-bold">$140</span>
+                    </div>
+                    <button
+                        class="w-full mt-4 py-2 rounded border border-white/20 text-white text-sm font-medium hover:bg-white hover:text-black transition-colors">
+                        Add to Cart
+                    </button>
+                </div>
+            </div>
+            <div class="mt-12 text-center">
+                <a class="inline-flex items-center text-white font-medium hover:text-primary transition-colors border-b border-transparent hover:border-primary pb-1"
+                    href="#">
+                    Visit Online Store
+                </a>
+            </div>
+        </div>
+    </section>
+    <!-- App / CTA Section -->
+    <section class="py-24 bg-background-light dark:bg-background-dark">
+        <div class="max-w-[1280px] mx-auto px-6">
+            <div
+                class="bg-primary rounded-3xl p-8 md:p-16 flex flex-col md:flex-row items-center justify-between relative overflow-hidden">
+                <!-- Decorative Circle -->
+                <div class="absolute -top-24 -left-24 w-64 h-64 bg-white/20 rounded-full blur-3xl"></div>
+                <div class="relative z-10 max-w-lg">
+                    <h2 class="text-[#112217] text-3xl md:text-5xl font-extrabold mb-6 leading-tight">Ready to join the
+                        club?</h2>
+                    <p class="text-[#112217]/80 text-lg mb-8 font-medium">Download the Bounce app to book courts, find
+                        matches, and track your progress seamlessly.</p>
+                    <div class="flex gap-4">
+                        <button
+                            class="bg-[#112217] text-white px-6 py-3 rounded-lg font-bold flex items-center gap-3 hover:bg-black transition-colors">
+                            <span class="material-symbols-outlined">ios</span>
+                            App Store
+                        </button>
+                        <button
+                            class="bg-[#112217] text-white px-6 py-3 rounded-lg font-bold flex items-center gap-3 hover:bg-black transition-colors">
+                            <span class="material-symbols-outlined">android</span>
+                            Play Store
+                        </button>
+                    </div>
+                </div>
+                <div class="relative z-10 mt-10 md:mt-0 flex justify-center">
+                    <div
+                        class="w-64 h-64 bg-[#112217]/10 rounded-full flex items-center justify-center backdrop-blur-sm border border-[#112217]/10">
+                        <span class="material-symbols-outlined text-[100px] text-[#112217]">qr_code_2</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Footer -->
+    <footer class="bg-[#0a160e] border-t border-[#23482f] pt-16 pb-8">
+        <div class="max-w-[1280px] mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+                <!-- Brand -->
+                <div class="flex flex-col gap-6">
+                    <div class="flex items-center gap-3 text-white">
+                        <div class="text-primary">
+                            <span class="material-symbols-outlined text-3xl">sports_tennis</span>
+                        </div>
+                        <h2 class="text-white text-xl font-bold tracking-tight">Bounce Padel</h2>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        The ultimate destination for padel enthusiasts. Premium courts, professional coaching, and a
+                        vibrant community.
+                    </p>
+                    <div class="flex gap-4">
+                        <a class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-primary hover:text-black transition-colors"
+                            href="#">
+                            <svg class="w-4 h-4" fill="currentColor" viewbox="0 0 24 24">
+                                <path
+                                    d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z">
+                                </path>
+                            </svg>
+                        </a>
+                        <a class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-primary hover:text-black transition-colors"
+                            href="#">
+                            <svg class="w-4 h-4" fill="currentColor" viewbox="0 0 24 24">
+                                <path
+                                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.85-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z">
+                                </path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <!-- Column 2 -->
+                <div class="flex flex-col gap-4">
+                    <h3 class="text-white font-bold text-lg">Club</h3>
+                    <a class="text-gray-400 hover:text-primary text-sm transition-colors" href="#">Book a Court</a>
+                    <a class="text-gray-400 hover:text-primary text-sm transition-colors" href="#">Memberships</a>
+                    <a class="text-gray-400 hover:text-primary text-sm transition-colors" href="#">Private Events</a>
+                    <a class="text-gray-400 hover:text-primary text-sm transition-colors" href="#">Tournaments</a>
+                </div>
+                <!-- Column 3 -->
+                <div class="flex flex-col gap-4">
+                    <h3 class="text-white font-bold text-lg">Learn</h3>
+                    <a class="text-gray-400 hover:text-primary text-sm transition-colors" href="#">Private Lessons</a>
+                    <a class="text-gray-400 hover:text-primary text-sm transition-colors" href="#">Group Clinics</a>
+                    <a class="text-gray-400 hover:text-primary text-sm transition-colors" href="#">Junior Academy</a>
+                    <a class="text-gray-400 hover:text-primary text-sm transition-colors" href="#">Rules of Padel</a>
+                </div>
+                <!-- Column 4 -->
+                <div class="flex flex-col gap-4">
+                    <h3 class="text-white font-bold text-lg">Contact</h3>
+                    <div class="flex items-center gap-3 text-gray-400 text-sm">
+                        <span class="material-symbols-outlined text-primary">location_on</span>
+                        <span>123 Padel Avenue, Sportsville</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-gray-400 text-sm">
+                        <span class="material-symbols-outlined text-primary">call</span>
+                        <span>+1 (555) 123-4567</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-gray-400 text-sm">
+                        <span class="material-symbols-outlined text-primary">mail</span>
+                        <span>hello@bouncepadel.com</span>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-gray-500 text-sm">© 2024 Bounce Padel Club. All rights reserved.</p>
+                <div class="flex gap-6">
+                    <a class="text-gray-500 hover:text-white text-sm" href="#">Privacy Policy</a>
+                    <a class="text-gray-500 hover:text-white text-sm" href="#">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>
