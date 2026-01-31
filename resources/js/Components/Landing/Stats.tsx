@@ -1,13 +1,13 @@
 export default function Stats() {
     const stats = [
-        { value: '12', label: 'Indoor Courts' },
-        { value: '4', label: 'VIP Suites' },
-        { value: '24/7', label: 'Access' },
-        { value: '500+', label: 'Members' },
+        { value: '12', label: 'Lapangan Indoor' },
+        { value: '4', label: 'Suite VIP' },
+        { value: '24/7', label: 'Akses' },
+        { value: '500+', label: 'Anggota' },
     ];
 
     return (
-        <div className="w-full border-b border-[#23482f] bg-surface-dark">
+        <div className="w-full border-b border-landing-border bg-surface-dark">
             <div className="mx-auto max-w-[1280px] px-6 py-12">
                 <div className="grid grid-cols-2 gap-8 divide-x divide-white/10 text-center md:grid-cols-4">
                     {stats.map((stat, index) => (

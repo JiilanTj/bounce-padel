@@ -6,31 +6,32 @@ export default function CTA() {
                     {/* Decorative Circle */}
                     <div className="absolute -left-24 -top-24 h-64 w-64 rounded-full bg-white/20 blur-3xl"></div>
                     <div className="relative z-10 max-w-lg">
-                        <h2 className="mb-6 text-3xl font-extrabold leading-tight text-[#112217] md:text-5xl">
-                            Ready to join the club?
+                        <h2 className="mb-6 text-3xl font-extrabold leading-tight text-background-dark md:text-5xl">
+                            Siap gabung?
                         </h2>
-                        <p className="mb-8 text-lg font-medium text-[#112217]/80">
-                            Download the Bounce app to book courts, find
-                            matches, and track your progress seamlessly.
+                        <p className="mb-8 text-lg font-medium text-background-dark/80">
+                            Download aplikasi Bounce buat booking lapangan,
+                            cari lawan main, dan pantau progress kamu dengan
+                            mudah.
                         </p>
-                        <div className="flex gap-4">
-                            <button className="flex items-center gap-3 rounded-lg bg-[#112217] px-6 py-3 font-bold text-white transition-colors hover:bg-black">
+                        <div className="flex flex-wrap gap-4">
+                            <button className="flex items-center gap-3 rounded-lg bg-background-dark px-6 py-3 font-bold text-white transition-colors hover:bg-black">
                                 <span className="material-symbols-outlined">
                                     ios
                                 </span>
                                 App Store
                             </button>
-                            <button className="flex items-center gap-3 rounded-lg bg-[#112217] px-6 py-3 font-bold text-white transition-colors hover:bg-black">
+                            <button className="flex items-center gap-3 rounded-lg bg-background-dark px-6 py-3 font-bold text-white transition-colors hover:bg-black">
                                 <span className="material-symbols-outlined">
                                     android
                                 </span>
-                                Play Store
+                                Google Play
                             </button>
                         </div>
                     </div>
                     <div className="relative z-10 mt-10 flex justify-center md:mt-0">
-                        <div className="flex h-64 w-64 items-center justify-center rounded-full border border-[#112217]/10 bg-[#112217]/10 backdrop-blur-sm">
-                            <span className="material-symbols-outlined text-[100px] text-[#112217]">
+                        <div className="flex h-64 w-64 items-center justify-center rounded-full border border-background-dark/10 bg-background-dark/10 backdrop-blur-sm">
+                            <span className="material-symbols-outlined text-[100px] text-background-dark">
                                 qr_code_2
                             </span>
                         </div>

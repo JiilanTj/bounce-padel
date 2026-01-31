@@ -10,20 +10,24 @@ export default {
         './resources/js/**/*.tsx',
     ],
 
-    darkMode: "class", // Enabled to match HTML's dark mode class on html tag
+    darkMode: 'class',
     theme: {
         extend: {
             colors: {
-                "primary": "#0fbd49",
-                "background-light": "#f6f8f6",
-                "background-dark": "#112217",
-                "surface-dark": "#1a3324",
-                "text-dim": "#92c9a4",
+                primary: 'rgb(var(--landing-page-primary) / <alpha-value>)',
+                'background-light': 'rgb(var(--landing-page-background-light) / <alpha-value>)',
+                'background-dark': 'rgb(var(--landing-page-background-dark) / <alpha-value>)',
+                'surface-dark': 'rgb(var(--landing-page-surface-dark) / <alpha-value>)',
+                'text-dim': 'rgb(var(--landing-page-text-dim) / <alpha-value>)',
+                'landing-border': 'rgb(var(--landing-page-border) / <alpha-value>)',
+                'landing-footer-bg': 'rgb(var(--landing-page-footer-bg) / <alpha-value>)',
+                'landing-shop-gradient': 'rgb(var(--landing-page-shop-gradient) / <alpha-value>)',
+                'landing-shop-card-bg': 'rgb(var(--landing-page-shop-card-bg) / <alpha-value>)',
             },
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
-                display: ["Manrope", "sans-serif"],
-                body: ["Manrope", "sans-serif"],
+                display: ['Manrope', 'sans-serif'],
+                body: ['Manrope', 'sans-serif'],
             },
         },
     },

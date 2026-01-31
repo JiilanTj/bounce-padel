@@ -2,22 +2,6 @@ export default function Shop() {
     const products = [
         {
             name: 'Nox AT10 Luxury',
-            category: 'Professional Series',
-            price: '$320',
-            image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD2b8iIcSdsnvF_Xk3wkGTIYrdcOlPCpm3CxosbR9OvOXlnWBCJgXd93pVuop5_3kHL83JPyIHqXEWBFhNYhT_HOvYQEVBD_n9zX46rZtStS9cdMVPorxPVkEoreiOOPRfl3WCyzKspyPD7cHmg463G5aUbltnGaAgs6TCuHLGWViq3AssBIKmuE03Yp8pUEmVmrkr4DcAyXHYvC_3Q4mOfGCjsx9dFabHsHvnTc6n7gHRWP14iuGJIsziBE4QZ0dsJQtImnsrHY-o',
-            tag: 'NEW',
-        },
-        {
-            name: 'Head Pro S Balls',
-            category: '3-Ball Can',
-            price: '$8.50',
-            image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAcP4gaYsK-qbYkqyLjEzVtkn5OA_csCQt3sagYgR707L3O-S0SJSPGK4FwwQRVfX4vs0HNpWZiooHXTVyR5-5lF4eWcoW_YWSshqi96SYVwMWNcKyiRJ-dR4Ca0yldKnZ1mEWIFAQlbJIYrcEQM-SbGmz-IAnNKltdDYl8-Uo8IMSLxqrEKOwKRM_2tEGKlQWadH8j92YTRUvdq8foe7eYc_a2gK-xl-it5plQTD96oGbXSLSA5e9JoGPHr6Dnv7zbUHiKUIdARC0',
-            tag: null,
-        },
-        {
-            name: 'Bounce Tech Tee',
-            category: 'Breathable Fabric',
-            price: '$45',
             image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDSEYSeHhDE3Irg1C5tbRLgDfMNZHRirewmKYhMC5EnEFy1RYiodtvuYznwqpQNyat0ZjR5p40jEVuonDlG86vbVvts7udBMwFEuYANChbl_zyzIcd9-reDZO_kKMp0_wARUQ_pdjnENWpBCdln815_piG25Q7M-2aHE9Yf_xEh86V-MP57Cn419Nom8C63_oVvlwQQALeqismZEh3EBvODNKZunY4eKZUGrZxWP7HymAnK5oQL2turs80dy_hTsGEtAqhrJyT9M30',
             tag: null,
         },
@@ -33,15 +17,15 @@ export default function Shop() {
     return (
         <section className="relative overflow-hidden bg-surface-dark py-24">
             {/* Abstract Background Pattern */}
-            <div className="pointer-events-none absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-[#152e20] to-transparent"></div>
+            <div className="pointer-events-none absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-landing-shop-gradient to-transparent"></div>
             <div className="relative z-10 mx-auto max-w-[1280px] px-6">
                 <div className="mb-16 flex flex-col items-center justify-between md:flex-row">
                     <div>
                         <span className="mb-2 block text-sm font-bold uppercase tracking-widest text-primary">
                             Official Retailer
                         </span>
-                        <h2 className="text-3xl font-bold text-white md:text-5xl">
-                            The Pro Shop
+                        <h2 className="mb-4 text-4xl font-extrabold text-white md:text-5xl">
+                            Toko Pro
                         </h2>
                     </div>
                     <div className="mt-6 flex gap-4 md:mt-0">
@@ -62,9 +46,9 @@ export default function Shop() {
                     {products.map((product, index) => (
                         <div
                             key={index}
-                            className="group rounded-xl border border-white/5 bg-[#112217] p-4 transition-all duration-300 hover:border-primary/50"
+                            className="group rounded-xl border border-white/5 bg-background-dark p-4 transition-all duration-300 hover:border-primary/50"
                         >
-                            <div className="relative mb-4 flex aspect-square items-center justify-center overflow-hidden rounded-lg bg-[#1a2c21]">
+                            <div className="relative mb-4 flex aspect-square items-center justify-center overflow-hidden rounded-lg bg-landing-shop-card-bg">
                                 {product.tag && (
                                     <span className="absolute left-3 top-3 rounded bg-white px-2 py-1 text-xs font-bold text-black">
                                         {product.tag}
@@ -82,7 +66,8 @@ export default function Shop() {
                                         {product.name}
                                     </h3>
                                     <p className="text-sm text-gray-400">
-                                        {product.category}
+                                        Perlengkapan premium untuk permainan
+                                        terbaik Anda
                                     </p>
                                 </div>
                                 <span className="font-bold text-primary">

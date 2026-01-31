@@ -11,10 +11,10 @@ export default function Welcome() {
     return (
         <div className="bg-background-light font-body text-slate-900 transition-colors duration-300 dark:bg-background-dark dark:text-white">
             <Head>
-                <title>Bounce Padel - Premium Courts & Gear</title>
+                <title>Bounce Padel - Lapangan & Perlengkapan Premium</title>
                 <meta
                     name="description"
-                    content="Bounce Padel - The City's Premier Padel Club"
+                    content="Bounce Padel - Klub Padel Premier Kota"
                 />
 
                 {/* Google Fonts */}
