@@ -18,6 +18,7 @@ Route::get('/', function () {
         'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
+        'settings' => \App\Models\WebsiteSetting::first(),
     ]);
 });
 
@@ -58,6 +59,11 @@ Route::middleware('auth')->group(function () {
         Route::resource('tables', TableController::class)->except(['index', 'show']);
         Route::resource('menus', MenuController::class)->except(['index', 'show']);
         Route::resource('menu-items', MenuItemController::class)->except(['index', 'show']);
+    });
+    // Owner Only Routes
+    Route::middleware('role:owner')->group(function () {
+        Route::get('/website-settings', [\App\Http\Controllers\WebsiteSettingController::class, 'edit'])->name('website-settings.edit');
+        Route::put('/website-settings', [\App\Http\Controllers\WebsiteSettingController::class, 'update'])->name('website-settings.update');
     });
 });
 

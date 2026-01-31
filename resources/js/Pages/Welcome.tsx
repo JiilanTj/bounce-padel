@@ -7,7 +7,21 @@ import Shop from '@/Components/Landing/Shop';
 import Stats from '@/Components/Landing/Stats';
 import { Head } from '@inertiajs/react';
 
-export default function Welcome() {
+export interface WebsiteSettings {
+    phone_number: string | null;
+    email: string | null;
+    location: string | null;
+    location_link: string | null;
+    facebook_link: string | null;
+    instagram_link: string | null;
+    twitter_link: string | null;
+}
+
+export default function Welcome({
+    settings,
+}: {
+    settings: WebsiteSettings | null;
+}) {
     return (
         <div className="bg-background-light font-body text-slate-900 transition-colors duration-300 dark:bg-background-dark dark:text-white">
             <Head>
@@ -36,7 +50,7 @@ export default function Welcome() {
                 />
             </Head>
 
-            <Navbar />
+            <Navbar settings={settings} />
 
             <main>
                 <Hero />
@@ -46,7 +60,7 @@ export default function Welcome() {
                 <CTA />
             </main>
 
-            <Footer />
+            <Footer settings={settings} />
         </div>
     );
 }

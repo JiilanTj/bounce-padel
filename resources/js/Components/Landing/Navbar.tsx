@@ -1,7 +1,12 @@
+import { WebsiteSettings } from '@/Pages/Welcome';
 import { Link } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
-export default function Navbar() {
+export default function Navbar({
+    settings,
+}: {
+    settings?: WebsiteSettings | null;
+}) {
     const [isOpen, setIsOpen] = useState(false);
 
     // Prevent scrolling when menu is open
@@ -99,12 +104,19 @@ export default function Navbar() {
 
                 {/* Mobile Menu Footer */}
                 <div className="shrink-0 border-t border-white/10 px-6 py-8">
-                    <button className="flex w-full items-center justify-between rounded-full bg-white px-6 py-4 font-bold text-[#112217] transition-colors hover:bg-gray-100">
+                    <a
+                        href={
+                            settings?.phone_number
+                                ? `tel:${settings.phone_number}`
+                                : '#'
+                        }
+                        className="flex w-full items-center justify-between rounded-full bg-white px-6 py-4 font-bold text-[#112217] transition-colors hover:bg-gray-100"
+                    >
                         <span>Hubungi Kami</span>
                         <span className="material-symbols-outlined">
                             arrow_forward
                         </span>
-                    </button>
+                    </a>
                 </div>
             </div>
         </nav>

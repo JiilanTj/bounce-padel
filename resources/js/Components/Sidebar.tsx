@@ -7,6 +7,7 @@ import {
     ChevronRightIcon,
     Cog6ToothIcon,
     CreditCardIcon,
+    GlobeAltIcon,
     HomeIcon,
     ShoppingBagIcon,
     Square2StackIcon,
@@ -120,6 +121,13 @@ export default function Sidebar({ className = '' }: { className?: string }) {
                 roles: ['admin', 'owner'],
             },
             {
+                name: 'Website Settings',
+                href: route('website-settings.edit'),
+                routeName: 'website-settings.*',
+                icon: GlobeAltIcon,
+                roles: ['owner'],
+            },
+            {
                 name: 'My Bookings',
                 href: '#',
                 routeName: 'bookings.*',
@@ -198,14 +206,11 @@ export default function Sidebar({ className = '' }: { className?: string }) {
                     {/* Logo Area */}
                     <div className="flex h-16 items-center px-6">
                         <Link href="/" className="flex items-center space-x-3">
-                            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 shadow-md shadow-blue-500/30">
-                                <span className="text-sm font-bold text-white">
-                                    BP
-                                </span>
-                            </div>
-                            <span className="text-lg font-bold text-gray-800">
-                                Bounce
-                            </span>
+                            <img
+                                src="/textlogoblack.png"
+                                alt="Bounce Padel"
+                                className="h-8 w-auto"
+                            />
                         </Link>
                     </div>
 
@@ -346,11 +351,11 @@ export default function Sidebar({ className = '' }: { className?: string }) {
                     {/* User Info */}
                     <div className="border-t border-gray-100 p-4">
                         <div className="flex items-center space-x-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 shadow-md ring-2 ring-white">
-                                <span className="text-sm font-semibold text-white">
-                                    {user.name.charAt(0).toUpperCase()}
-                                </span>
-                            </div>
+                            <img
+                                src={user.avatar}
+                                alt={user.name}
+                                className="h-10 w-10 rounded-full object-cover shadow-md ring-2 ring-white"
+                            />
                             <div className="min-w-0 flex-1">
                                 <p className="truncate text-sm font-semibold text-gray-800">
                                     {user.name}

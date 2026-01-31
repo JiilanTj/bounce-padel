@@ -143,11 +143,11 @@ export default function Authenticated({
                                         {user.role}
                                     </p>
                                 </div>
-                                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 shadow-sm">
-                                    <span className="text-sm font-semibold text-white">
-                                        {user.name.charAt(0).toUpperCase()}
-                                    </span>
-                                </div>
+                                <img
+                                    src={user.avatar}
+                                    alt={user.name}
+                                    className="h-9 w-9 rounded-full object-cover shadow-sm ring-2 ring-white"
+                                />
                             </Link>
                         </div>
                     </header>

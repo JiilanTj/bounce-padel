@@ -4,6 +4,7 @@ export interface User {
     email: string;
     email_verified_at?: string;
     role: 'user' | 'kasir' | 'pelayan' | 'admin' | 'owner';
+    avatar: string;
     created_at: string;
     updated_at: string;
 }

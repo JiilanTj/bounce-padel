@@ -1,4 +1,10 @@
-export default function Footer() {
+import { WebsiteSettings } from '@/Pages/Welcome';
+
+export default function Footer({
+    settings,
+}: {
+    settings?: WebsiteSettings | null;
+}) {
     return (
         <footer className="border-t border-landing-border bg-landing-footer-bg pb-8 pt-12 md:pt-16">
             <div className="mx-auto max-w-[1280px] px-6">
@@ -18,7 +24,9 @@ export default function Footer() {
                         </p>
                         <div className="flex gap-3">
                             <a
-                                href="#"
+                                href={settings?.facebook_link || '#'}
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 className="flex h-10 w-10 items-center justify-center rounded-full bg-white/5 text-white transition-colors hover:bg-primary hover:text-black"
                                 aria-label="Facebook"
                             >
@@ -31,7 +39,9 @@ export default function Footer() {
                                 </svg>
                             </a>
                             <a
-                                href="#"
+                                href={settings?.instagram_link || '#'}
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 className="flex h-10 w-10 items-center justify-center rounded-full bg-white/5 text-white transition-colors hover:bg-primary hover:text-black"
                                 aria-label="Instagram"
                             >
@@ -44,7 +54,9 @@ export default function Footer() {
                                 </svg>
                             </a>
                             <a
-                                href="#"
+                                href={settings?.twitter_link || '#'}
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 className="flex h-10 w-10 items-center justify-center rounded-full bg-white/5 text-white transition-colors hover:bg-primary hover:text-black"
                                 aria-label="Twitter"
                             >
@@ -151,23 +163,47 @@ export default function Footer() {
                                 <span className="material-symbols-outlined mt-0.5 text-primary">
                                     location_on
                                 </span>
-                                <span>
-                                    Jl. Padel Indonesia No. 88,
-                                    <br />
-                                    Jakarta Selatan, 12345
-                                </span>
+                                <div>
+                                    {settings?.location_link ? (
+                                        <a
+                                            href={settings.location_link}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="hover:text-primary"
+                                        >
+                                            {settings?.location ||
+                                                'Jl. Padel Indonesia No. 88, Jakarta Selatan, 12345'}
+                                        </a>
+                                    ) : (
+                                        <span>
+                                            {settings?.location ||
+                                                'Jl. Padel Indonesia No. 88, Jakarta Selatan, 12345'}
+                                        </span>
+                                    )}
+                                </div>
                             </li>
                             <li className="flex items-center gap-3">
                                 <span className="material-symbols-outlined text-primary">
                                     email
                                 </span>
-                                <span>info@bounce.id</span>
+                                <a
+                                    href={`mailto:${settings?.email || 'info@bounce.id'}`}
+                                    className="hover:text-primary"
+                                >
+                                    {settings?.email || 'info@bounce.id'}
+                                </a>
                             </li>
                             <li className="flex items-center gap-3">
                                 <span className="material-symbols-outlined text-primary">
                                     call
                                 </span>
-                                <span>+62 21 1234 5678</span>
+                                <a
+                                    href={`tel:${settings?.phone_number || '+62 21 1234 5678'}`}
+                                    className="hover:text-primary"
+                                >
+                                    {settings?.phone_number ||
+                                        '+62 21 1234 5678'}
+                                </a>
                             </li>
                         </ul>
                     </div>
@@ -175,7 +211,7 @@ export default function Footer() {
                 <div className="flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 md:flex-row">
                     <div className="flex flex-col items-center gap-2 md:flex-row md:gap-4">
                         <p className="text-sm text-gray-500">
-                            © 2024 Bounce Padel. Hak cipta dilindungi.
+                            © 2026 Bounce Padel. Hak cipta dilindungi.
                         </p>
                         <span className="hidden text-gray-600 md:inline">
                             •
