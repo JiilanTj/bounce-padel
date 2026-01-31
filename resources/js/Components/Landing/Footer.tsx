@@ -1,10 +1,10 @@
 export default function Footer() {
     return (
-        <footer className="border-t border-landing-border bg-landing-footer-bg pb-8 pt-16">
+        <footer className="border-t border-landing-border bg-landing-footer-bg pb-8 pt-12 md:pt-16">
             <div className="mx-auto max-w-[1280px] px-6">
-                <div className="mb-16 grid grid-cols-1 gap-12 md:grid-cols-3">
+                <div className="mb-12 grid grid-cols-2 gap-8 md:mb-16 lg:gap-12 xl:grid-cols-4">
                     {/* Brand */}
-                    <div>
+                    <div className="col-span-2 xl:col-span-1">
                         <div className="mb-6 flex items-center gap-3">
                             <img
                                 src="/textlogo.png"
@@ -59,10 +59,10 @@ export default function Footer() {
                         </div>
                     </div>
 
-                    {/* Quick Links */}
+                    {/* Eksplorasi */}
                     <div>
                         <h3 className="mb-6 text-lg font-bold text-white">
-                            Menu
+                            Eksplorasi
                         </h3>
                         <ul className="space-y-3">
                             <li>
@@ -86,14 +86,6 @@ export default function Footer() {
                                     href="#"
                                     className="text-sm text-gray-400 transition-colors hover:text-primary"
                                 >
-                                    Rental Alat
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="#"
-                                    className="text-sm text-gray-400 transition-colors hover:text-primary"
-                                >
                                     Padel Store
                                 </a>
                             </li>
@@ -102,23 +94,81 @@ export default function Footer() {
                                     href="#"
                                     className="text-sm text-gray-400 transition-colors hover:text-primary"
                                 >
-                                    Kontak
+                                    Rental Alat
                                 </a>
                             </li>
                         </ul>
                     </div>
 
-
+                    {/* Komunitas */}
+                    <div>
+                        <h3 className="mb-6 text-lg font-bold text-white">
+                            Komunitas
+                        </h3>
+                        <ul className="space-y-3">
+                            <li>
+                                <a
+                                    href="#"
+                                    className="text-sm text-gray-400 transition-colors hover:text-primary"
+                                >
+                                    Akademi Padel
+                                </a>
+                            </li>
+                            <li>
+                                <a
+                                    href="#"
+                                    className="text-sm text-gray-400 transition-colors hover:text-primary"
+                                >
+                                    Turnamen
+                                </a>
+                            </li>
+                            <li>
+                                <a
+                                    href="#"
+                                    className="text-sm text-gray-400 transition-colors hover:text-primary"
+                                >
+                                    Membership
+                                </a>
+                            </li>
+                            <li>
+                                <a
+                                    href="#"
+                                    className="text-sm text-gray-400 transition-colors hover:text-primary"
+                                >
+                                    Aturan Main
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
 
                     {/* Contact */}
-                    <div>
+                    <div className="col-span-2 xl:col-span-1">
                         <h3 className="mb-6 text-lg font-bold text-white">
                             Kontak
                         </h3>
                         <ul className="space-y-3 text-sm text-gray-400">
-                            <li>Jakarta, Indonesia</li>
-                            <li>info@bounce.id</li>
-                            <li>+62 21 1234 5678</li>
+                            <li className="flex items-start gap-3">
+                                <span className="material-symbols-outlined mt-0.5 text-primary">
+                                    location_on
+                                </span>
+                                <span>
+                                    Jl. Padel Indonesia No. 88,
+                                    <br />
+                                    Jakarta Selatan, 12345
+                                </span>
+                            </li>
+                            <li className="flex items-center gap-3">
+                                <span className="material-symbols-outlined text-primary">
+                                    email
+                                </span>
+                                <span>info@bounce.id</span>
+                            </li>
+                            <li className="flex items-center gap-3">
+                                <span className="material-symbols-outlined text-primary">
+                                    call
+                                </span>
+                                <span>+62 21 1234 5678</span>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -127,7 +177,9 @@ export default function Footer() {
                         <p className="text-sm text-gray-500">
                             © 2024 Bounce Padel. Hak cipta dilindungi.
                         </p>
-                        <span className="hidden text-gray-600 md:inline">•</span>
+                        <span className="hidden text-gray-600 md:inline">
+                            •
+                        </span>
                         <p className="text-sm text-gray-500">
                             Technology Supported by{' '}
                             <a

@@ -1,39 +1,62 @@
 export default function CTA() {
     return (
-        <section className="bg-background-light py-24 dark:bg-background-dark">
+        <section className="bg-background-light py-16 dark:bg-background-dark md:py-24">
             <div className="mx-auto max-w-[1280px] px-6">
-                <div className="relative flex flex-col items-center justify-between overflow-hidden rounded-3xl bg-primary p-8 md:flex-row md:p-16">
-                    {/* Decorative Circle */}
-                    <div className="absolute -left-24 -top-24 h-64 w-64 rounded-full bg-white/20 blur-3xl"></div>
-                    <div className="relative z-10 max-w-lg">
-                        <h2 className="mb-6 text-3xl font-extrabold leading-tight text-background-dark md:text-5xl">
-                            Siap gabung?
-                        </h2>
-                        <p className="mb-8 text-lg font-medium text-background-dark/80">
-                            Download aplikasi Bounce buat booking lapangan,
-                            cari lawan main, dan pantau progress kamu dengan
-                            mudah.
-                        </p>
-                        <div className="flex flex-wrap gap-4">
-                            <button className="flex items-center gap-3 rounded-lg bg-background-dark px-6 py-3 font-bold text-white transition-colors hover:bg-black">
-                                <span className="material-symbols-outlined">
-                                    ios
-                                </span>
-                                App Store
-                            </button>
-                            <button className="flex items-center gap-3 rounded-lg bg-background-dark px-6 py-3 font-bold text-white transition-colors hover:bg-black">
-                                <span className="material-symbols-outlined">
-                                    android
-                                </span>
-                                Google Play
-                            </button>
+                <div className="relative overflow-hidden rounded-3xl bg-[#112217] p-8 md:p-16">
+                    {/* Background Image / Overlay */}
+                    <div
+                        className="absolute inset-0 z-0 bg-cover bg-center opacity-30 mix-blend-overlay"
+                        style={{
+                            backgroundImage:
+                                "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAWlE-9UDhnPPYTmQb0VHg__XUkAnTXCthkpo9ZkfiKNRmIC7CQUcyKlnsJXP235wYvaGqewFFJ6HS--YbNjQeYE2x3zY2ZDkRAONMAB_vpQQE2vIrmZcxaQNBvlY1vScM2u7xObOEwAR4FH36sqXxgM13S30u2rFJlhKTFMZJQdSRa4dR52rgZPUZuuv4bOvFYYeL8oEaywrg-IRdz3tBHtoia3Bq3TAGivjgtI6ebmZiNrCk0Bw41S1hx4qBFbHuBUg_gv9b5Rko')",
+                        }}
+                    ></div>
+                    <div className="absolute inset-0 z-0 bg-gradient-to-r from-[#112217] via-[#112217]/90 to-transparent"></div>
+
+                    <div className="relative z-10 flex flex-col items-center justify-between gap-12 md:flex-row">
+                        <div className="max-w-lg text-center md:text-left">
+                            <h2 className="mb-6 text-3xl font-extrabold leading-tight text-white md:text-5xl">
+                                Siap untuk{' '}
+                                <span className="text-primary">Juara?</span>
+                            </h2>
+                            <p className="mb-8 text-lg font-medium text-gray-400">
+                                Jangan lewatkan keseruan bermain Padel. Booking
+                                lapangan sekarang via Ayo.co.id atau website
+                                kami.
+                            </p>
+                            <div className="flex flex-col gap-4 sm:flex-row">
+                                <a
+                                    href="https://ayo.co.id"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex w-full items-center justify-center gap-3 rounded-lg bg-primary px-6 py-4 font-bold text-[#112217] transition-all hover:bg-white sm:w-auto"
+                                >
+                                    <span className="material-symbols-outlined">
+                                        sports_tennis
+                                    </span>
+                                    Book via Ayo Indonesia
+                                </a>
+                                <button className="flex w-full items-center justify-center gap-3 rounded-lg border border-white/20 bg-transparent px-6 py-4 font-bold text-white transition-all hover:bg-white hover:text-[#112217] sm:w-auto">
+                                    <span className="material-symbols-outlined">
+                                        calendar_today
+                                    </span>
+                                    Web Booking
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    <div className="relative z-10 mt-10 flex justify-center md:mt-0">
-                        <div className="flex h-64 w-64 items-center justify-center rounded-full border border-background-dark/10 bg-background-dark/10 backdrop-blur-sm">
-                            <span className="material-symbols-outlined text-[100px] text-background-dark">
-                                qr_code_2
-                            </span>
+
+                        {/* QR Code / App Preview aligned right */}
+                        <div className="relative flex justify-center">
+                            <div className="relative flex h-64 w-64 items-center justify-center rounded-2xl bg-white shadow-2xl transition-transform hover:scale-105 md:h-72 md:w-72">
+                                <span className="material-symbols-outlined text-[150px] text-[#112217]">
+                                    qr_code_2
+                                </span>
+                                <div className="absolute -bottom-4 rounded-full bg-primary px-4 py-1 text-sm font-bold text-[#112217] shadow-lg">
+                                    Scan to Book
+                                </div>
+                            </div>
+                            {/* Decorative background blur behind QR */}
+                            <div className="absolute -inset-4 -z-10 rounded-full bg-primary/20 blur-3xl"></div>
                         </div>
                     </div>
                 </div>

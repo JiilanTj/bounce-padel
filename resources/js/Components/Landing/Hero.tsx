@@ -17,12 +17,14 @@ export default function Hero() {
                 <h1 className="mb-6 text-4xl font-extrabold leading-tight text-white md:text-6xl lg:text-7xl">
                     Lapangan Indoor Berkualitas
                     <br />
-                    <span className="text-primary">Main Padel Semakin Seru</span>
+                    <span className="text-primary">
+                        Main Padel Semakin Seru
+                    </span>
                 </h1>
                 <p className="mb-10 text-lg font-medium leading-relaxed text-gray-200 md:text-xl">
                     Gabung di klub padel paling asyik! Fasilitas lengkap,
-                    pelatih berpengalaman, dan komunitas yang solid buat
-                    kamu yang suka main padel.
+                    pelatih berpengalaman, dan komunitas yang solid buat kamu
+                    yang suka main padel.
                 </p>
                 <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
                     <button className="h-12 w-full transform rounded-lg bg-primary px-8 text-base font-bold text-background-dark transition-all hover:scale-105 hover:bg-green-600 sm:w-auto">
