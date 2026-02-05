@@ -12,6 +12,7 @@ use App\Http\Controllers\TableController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\MenuItemController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\PublicCourtController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -22,6 +23,10 @@ Route::get('/', function () {
         'settings' => \App\Models\WebsiteSetting::first(),
     ]);
 });
+
+// Public routes (no auth required)
+Route::get('/lapangan', [PublicCourtController::class, 'index'])->name('public.courts.index');
+Route::get('/lapangan/{court}', [PublicCourtController::class, 'show'])->name('public.courts.show');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');

@@ -19,7 +19,7 @@ export default function Navbar({
     }, [isOpen]);
 
     const menuItems = [
-        { label: 'Lapangan', href: '#' },
+        { label: 'Lapangan', href: '/lapangan' },
         { label: 'Fasilitas', href: '#' },
         { label: 'Rental Alat', href: '#' },
         { label: 'Padel Store', href: '#' },
