@@ -1,5 +1,5 @@
 import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import { ChangeEvent, useRef, useState } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 
 type Props = {
     label?: string;
@@ -19,6 +19,11 @@ export default function FileInput({
     const inputRef = useRef<HTMLInputElement>(null);
     const [preview, setPreview] = useState<string | null>(previewUrl || null);
     const [fileName, setFileName] = useState<string | null>(null);
+
+    // Update preview when previewUrl prop changes
+    useEffect(() => {
+        setPreview(previewUrl || null);
+    }, [previewUrl]);
 
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];

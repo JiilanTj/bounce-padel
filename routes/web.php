@@ -11,6 +11,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TableController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\MenuItemController;
+use App\Http\Controllers\InventoryController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -46,6 +47,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('tables', TableController::class)->only(['index', 'show']);
         Route::resource('menus', MenuController::class)->only(['index', 'show']);
         Route::resource('menu-items', MenuItemController::class)->only(['index', 'show']);
+        Route::resource('inventories', InventoryController::class)->only(['index', 'show']);
     });
 
     // Master Data - Write Access (Owner & Admin only)
@@ -58,6 +60,8 @@ Route::middleware('auth')->group(function () {
         
         Route::resource('tables', TableController::class)->except(['index', 'show']);
         Route::resource('menus', MenuController::class)->except(['index', 'show']);
+        
+        Route::resource('inventories', InventoryController::class)->except(['index', 'show']);
         Route::resource('menu-items', MenuItemController::class)->except(['index', 'show']);
     });
     // Owner Only Routes

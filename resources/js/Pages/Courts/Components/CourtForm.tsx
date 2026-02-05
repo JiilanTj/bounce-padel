@@ -7,6 +7,7 @@ import SecondaryButton from '@/Components/SecondaryButton';
 import TextInput from '@/Components/TextInput';
 import { useForm } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 // Types
 type OperatingHour = {
@@ -145,7 +146,15 @@ export default function CourtForm({ show, onClose, court }: Props) {
                         <div className="space-y-4">
                             <FileInput
                                 label="Court Image"
-                                onChange={(file) => setData('image', file)}
+                                onChange={(file) => {
+                                    if (file && file.size > 8 * 1024 * 1024) {
+                                        toast.error(
+                                            'File is too large. Server limit is 8MB. Please upload a smaller image.',
+                                        );
+                                        return;
+                                    }
+                                    setData('image', file);
+                                }}
                                 error={errors.image}
                                 previewUrl={court?.image_path}
                                 className="w-full"

@@ -73,6 +73,11 @@ export default function Sidebar({ className = '' }: { className?: string }) {
                         routeName: 'products.*',
                     },
                     {
+                        name: 'Inventories',
+                        href: route('inventories.index'),
+                        routeName: 'inventories.*',
+                    },
+                    {
                         name: 'Tables',
                         href: route('tables.index'),
                         routeName: 'tables.*',
