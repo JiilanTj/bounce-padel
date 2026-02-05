@@ -92,6 +92,11 @@ export default function Sidebar({ className = '' }: { className?: string }) {
                         href: route('menu-items.index'),
                         routeName: 'menu-items.*',
                     },
+                    {
+                        name: 'Facilities',
+                        href: route('facilities.index'),
+                        routeName: 'facilities.*',
+                    },
                 ],
             },
             {

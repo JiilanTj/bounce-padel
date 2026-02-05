@@ -1,4 +1,5 @@
 import FileInput from '@/Components/FileInput';
+import IconPicker from '@/Components/IconPicker';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import Modal from '@/Components/Modal';
@@ -31,7 +32,7 @@ export default function FacilityForm({ show, onClose, facility }: Props) {
         useForm({
             name: '',
             description: '',
-            icon: '',
+            icon: null as string | null,
             image: null as File | null,
             status: 'active' as 'active' | 'inactive',
             sort_order: '',
@@ -44,7 +45,7 @@ export default function FacilityForm({ show, onClose, facility }: Props) {
                 setData({
                     name: facility.name,
                     description: facility.description || '',
-                    icon: facility.icon || '',
+                    icon: facility.icon,
                     image: null,
                     status: facility.status,
                     sort_order: facility.sort_order.toString(),
@@ -76,30 +77,6 @@ export default function FacilityForm({ show, onClose, facility }: Props) {
             });
         }
     };
-
-    // Popular Material Icons for facilities
-    const commonIcons = [
-        'pool',
-        'fitness_center',
-        'restaurant',
-        'wifi',
-        'local_parking',
-        'air',
-        'shower',
-        'kitchen',
-        'meeting_room',
-        'elevator',
-        'accessible',
-        'security',
-        'local_cafe',
-        'tv',
-        'music_note',
-        'sports_tennis',
-        'sports_soccer',
-        'sports_basketball',
-        'balcony',
-        'outdoor_grill',
-    ];
 
     return (
         <Modal show={show} onClose={onClose} maxWidth="2xl">
@@ -227,65 +204,15 @@ export default function FacilityForm({ show, onClose, facility }: Props) {
                             </div>
 
                             <div>
-                                <InputLabel
-                                    htmlFor="icon"
-                                    value="Icon (Optional)"
+                                <IconPicker
+                                    value={data.icon}
+                                    onChange={(icon) => setData('icon', icon)}
+                                    error={errors.icon}
+                                    label="Icon (Optional)"
                                 />
-                                <div className="mt-1 space-y-2">
-                                    <TextInput
-                                        id="icon"
-                                        type="text"
-                                        className="block w-full"
-                                        value={data.icon}
-                                        onChange={(e) =>
-                                            setData('icon', e.target.value)
-                                        }
-                                        placeholder="pool, fitness_center, wifi..."
-                                    />
-                                    <InputError
-                                        message={errors.icon}
-                                        className="mt-2"
-                                    />
-
-                                    {/* Icon Preview */}
-                                    {data.icon && (
-                                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                                            <span>Preview:</span>
-                                            <span className="material-symbols-outlined text-lg">
-                                                {data.icon}
-                                            </span>
-                                        </div>
-                                    )}
-
-                                    {/* Common Icons */}
-                                    <div>
-                                        <p className="mb-2 text-sm text-gray-600">
-                                            Common icons:
-                                        </p>
-                                        <div className="flex flex-wrap gap-1">
-                                            {commonIcons.map((icon) => (
-                                                <button
-                                                    key={icon}
-                                                    type="button"
-                                                    onClick={() =>
-                                                        setData('icon', icon)
-                                                    }
-                                                    className={`flex items-center gap-1 rounded-md px-2 py-1 text-xs transition-colors ${
-                                                        data.icon === icon
-                                                            ? 'bg-blue-100 text-blue-700'
-                                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                                    }`}
-                                                    title={icon}
-                                                >
-                                                    <span className="material-symbols-outlined text-sm">
-                                                        {icon}
-                                                    </span>
-                                                    <span>{icon}</span>
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
+                                <p className="mt-1 text-xs text-gray-500">
+                                    Select an icon to represent this facility
+                                </p>
                             </div>
                         </div>
                     </div>
