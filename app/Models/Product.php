@@ -26,6 +26,6 @@ class Product extends Model
 
     public function inventoryLogs()
     {
-        return $this->morphMany(InventoryLog::class, 'reference');
+        return $this->hasMany(InventoryLog::class);
     }
 }

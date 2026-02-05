@@ -1,11 +1,14 @@
 import Sidebar from '@/Components/Sidebar';
 import { PageProps } from '@/types';
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import {
     BellIcon,
+    ChevronDownIcon,
     MagnifyingGlassIcon,
     XMarkIcon,
 } from '@heroicons/react/24/outline';
-import { Link, usePage } from '@inertiajs/react';
+import { ArrowRightOnRectangleIcon, UserIcon } from '@heroicons/react/24/solid';
+import { Link, router, usePage } from '@inertiajs/react';
 import {
     PropsWithChildren,
     ReactNode,
@@ -130,25 +133,65 @@ export default function Authenticated({
                             {/* Divider */}
                             <div className="mx-2 h-8 w-px bg-gray-200"></div>
 
-                            {/* User */}
-                            <Link
-                                href={route('profile.edit')}
-                                className="flex items-center space-x-3 rounded-xl p-1.5 transition-colors hover:bg-gray-50"
-                            >
-                                <div className="hidden text-right sm:block">
-                                    <p className="text-sm font-semibold text-gray-800">
-                                        {user.name}
-                                    </p>
-                                    <p className="text-xs capitalize text-gray-500">
-                                        {user.role}
-                                    </p>
-                                </div>
-                                <img
-                                    src={user.avatar}
-                                    alt={user.name}
-                                    className="h-9 w-9 rounded-full object-cover shadow-sm ring-2 ring-white"
-                                />
-                            </Link>
+                            {/* User Profile Dropdown */}
+                            <Menu as="div" className="relative">
+                                <MenuButton className="flex items-center space-x-3 rounded-xl p-1.5 transition-colors hover:bg-gray-50">
+                                    <div className="hidden text-right sm:block">
+                                        <p className="text-sm font-semibold text-gray-800">
+                                            {user.name}
+                                        </p>
+                                        <p className="text-xs capitalize text-gray-500">
+                                            {user.role}
+                                        </p>
+                                    </div>
+                                    <img
+                                        src={user.avatar}
+                                        alt={user.name}
+                                        className="h-9 w-9 rounded-full object-cover shadow-sm ring-2 ring-white"
+                                    />
+                                    <ChevronDownIcon className="h-4 w-4 text-gray-400" />
+                                </MenuButton>
+
+                                <MenuItems className="absolute right-0 z-50 mt-1 w-48 origin-top-right rounded-lg bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
+                                    <div className="py-1">
+                                        <MenuItem>
+                                            {({ focus }) => (
+                                                <Link
+                                                    href={route('profile.edit')}
+                                                    className={`flex items-center px-4 py-2 text-sm ${
+                                                        focus
+                                                            ? 'bg-gray-50 text-gray-900'
+                                                            : 'text-gray-700'
+                                                    }`}
+                                                >
+                                                    <UserIcon className="mr-3 h-4 w-4" />
+                                                    Profile
+                                                </Link>
+                                            )}
+                                        </MenuItem>
+                                        <div className="border-t border-gray-100" />
+                                        <MenuItem>
+                                            {({ focus }) => (
+                                                <button
+                                                    onClick={() =>
+                                                        router.post(
+                                                            route('logout'),
+                                                        )
+                                                    }
+                                                    className={`flex w-full items-center px-4 py-2 text-left text-sm ${
+                                                        focus
+                                                            ? 'bg-gray-50 text-gray-900'
+                                                            : 'text-gray-700'
+                                                    }`}
+                                                >
+                                                    <ArrowRightOnRectangleIcon className="mr-3 h-4 w-4" />
+                                                    Logout
+                                                </button>
+                                            )}
+                                        </MenuItem>
+                                    </div>
+                                </MenuItems>
+                            </Menu>
                         </div>
                     </header>
 

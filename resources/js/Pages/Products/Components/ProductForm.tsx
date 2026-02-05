@@ -60,7 +60,7 @@ export default function ProductForm({
         });
 
     useEffect(() => {
-        if (show) {
+        if (show && categories && categories.length > 0) {
             if (product) {
                 setData({
                     category_id: product.category_id.toString(),
@@ -129,7 +129,9 @@ export default function ProductForm({
         }
     };
 
-    const productCategories = categories.filter((c) => c.type === 'product');
+    const productCategories = (categories || []).filter(
+        (c) => c.type === 'product',
+    );
 
     return (
         <Modal show={show} onClose={onClose} maxWidth="2xl">

@@ -21,9 +21,9 @@ export default function Navbar({
     const menuItems = [
         { label: 'Lapangan', href: '/lapangan' },
         { label: 'Fasilitas', href: '#' },
-        { label: 'Rental Alat', href: '#' },
-        { label: 'Padel Store', href: '#' },
-        { label: 'Kontak', href: '#' },
+        { label: 'Rental Alat', href: '/rental-alat' },
+        { label: 'Padel Store', href: '/padel-store' },
+        { label: 'Kontak', href: '/kontak' },
     ];
 
     return (
