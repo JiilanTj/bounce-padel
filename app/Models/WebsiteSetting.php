@@ -14,5 +14,8 @@ class WebsiteSetting extends Model
         'facebook_link',
         'instagram_link',
         'twitter_link',
+        'opening_hours',
+        'operating_days',
+        'holiday_notes',
     ];
 }

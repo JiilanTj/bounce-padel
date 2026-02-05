@@ -6,12 +6,14 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import {
     AtSymbolIcon,
     BuildingOffice2Icon,
+    ClockIcon,
     EnvelopeIcon,
     GlobeAmericasIcon,
     HashtagIcon,
     LinkIcon,
     MapPinIcon,
     PhoneIcon,
+    XCircleIcon,
 } from '@heroicons/react/24/outline';
 import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
@@ -25,9 +27,16 @@ interface WebsiteSettings {
     facebook_link: string | null;
     instagram_link: string | null;
     twitter_link: string | null;
+    opening_hours: string | null;
+    operating_days: string | null;
+    holiday_notes: string | null;
 }
 
-export default function Edit({ settings }: { settings?: WebsiteSettings }) {
+export default function Edit({
+    settings,
+}: {
+    settings?: WebsiteSettings;
+}) {
     const { data, setData, put, processing, errors } = useForm({
         phone_number: settings?.phone_number || '',
         email: settings?.email || '',
@@ -36,6 +45,9 @@ export default function Edit({ settings }: { settings?: WebsiteSettings }) {
         facebook_link: settings?.facebook_link || '',
         instagram_link: settings?.instagram_link || '',
         twitter_link: settings?.twitter_link || '',
+        opening_hours: settings?.opening_hours || '',
+        operating_days: settings?.operating_days || '',
+        holiday_notes: settings?.holiday_notes || '',
     });
 
     const submit: FormEventHandler = (e) => {
@@ -65,9 +77,8 @@ export default function Edit({ settings }: { settings?: WebsiteSettings }) {
                                 Website Control Center
                             </h1>
                             <p className="mt-4 max-w-2xl text-lg text-gray-500">
-                                Manage your digital presence. Keep your contact
-                                info, location, and social connections fresh for
-                                the Bounce Padel community.
+                                Manage your digital presence and operational
+                                information for Bounce Padel.
                             </p>
                         </div>
                         {/* Decorative background element - Subtle */}
@@ -89,7 +100,7 @@ export default function Edit({ settings }: { settings?: WebsiteSettings }) {
                                 </div>
                                 <div>
                                     <h3 className="text-lg font-semibold text-gray-900">
-                                        Business Details
+                                        Contact Information
                                     </h3>
                                     <p className="text-sm text-gray-500">
                                         Manage your contact info & location
@@ -210,6 +221,110 @@ export default function Edit({ settings }: { settings?: WebsiteSettings }) {
                         </div>
                     </div>
 
+                    {/* Operational Hours Section */}
+                    <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-shadow hover:shadow-md">
+                        <div className="border-b border-gray-100 bg-gray-50/50 px-6 py-4">
+                            <div className="flex items-center gap-4">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-100 text-green-600">
+                                    <ClockIcon className="h-6 w-6" />
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-semibold text-gray-900">
+                                        Operational Hours
+                                    </h3>
+                                    <p className="text-sm text-gray-500">
+                                        Set your business hours and operating days.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="space-y-6 p-6">
+                            {/* Operating Days */}
+                            <div>
+                                <InputLabel
+                                    htmlFor="operating_days"
+                                    value="Operating Days"
+                                />
+                                <TextInput
+                                    id="operating_days"
+                                    className="mt-1 block w-full"
+                                    value={data.operating_days}
+                                    placeholder="Senin - Jumat, 08:00 - 22:00"
+                                    onChange={(e) =>
+                                        setData(
+                                            'operating_days',
+                                            e.target.value,
+                                        )
+                                    }
+                                />
+                                <p className="mt-1 text-sm text-gray-500">
+                                    Example: Senin - Jumat, 08:00 - 22:00
+                                </p>
+                                <InputError
+                                    className="mt-2"
+                                    message={errors.operating_days}
+                                />
+                            </div>
+
+                            {/* Opening Hours */}
+                            <div>
+                                <InputLabel
+                                    htmlFor="opening_hours"
+                                    value="Opening Hours"
+                                />
+                                <TextInput
+                                    id="opening_hours"
+                                    className="mt-1 block w-full"
+                                    value={data.opening_hours}
+                                    placeholder="08:00 - 22:00 WIB"
+                                    onChange={(e) =>
+                                        setData(
+                                            'opening_hours',
+                                            e.target.value,
+                                        )
+                                    }
+                                />
+                                <p className="mt-1 text-sm text-gray-500">
+                                    Example: 08:00 - 22:00 WIB
+                                </p>
+                                <InputError
+                                    className="mt-2"
+                                    message={errors.opening_hours}
+                                />
+                            </div>
+
+                            {/* Holiday Notes */}
+                            <div>
+                                <InputLabel
+                                    htmlFor="holiday_notes"
+                                    value="Holiday Notes (Optional)"
+                                />
+                                <textarea
+                                    id="holiday_notes"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    rows={3}
+                                    value={data.holiday_notes}
+                                    placeholder="Tutup pada tanggal merah..."
+                                    onChange={(e) =>
+                                        setData(
+                                            'holiday_notes',
+                                            e.target.value,
+                                        )
+                                    }
+                                />
+                                <p className="mt-1 text-sm text-gray-500">
+                                    Informasi tambahan tentang hari libur atau jam
+                                    operasional khusus.
+                                </p>
+                                <InputError
+                                    className="mt-2"
+                                    message={errors.holiday_notes}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Social Media Section */}
                     <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-shadow hover:shadow-md">
                         <div className="border-b border-gray-100 bg-gray-50/50 px-6 py-4">
@@ -252,6 +367,10 @@ export default function Edit({ settings }: { settings?: WebsiteSettings }) {
                                         }
                                     />
                                 </div>
+                                <InputError
+                                    className="mt-2"
+                                    message={errors.facebook_link}
+                                />
                             </div>
 
                             {/* Instagram */}
@@ -277,6 +396,10 @@ export default function Edit({ settings }: { settings?: WebsiteSettings }) {
                                         }
                                     />
                                 </div>
+                                <InputError
+                                    className="mt-2"
+                                    message={errors.instagram_link}
+                                />
                             </div>
 
                             {/* Twitter */}
@@ -302,17 +425,34 @@ export default function Edit({ settings }: { settings?: WebsiteSettings }) {
                                         }
                                     />
                                 </div>
+                                <InputError
+                                    className="mt-2"
+                                    message={errors.twitter_link}
+                                />
                             </div>
                         </div>
-                        <div className="border-t border-gray-100 bg-gray-50 px-6 py-4">
-                            <div className="flex items-center justify-end">
-                                <PrimaryButton
-                                    disabled={processing}
-                                    className="px-6 py-2"
-                                >
-                                    Save Changes
-                                </PrimaryButton>
-                            </div>
+                    </div>
+
+                    <div className="border-t border-gray-100 bg-gray-50 px-6 py-4">
+                        <div className="flex items-center justify-end gap-4">
+                            <PrimaryButton
+                                disabled={processing}
+                                className="px-6 py-2"
+                            >
+                                Save Changes
+                            </PrimaryButton>
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    window.open(
+                                        '/lapangan',
+                                        '_blank',
+                                    )
+                                }
+                                className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                            >
+                                Preview Public Page
+                            </button>
                         </div>
                     </div>
                 </form>

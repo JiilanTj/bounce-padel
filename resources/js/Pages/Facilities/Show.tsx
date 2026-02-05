@@ -2,7 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { PageProps } from '@/types';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { Head, Link } from '@inertiajs/react';
-import { CheckCircle, Home, XCircle } from 'lucide-react';
+import { Home } from 'lucide-react';
 
 type Facility = {
     id: number;
@@ -72,11 +72,15 @@ export default function Show() {
                                                 : 'bg-red-100 text-red-800'
                                         }`}
                                     >
-                                        {facility.status === 'active' ? 'Active' : 'Inactive'}
+                                        {facility.status === 'active'
+                                            ? 'Active'
+                                            : 'Inactive'}
                                     </span>
                                 </p>
                                 <p className="mt-2">
-                                    <span className="font-medium">Sort Order:</span>{' '}
+                                    <span className="font-medium">
+                                        Sort Order:
+                                    </span>{' '}
                                     {facility.sort_order}
                                 </p>
                             </div>
@@ -94,7 +98,9 @@ export default function Show() {
                                         <span className="material-symbols-outlined text-lg">
                                             {facility.icon}
                                         </span>
-                                        <span className="text-sm">({facility.icon})</span>
+                                        <span className="text-sm">
+                                            ({facility.icon})
+                                        </span>
                                     </div>
                                 )}
                             </div>
@@ -112,30 +118,32 @@ export default function Show() {
 
                             <div className="space-y-2 text-sm text-gray-500">
                                 <p>
-                                    <span className="font-medium">Created:</span>{' '}
-                                    {new Date(facility.created_at).toLocaleDateString(
-                                        'id-ID',
-                                        {
-                                            day: 'numeric',
-                                            month: 'long',
-                                            year: 'numeric',
-                                            hour: '2-digit',
-                                            minute: '2-digit',
-                                        },
-                                    )}
+                                    <span className="font-medium">
+                                        Created:
+                                    </span>{' '}
+                                    {new Date(
+                                        facility.created_at,
+                                    ).toLocaleDateString('id-ID', {
+                                        day: 'numeric',
+                                        month: 'long',
+                                        year: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                    })}
                                 </p>
                                 <p>
-                                    <span className="font-medium">Last Updated:</span>{' '}
-                                    {new Date(facility.updated_at).toLocaleDateString(
-                                        'id-ID',
-                                        {
-                                            day: 'numeric',
-                                            month: 'long',
-                                            year: 'numeric',
-                                            hour: '2-digit',
-                                            minute: '2-digit',
-                                        },
-                                    )}
+                                    <span className="font-medium">
+                                        Last Updated:
+                                    </span>{' '}
+                                    {new Date(
+                                        facility.updated_at,
+                                    ).toLocaleDateString('id-ID', {
+                                        day: 'numeric',
+                                        month: 'long',
+                                        year: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                    })}
                                 </p>
                             </div>
                         </div>

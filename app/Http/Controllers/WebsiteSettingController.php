@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
 use App\Models\WebsiteSetting;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -12,7 +11,7 @@ use Inertia\Response;
 class WebsiteSettingController extends Controller
 {
     /**
-     * Display the website settings form.
+     * Display website settings form.
      */
     public function edit(): Response
     {
@@ -24,7 +23,7 @@ class WebsiteSettingController extends Controller
     }
 
     /**
-     * Update the website settings.
+     * Update website settings.
      */
     public function update(Request $request): RedirectResponse
     {
@@ -36,6 +35,9 @@ class WebsiteSettingController extends Controller
             'facebook_link' => 'nullable|url|max:255',
             'instagram_link' => 'nullable|url|max:255',
             'twitter_link' => 'nullable|url|max:255',
+            'opening_hours' => 'nullable|string|max:255',
+            'operating_days' => 'nullable|string|max:255',
+            'holiday_notes' => 'nullable|string',
         ]);
 
         $settings = WebsiteSetting::first();

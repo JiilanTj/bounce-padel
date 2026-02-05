@@ -13,6 +13,7 @@ use App\Http\Controllers\MenuController;
 use App\Http\Controllers\MenuItemController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\PublicCourtController;
+use App\Http\Controllers\PublicFacilityController;
 use App\Http\Controllers\PublicProductController;
 use App\Http\Controllers\PublicContactController;
 use App\Http\Controllers\FacilityController;
@@ -30,6 +31,7 @@ Route::get('/', function () {
 // Public routes (no auth required)
 Route::get('/lapangan', [PublicCourtController::class, 'index'])->name('public.courts.index');
 Route::get('/lapangan/{court}', [PublicCourtController::class, 'show'])->name('public.courts.show');
+Route::get('/fasilitas', [PublicFacilityController::class, 'index'])->name('public.facilities');
 Route::get('/rental-alat', [PublicProductController::class, 'rental'])->name('public.rental');
 Route::get('/padel-store', [PublicProductController::class, 'store'])->name('public.store');
 Route::get('/kontak', [PublicContactController::class, 'index'])->name('public.contact');
