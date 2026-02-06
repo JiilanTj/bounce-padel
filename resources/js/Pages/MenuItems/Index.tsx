@@ -21,15 +21,22 @@ type Menu = {
     name: string;
 };
 
+type Category = {
+    id: number;
+    name: string;
+};
+
 type MenuItem = {
     id: number;
     menu_id: number;
+    category_id: number | null;
     name: string;
     description: string | null;
     price: number;
     image_url: string | null;
     is_available: boolean;
     menu?: Menu;
+    category?: Category;
 };
 
 interface MenuItemsIndexProps extends PageProps {
@@ -48,6 +55,7 @@ interface MenuItemsIndexProps extends PageProps {
         }>;
     };
     menus: Menu[];
+    categories: Category[];
     filters: {
         search: string | null;
         menu_id: string | null;
@@ -62,7 +70,7 @@ interface MenuItemsIndexProps extends PageProps {
 }
 
 export default function Index() {
-    const { menuItems, menus, filters, stats } =
+    const { menuItems, menus, categories, filters, stats } =
         usePage<MenuItemsIndexProps>().props;
     const { flash } = usePage<PageProps>().props;
 
@@ -190,9 +198,17 @@ export default function Index() {
             sortable: true,
             render: (item: MenuItem) => (
                 <div className="flex items-center">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500 to-red-600 text-white">
-                        <Utensils className="h-5 w-5" />
-                    </div>
+                    {item.image_url ? (
+                        <img
+                            src={item.image_url}
+                            alt={item.name}
+                            className="h-10 w-10 rounded-lg object-cover"
+                        />
+                    ) : (
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500 to-red-600 text-white">
+                            <Utensils className="h-5 w-5" />
+                        </div>
+                    )}
                     <div className="ml-3">
                         <p className="text-sm font-medium text-gray-900">
                             {item.name}
@@ -213,6 +229,16 @@ export default function Index() {
             render: (item: MenuItem) => (
                 <p className="text-sm text-gray-600">
                     {item.menu?.name || '-'}
+                </p>
+            ),
+        },
+        {
+            key: 'category',
+            label: 'Category',
+            sortable: false,
+            render: (item: MenuItem) => (
+                <p className="text-sm text-gray-600">
+                    {item.category?.name || '-'}
                 </p>
             ),
         },
@@ -377,6 +403,7 @@ export default function Index() {
                 onClose={closeModal}
                 menuItem={selectedItem}
                 menus={menus}
+                categories={categories}
             />
 
             {/* Delete Confirmation Modal */}

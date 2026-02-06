@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreMenuItemRequest;
 use App\Http\Requests\UpdateMenuItemRequest;
 use App\Models\MenuItem;
+use Illuminate\Support\Facades\Storage;
 
 class MenuItemController extends Controller
 {
@@ -13,7 +14,7 @@ class MenuItemController extends Controller
      */
     public function index()
     {
-        $query = MenuItem::query()->with('menu');
+        $query = MenuItem::query()->with(['menu', 'category']);
 
         // Search
         if (request('search')) {
@@ -44,10 +45,12 @@ class MenuItemController extends Controller
         ];
 
         $menus = \App\Models\Menu::all();
+        $categories = \App\Models\Category::where('type', 'menu')->get();
 
         return inertia('MenuItems/Index', [
             'menuItems' => $menuItems,
             'menus' => $menus,
+            'categories' => $categories,
             'filters' => [
                 'search' => request('search'),
                 'menu_id' => request('menu_id'),
@@ -63,7 +66,14 @@ class MenuItemController extends Controller
      */
     public function store(StoreMenuItemRequest $request)
     {
-        MenuItem::create($request->validated());
+        $data = $request->validated();
+        
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('menu-items', 'r2');
+            $data['image_url'] = Storage::disk('r2')->url($path);
+        }
+
+        MenuItem::create($data);
         return redirect()->back()->with('success', 'Menu Item created successfully.');
     }
 
@@ -88,7 +98,21 @@ class MenuItemController extends Controller
      */
     public function update(UpdateMenuItemRequest $request, MenuItem $menuItem)
     {
-        $menuItem->update($request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('image')) {
+            // Delete old image
+            if ($menuItem->image_url) {
+                $oldPath = str_replace(env('R2_PUBLIC_URL') . '/', '', $menuItem->image_url);
+                if (Storage::disk('r2')->exists($oldPath)) {
+                    Storage::disk('r2')->delete($oldPath);
+                }
+            }
+            $path = $request->file('image')->store('menu-items', 'r2');
+            $data['image_url'] = Storage::disk('r2')->url($path);
+        }
+
+        $menuItem->update($data);
         return redirect()->back()->with('success', 'Menu Item updated successfully.');
     }
 

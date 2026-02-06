@@ -18,10 +18,11 @@ class StoreMenuItemRequest extends FormRequest
     {
         return [
             'menu_id' => ['required', 'exists:menus,id'],
+            'category_id' => ['nullable', 'exists:categories,id'],
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'price' => ['required', 'numeric', 'min:0'],
-            'image_url' => ['nullable', 'string', 'max:2048'],
+            'image' => ['nullable', 'image', 'max:8192'],
             'is_available' => ['boolean'],
         ];
     }

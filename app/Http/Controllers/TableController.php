@@ -100,4 +100,32 @@ class TableController extends Controller
         $table->delete();
         return redirect()->back()->with('success', 'Table deleted successfully.');
     }
+
+    /**
+     * Validate table QR code
+     */
+    public function validateQrCode()
+    {
+        request()->validate([
+            'qr_code' => 'required|string',
+        ]);
+
+        $table = Table::where('qr_code', request('qr_code'))->first();
+
+        if (!$table) {
+            return response()->json([
+                'valid' => false,
+                'message' => 'Kode QR tidak valid atau meja tidak ditemukan',
+            ], 404);
+        }
+
+        return response()->json([
+            'valid' => true,
+            'table' => [
+                'id' => $table->id,
+                'number' => $table->number,
+                'qr_code' => $table->qr_code,
+            ],
+        ]);
+    }
 }

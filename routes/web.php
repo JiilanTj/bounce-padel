@@ -37,6 +37,7 @@ Route::get('/lapangan', [PublicCourtController::class, 'index'])->name('public.c
 Route::get('/lapangan/{court}', [PublicCourtController::class, 'show'])->name('public.courts.show');
 Route::get('/fasilitas', [PublicFacilityController::class, 'index'])->name('public.facilities');
 Route::get('/cafe-resto', [PublicMenuController::class, 'index'])->name('public.cafe-resto');
+Route::post('/validate-table-qr', [TableController::class, 'validateQrCode'])->name('validate.table.qr');
 Route::get('/rental-alat', [PublicProductController::class, 'rental'])->name('public.rental');
 Route::get('/padel-store', [PublicProductController::class, 'store'])->name('public.store');
 Route::get('/kontak', [PublicContactController::class, 'index'])->name('public.contact');
