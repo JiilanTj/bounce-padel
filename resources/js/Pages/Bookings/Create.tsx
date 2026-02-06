@@ -1,7 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { PageProps } from '@/types';
 import { formatCurrency } from '@/utils/currency';
-import { Head, Link, useForm, router } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import { FormEvent, useCallback, useEffect, useState } from 'react';
 
 type Court = {
@@ -113,7 +113,7 @@ export default function Create({ courts }: Props) {
 
     const handleSlotClick = (index: number) => {
         const slot = availableSlots[index];
-        
+
         // Can't select unavailable slots
         if (!slot.available) return;
 
@@ -124,13 +124,13 @@ export default function Create({ courts }: Props) {
             newSelectedSlots = [index];
         } else if (selectedSlots.includes(index)) {
             // Deselect if already selected
-            newSelectedSlots = selectedSlots.filter(i => i !== index);
+            newSelectedSlots = selectedSlots.filter((i) => i !== index);
         } else {
             // Add to selection - create range from min to max
             const allSlots = [...selectedSlots, index].sort((a, b) => a - b);
             const minIndex = allSlots[0];
             const maxIndex = allSlots[allSlots.length - 1];
-            
+
             // Create continuous range and check if all are available
             newSelectedSlots = [];
             for (let i = minIndex; i <= maxIndex; i++) {
@@ -149,8 +149,9 @@ export default function Create({ courts }: Props) {
         if (newSelectedSlots.length > 0) {
             const sortedSlots = newSelectedSlots.sort((a, b) => a - b);
             const firstSlot = availableSlots[sortedSlots[0]];
-            const lastSlot = availableSlots[sortedSlots[sortedSlots.length - 1]];
-            
+            const lastSlot =
+                availableSlots[sortedSlots[sortedSlots.length - 1]];
+
             setData('start_time', firstSlot.start_time);
             setData('end_time', lastSlot.end_time);
         } else {
@@ -202,7 +203,7 @@ export default function Create({ courts }: Props) {
                                     <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                                         Customer Information
                                     </h3>
-                                    
+
                                     <div>
                                         <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                                             Name *
@@ -211,7 +212,10 @@ export default function Create({ courts }: Props) {
                                             type="text"
                                             value={data.customer_name}
                                             onChange={(e) =>
-                                                setData('customer_name', e.target.value)
+                                                setData(
+                                                    'customer_name',
+                                                    e.target.value,
+                                                )
                                             }
                                             className="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                                             placeholder="e.g. John Doe"
@@ -232,7 +236,10 @@ export default function Create({ courts }: Props) {
                                             type="email"
                                             value={data.customer_email}
                                             onChange={(e) =>
-                                                setData('customer_email', e.target.value)
+                                                setData(
+                                                    'customer_email',
+                                                    e.target.value,
+                                                )
                                             }
                                             className="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                                             placeholder="e.g. john@example.com"
@@ -253,7 +260,10 @@ export default function Create({ courts }: Props) {
                                             type="tel"
                                             value={data.customer_phone}
                                             onChange={(e) =>
-                                                setData('customer_phone', e.target.value)
+                                                setData(
+                                                    'customer_phone',
+                                                    e.target.value,
+                                                )
                                             }
                                             className="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                                             placeholder="e.g. 08123456789"
@@ -344,8 +354,11 @@ export default function Create({ courts }: Props) {
                                             <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
                                                 {availableSlots.map(
                                                     (slot, index) => {
-                                                        const isSelected = selectedSlots.includes(index);
-                                                        
+                                                        const isSelected =
+                                                            selectedSlots.includes(
+                                                                index,
+                                                            );
+
                                                         return (
                                                             <button
                                                                 key={index}
@@ -353,7 +366,11 @@ export default function Create({ courts }: Props) {
                                                                 disabled={
                                                                     !slot.available
                                                                 }
-                                                                onClick={() => handleSlotClick(index)}
+                                                                onClick={() =>
+                                                                    handleSlotClick(
+                                                                        index,
+                                                                    )
+                                                                }
                                                                 className={`rounded-lg border px-3 py-2 text-sm font-medium transition ${
                                                                     isSelected
                                                                         ? 'border-primary bg-primary text-black'
@@ -362,7 +379,9 @@ export default function Create({ courts }: Props) {
                                                                           : 'cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400 dark:border-gray-700 dark:bg-gray-800'
                                                                 }`}
                                                             >
-                                                                {slot.start_time}
+                                                                {
+                                                                    slot.start_time
+                                                                }
                                                                 {!slot.available && (
                                                                     <span className="ml-1 text-xs">
                                                                         ✕
@@ -370,7 +389,7 @@ export default function Create({ courts }: Props) {
                                                                 )}
                                                             </button>
                                                         );
-                                                    }
+                                                    },
                                                 )}
                                             </div>
                                         ) : (

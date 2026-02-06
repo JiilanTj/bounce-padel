@@ -81,11 +81,12 @@ class BookingController extends Controller
         // Get all courts with operating hours
         $courts = Court::with('operatingHours')->get();
 
-        // Get today's bookings for availability overview
+        // Get today's bookings for availability overview (with user info)
         $todayDate = $request->filled('date') ? Carbon::parse($request->date) : Carbon::today();
-        $todayBookings = Booking::whereDate('start_time', $todayDate)
+        $todayBookings = Booking::with('user')
+            ->whereDate('start_time', $todayDate)
             ->whereIn('status', ['pending', 'confirmed', 'paid'])
-            ->get(['court_id', 'start_time', 'end_time', 'status']);
+            ->get(['id', 'user_id', 'court_id', 'start_time', 'end_time', 'status', 'total_price']);
 
         return Inertia::render('Bookings/Index', [
             'bookings' => $bookings,

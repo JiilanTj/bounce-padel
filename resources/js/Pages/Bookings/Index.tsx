@@ -30,10 +30,13 @@ type OperatingHour = {
 };
 
 type TodayBooking = {
+    id: number;
     court_id: number;
     start_time: string;
     end_time: string;
     status: string;
+    total_price: number;
+    user: User;
 };
 
 type Booking = {
@@ -110,17 +113,22 @@ function CourtAvailabilityTable({
         );
     };
 
-    // Check if a specific slot is booked for a court
-    const isSlotBooked = (courtId: number, slotTime: string) => {
+    // Check if a specific slot is booked for a court - return booking info
+    const getSlotBooking = (
+        courtId: number,
+        slotTime: string,
+    ): TodayBooking | null => {
         const slotStart = new Date(`${overviewDate}T${slotTime}:00`);
         const slotEnd = new Date(slotStart.getTime() + 60 * 60 * 1000);
 
-        return todayBookings.some((b) => {
-            if (b.court_id !== courtId) return false;
-            const bStart = new Date(b.start_time);
-            const bEnd = new Date(b.end_time);
-            return slotStart < bEnd && slotEnd > bStart;
-        });
+        return (
+            todayBookings.find((b) => {
+                if (b.court_id !== courtId) return false;
+                const bStart = new Date(b.start_time);
+                const bEnd = new Date(b.end_time);
+                return slotStart < bEnd && slotEnd > bStart;
+            }) || null
+        );
     };
 
     // Check if slot is within operating hours
@@ -212,19 +220,32 @@ function CourtAvailabilityTable({
                                     {timeSlots.map((slot) => {
                                         const withinHours =
                                             isWithinOperatingHours(court, slot);
-                                        const booked =
-                                            withinHours &&
-                                            isSlotBooked(court.id, slot);
+                                        const booking = withinHours
+                                            ? getSlotBooking(court.id, slot)
+                                            : null;
 
                                         let cellClass =
                                             'bg-gray-50 border-gray-200'; // closed
-                                        if (withinHours && !booked) {
+                                        if (withinHours && !booking) {
                                             cellClass =
                                                 'bg-green-50 border-green-200';
-                                        } else if (booked) {
+                                        } else if (booking) {
                                             cellClass =
-                                                'bg-red-50 border-red-200';
+                                                'bg-red-100 border-red-300';
                                         }
+
+                                        const formatTime = (
+                                            dateStr: string,
+                                        ) => {
+                                            const d = new Date(dateStr);
+                                            return d.toTimeString().slice(0, 5);
+                                        };
+
+                                        const tooltipContent = !withinHours
+                                            ? 'Tutup'
+                                            : booking
+                                              ? `${booking.user?.name || 'Customer'}\n${formatTime(booking.start_time)} - ${formatTime(booking.end_time)}\n${formatCurrency(booking.total_price)}\nStatus: ${booking.status}`
+                                              : 'Available';
 
                                         return (
                                             <td
@@ -232,15 +253,55 @@ function CourtAvailabilityTable({
                                                 className="px-0.5 py-3"
                                             >
                                                 <div
-                                                    className={`mx-auto h-6 w-8 rounded border ${cellClass}`}
-                                                    title={
-                                                        !withinHours
-                                                            ? 'Closed'
-                                                            : booked
-                                                              ? 'Booked'
-                                                              : 'Available'
-                                                    }
-                                                />
+                                                    className={`group relative mx-auto h-6 w-8 cursor-pointer rounded border ${cellClass} transition-all hover:scale-110`}
+                                                    title={tooltipContent}
+                                                >
+                                                    {booking && (
+                                                        <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 hidden w-48 -translate-x-1/2 rounded-lg bg-gray-900 p-2 text-xs text-white shadow-lg group-hover:block">
+                                                            <div className="font-semibold">
+                                                                {booking.user
+                                                                    ?.name ||
+                                                                    'Customer'}
+                                                            </div>
+                                                            <div className="text-gray-300">
+                                                                {
+                                                                    booking.user
+                                                                        ?.email
+                                                                }
+                                                            </div>
+                                                            <div className="mt-1 text-gray-300">
+                                                                {formatTime(
+                                                                    booking.start_time,
+                                                                )}{' '}
+                                                                -{' '}
+                                                                {formatTime(
+                                                                    booking.end_time,
+                                                                )}
+                                                            </div>
+                                                            <div className="font-semibold text-green-400">
+                                                                {formatCurrency(
+                                                                    booking.total_price,
+                                                                )}
+                                                            </div>
+                                                            <div className="mt-1">
+                                                                <span
+                                                                    className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${
+                                                                        booking.status ===
+                                                                        'confirmed'
+                                                                            ? 'bg-blue-500'
+                                                                            : booking.status ===
+                                                                                'paid'
+                                                                              ? 'bg-green-500'
+                                                                              : 'bg-yellow-500'
+                                                                    }`}
+                                                                >
+                                                                    {booking.status.toUpperCase()}
+                                                                </span>
+                                                            </div>
+                                                            <div className="absolute -bottom-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 bg-gray-900" />
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </td>
                                         );
                                     })}
@@ -261,7 +322,6 @@ function CourtAvailabilityTable({
 }
 
 export default function Index({
-    bookings,
     courts,
     todayBookings,
     overviewDate,
@@ -307,48 +367,6 @@ export default function Index({
                 preserveScroll: true,
             },
         );
-    };
-
-    const handleDelete = (id: number) => {
-        if (confirm('Are you sure you want to delete this booking?')) {
-            router.delete(route('bookings.destroy', id));
-        }
-    };
-
-    const getStatusBadge = (status: Booking['status']) => {
-        const badges = {
-            pending: 'bg-yellow-100 text-yellow-800',
-            confirmed: 'bg-blue-100 text-blue-800',
-            paid: 'bg-green-100 text-green-800',
-            cancelled: 'bg-red-100 text-red-800',
-            completed: 'bg-gray-100 text-gray-800',
-            no_show: 'bg-orange-100 text-orange-800',
-        };
-
-        const labels = {
-            pending: 'Pending',
-            confirmed: 'Confirmed',
-            paid: 'Paid',
-            cancelled: 'Cancelled',
-            completed: 'Completed',
-            no_show: 'No Show',
-        };
-
-        return (
-            <span
-                className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${badges[status]}`}
-            >
-                {labels[status]}
-            </span>
-        );
-    };
-
-    const formatDateTime = (dateString: string) => {
-        const date = new Date(dateString);
-        return new Intl.DateTimeFormat('id-ID', {
-            dateStyle: 'medium',
-            timeStyle: 'short',
-        }).format(date);
     };
 
     return (
@@ -452,173 +470,13 @@ export default function Index({
                 </div>
             </div>
 
-            {/* Bookings Table */}
+            {/* Court Availability Table */}
             <div className="overflow-hidden bg-white shadow sm:rounded-lg">
-                {bookings.data.length === 0 ? (
-                    <CourtAvailabilityTable
-                        courts={courts}
-                        todayBookings={todayBookings}
-                        overviewDate={overviewDate}
-                    />
-                ) : (
-                    <>
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-50">
-                                    <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                                            Customer
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                                            Court
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                                            Start Time
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                                            End Time
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                                            Total Price
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                                            Status
-                                        </th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
-                                            Actions
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-200 bg-white">
-                                    {bookings.data.map((booking) => (
-                                        <tr
-                                            key={booking.id}
-                                            className="hover:bg-gray-50"
-                                        >
-                                            <td className="whitespace-nowrap px-6 py-4">
-                                                <div className="text-sm font-medium text-gray-900">
-                                                    {booking.user.name}
-                                                </div>
-                                                <div className="text-sm text-gray-500">
-                                                    {booking.user.email}
-                                                </div>
-                                            </td>
-                                            <td className="whitespace-nowrap px-6 py-4">
-                                                <div className="text-sm text-gray-900">
-                                                    {booking.court.name}
-                                                </div>
-                                                <div className="text-xs text-gray-500">
-                                                    {booking.court.type}
-                                                </div>
-                                            </td>
-                                            <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">
-                                                {formatDateTime(
-                                                    booking.start_time,
-                                                )}
-                                            </td>
-                                            <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">
-                                                {formatDateTime(
-                                                    booking.end_time,
-                                                )}
-                                            </td>
-                                            <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
-                                                {formatCurrency(
-                                                    booking.total_price,
-                                                )}
-                                            </td>
-                                            <td className="whitespace-nowrap px-6 py-4">
-                                                {getStatusBadge(booking.status)}
-                                            </td>
-                                            <td className="whitespace-nowrap px-6 py-4 text-right text-sm">
-                                                <Link
-                                                    href={route(
-                                                        'bookings.edit',
-                                                        booking.id,
-                                                    )}
-                                                    className="mr-4 text-blue-600 hover:text-blue-900"
-                                                >
-                                                    Edit
-                                                </Link>
-                                                <button
-                                                    onClick={() =>
-                                                        handleDelete(booking.id)
-                                                    }
-                                                    className="text-red-600 hover:text-red-900"
-                                                >
-                                                    Delete
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-
-                        {/* Pagination */}
-                        {bookings.last_page > 1 && (
-                            <div className="border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
-                                <div className="flex items-center justify-between">
-                                    <div className="text-sm text-gray-700">
-                                        Showing{' '}
-                                        {(bookings.current_page - 1) *
-                                            bookings.per_page +
-                                            1}{' '}
-                                        to{' '}
-                                        {Math.min(
-                                            bookings.current_page *
-                                                bookings.per_page,
-                                            bookings.total,
-                                        )}{' '}
-                                        of {bookings.total} results
-                                    </div>
-                                    <div className="flex gap-1">
-                                        {Array.from(
-                                            { length: bookings.last_page },
-                                            (_, i) => i + 1,
-                                        ).map((page) => (
-                                            <button
-                                                key={page}
-                                                onClick={() => {
-                                                    router.get(
-                                                        route('bookings.index'),
-                                                        {
-                                                            page,
-                                                            search:
-                                                                searchQuery ||
-                                                                undefined,
-                                                            status:
-                                                                selectedStatus !==
-                                                                'all'
-                                                                    ? selectedStatus
-                                                                    : undefined,
-                                                            date:
-                                                                selectedDate ||
-                                                                undefined,
-                                                            court_id:
-                                                                selectedCourt !==
-                                                                'all'
-                                                                    ? selectedCourt
-                                                                    : undefined,
-                                                        },
-                                                        { preserveState: true },
-                                                    );
-                                                }}
-                                                className={`relative inline-flex items-center rounded-md px-4 py-2 text-sm font-medium ${
-                                                    bookings.current_page ===
-                                                    page
-                                                        ? 'bg-blue-600 text-white'
-                                                        : 'bg-white text-gray-700 hover:bg-gray-50'
-                                                } border border-gray-300`}
-                                            >
-                                                {page}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </>
-                )}
+                <CourtAvailabilityTable
+                    courts={courts}
+                    todayBookings={todayBookings}
+                    overviewDate={overviewDate}
+                />
             </div>
         </AuthenticatedLayout>
     );
