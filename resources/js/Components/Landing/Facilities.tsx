@@ -1,42 +1,138 @@
+import { Facility } from '@/Pages/Welcome';
 import { Link } from '@inertiajs/react';
+import { useState } from 'react';
 
-export default function Facilities() {
-    const facilities = [
+// Facility card component with image optimization
+function FacilityCard({
+    facility,
+    index,
+}: {
+    facility: Facility;
+    index: number;
+}) {
+    const [imageLoaded, setImageLoaded] = useState(false);
+
+    return (
+        <div
+            key={facility.id}
+            className={`group relative cursor-pointer overflow-hidden rounded-xl ${
+                index === 0
+                    ? 'col-span-2 h-[300px] md:col-span-2 md:h-[400px] lg:col-span-2'
+                    : index === 3 || index === 4
+                      ? 'col-span-1 h-[200px] md:col-span-1 md:h-[400px]'
+                      : 'col-span-1 h-[200px] md:col-span-1 md:h-[400px]'
+            }`}
+        >
+            {/* Loading placeholder */}
+            {!imageLoaded && (
+                <div className="absolute inset-0 animate-pulse bg-gray-800" />
+            )}
+
+            {/* Optimized image with lazy loading */}
+            <img
+                src={facility.image_path || ''}
+                alt={facility.name}
+                loading="lazy"
+                decoding="async"
+                onLoad={() => setImageLoaded(true)}
+                className={`absolute inset-0 h-full w-full object-cover transition-all duration-700 group-hover:scale-110 ${
+                    imageLoaded ? 'opacity-100' : 'opacity-0'
+                }`}
+            />
+
+            {/* Gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+
+            {/* Content */}
+            <div className="absolute bottom-0 left-0 w-full p-4 md:p-8">
+                <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-[#112217] md:mb-4 md:h-12 md:w-12">
+                    <span className="material-symbols-outlined text-sm md:text-2xl">
+                        {facility.icon || 'info'}
+                    </span>
+                </div>
+                <h3
+                    className={`font-bold text-white ${index === 0 ? 'mb-2 text-xl md:text-2xl' : 'mb-1 text-sm md:mb-2 md:text-xl'}`}
+                >
+                    {facility.name}
+                </h3>
+                <p
+                    className={`transform text-gray-300 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 ${index === 0 ? 'translate-y-2 text-sm md:text-base' : 'hidden md:block md:translate-y-2 md:text-sm'}`}
+                >
+                    {facility.description}
+                </p>
+            </div>
+        </div>
+    );
+}
+
+export default function Facilities({
+    facilities: dbFacilities,
+}: {
+    facilities: Facility[];
+}) {
+    // Hardcoded fallback facilities
+    const fallbackFacilities = [
         {
-            title: 'Lapangan Indoor Pro',
+            id: 0,
+            name: 'Lapangan Indoor Pro',
             description:
                 'Kaca panoramik, rumput Mondo, dan pencahayaan profesional untuk permainan yang sempurna.',
             icon: 'stadium',
-            image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAWlE-9UDhnPPYTmQb0VHg__XUkAnTXCthkpo9ZkfiKNRmIC7CQUcyKlnsJXP235wYvaGqewFFJ6HS--YbNjQeYE2x3zY2ZDkRAONMAB_vpQQE2vIrmZcxaQNBvlY1vScM2u7xObOEwAR4FH36sqXxgM13S30u2rFJlhKTFMZJQdSRa4dR52rgZPUZuuv4bOvFYYeL8oEaywrg-IRdz3tBHtoia3Bq3TAGivjgtI6ebmZiNrCk0Bw41S1hx4qBFbHuBUg_gv9b5Rko',
+            image_path:
+                'https://lh3.googleusercontent.com/aida-public/AB6AXuAWlE-9UDhnPPYTmQb0VHg__XUkAnTXCthkpo9ZkfiKNRmIC7CQUcyKlnsJXP235wYvaGqewFFJ6HS--YbNjQeYE2x3zY2ZDkRAONMAB_vpQQE2vIrmZcxaQNBvlY1vScM2u7xObOEwAR4FH36sqXxgM13S30u2rFJlhKTFMZJQdSRa4dR52rgZPUZuuv4bOvFYYeL8oEaywrg-IRdz3tBHtoia3Bq3TAGivjgtI6ebmZiNrCk0Bw41S1hx4qBFbHuBUg_gv9b5Rko',
+            status: 'active',
+            sort_order: 0,
         },
         {
-            title: 'Lounge Member',
+            id: 1,
+            name: 'Lounge Member',
             description:
                 'Bersantai sebelum atau sesudah pertandingan di lounge eksklusif kami.',
             icon: 'coffee',
-            image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDgl66a98RU0fzBjt1ltPkrPH-XPRCBoh9QCA9dAYr6GYL6QYW5Rfwo3tcWj0yrIornNJ39rzpVrYzSfp9WS5DX8H6-kdA40c11RYFpfWLg9klYJHARCRDXfDQZOg8ZGkWrOuoJkiy7M8PSGL-fQ6dzi0k-UzO80hNlkvV4JtWwhnPUR8YCh56cLYlgyUc0nFhfSdDmbgTyg5HyNMWq1JxG0YAcGXP7OD9szU01TBGvbxdlgYXZsUKJeA4hd522iSVEgXuMjsknNXs',
+            image_path:
+                'https://lh3.googleusercontent.com/aida-public/AB6AXuDgl66a98RU0fzBjt1ltPkrPH-XPRCBoh9QCA9dAYr6GYL6QYW5Rfwo3tcWj0yrIornNJ39rzpVrYzSfp9WS5DX8H6-kdA40c11RYFpfWLg9klYJHARCRDXfDQZOg8ZGkWrOuoJkiy7M8PSGL-fQ6dzi0k-UzO80hNlkvV4JtWwhnPUR8YCh56cLYlgyUc0nFhfSdDmbgTyg5HyNMWq1JxG0YAcGXP7OD9szU01TBGvbxdlgYXZsUKJeA4hd522iSVEgXuMjsknNXs',
+            status: 'active',
+            sort_order: 1,
         },
         {
-            title: 'Ruang Ganti Mewah',
+            id: 2,
+            name: 'Ruang Ganti Mewah',
             description:
                 'Shower dengan sentuhan spa, akses sauna, dan produk perawatan premium.',
             icon: 'checkroom',
-            image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBZQUbakj-Y2WTQR6g7xtXEWAG9Z-42yQDUJ4fIyYut5SBglKLL_WGDCfTebYzry-MyopQjVfBAb_F8BQZxULjvJi10OxKgZPCFRAgf8xBjaw2T4MI_yLytjdMuIHFuXKRbJrsuvQMo2w2MBA5JDGOe99f_GkhbPL1b8I5YWn7d7L5vr8KgA0O5lxdl7GBArX2OIFZ9-yVzZJ18T-p2iAm_95PEGhyR7W-1D4KJSt_ksVaT_O06YfGn0QWE7d2MlYjgi7CGRhy69GM',
+            image_path:
+                'https://lh3.googleusercontent.com/aida-public/AB6AXuBZQUbakj-Y2WTQR6g7xtXEWAG9Z-42yQDUJ4fIyYut5SBglKLL_WGDCfTebYzry-MyopQjVfBAb_F8BQZxULjvJi10OxKgZPCFRAgf8xBjaw2T4MI_yLytjdMuIHFuXKRbJrsuvQMo2w2MBA5JDGOe99f_GkhbPL1b8I5YWn7d7L5vr8KgA0O5lxdl7GBArX2OIFZ9-yVzZJ18T-p2iAm_95PEGhyR7W-1D4KJSt_ksVaT_O06YfGn0QWE7d2MlYjgi7CGRhy69GM',
+            status: 'active',
+            sort_order: 2,
         },
         {
-            title: 'Akademi Padel',
+            id: 3,
+            name: 'Akademi Padel',
             description:
                 'Program pelatihan dari pelatih bersertifikat untuk semua tingkatan.',
             icon: 'school',
-            image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDSEYSeHhDE3Irg1C5tbRLgDfMNZHRirewmKYhMC5EnEFy1RYiodtvuYznwqpQNyat0ZjR5p40jEVuonDlG86vbVvts7udBMwFEuYANChbl_zyzIcd9-reDZO_kKMp0_wARUQ_pdjnENWpBCdln815_piG25Q7M-2aHE9Yf_xEh86V-MP57Cn419Nom8C63_oVvlwQQALeqismZEh3EBvODNKZunY4eKZUGrZxWP7HymAnK5oQL2turs80dy_hTsGEtAqhrJyT9M30',
+            image_path:
+                'https://lh3.googleusercontent.com/aida-public/AB6AXuDSEYSeHhDE3Irg1C5tbRLgDfMNZHRirewmKYhMC5EnEFy1RYiodtvuYznwqpQNyat0ZjR5p40jEVuonDlG86vbVvts7udBMwFEuYANChbl_zyzIcd9-reDZO_kKMp0_wARUQ_pdjnENWpBCdln815_piG25Q7M-2aHE9Yf_xEh86V-MP57Cn419Nom8C63_oVvlwQQALeqismZEh3EBvODNKZunY4eKZUGrZxWP7HymAnK5oQL2turs80dy_hTsGEtAqhrJyT9M30',
+            status: 'active',
+            sort_order: 3,
         },
         {
-            title: 'Musholla & Area Santai',
+            id: 4,
+            name: 'Musholla & Area Santai',
             description: 'Fasilitas ibadah yang nyaman dan area terbuka hijau.',
             icon: 'mosque',
-            image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA3pXBPgMawfEfgq2yETVzdlu7RR4lG0L2GRBTgIFECLLcBDpp1Hi7R-jqp4WCd_cdl1a6z3q2wDfVI1j8wgIS07otEZ8IAjmaH3mE_-cO55iFZowYLH3Tw8lsXWyzj79aYU5p4kyaQ2Zungmq4YsA7ylb3_atGVgXg1-l2exzj9klR0n1c5VQ1OfAldzuqcnLomAi-eIwoOLhFVLfXulxmwEXU9-Kk0xn45K3ZvkKY5Ue8D00Q5NDZBqtb8BxXBccDU1i0Wu1X5Xk',
+            image_path:
+                'https://lh3.googleusercontent.com/aida-public/AB6AXuA3pXBPgMawfEfgq2yETVzdlu7RR4lG0L2GRBTgIFECLLcBDpp1Hi7R-jqp4WCd_cdl1a6z3q2wDfVI1j8wgIS07otEZ8IAjmaH3mE_-cO55iFZowYLH3Tw8lsXWyzj79aYU5p4kyaQ2Zungmq4YsA7ylb3_atGVgXg1-l2exzj9klR0n1c5VQ1OfAldzuqcnLomAi-eIwoOLhFVLfXulxmwEXU9-Kk0xn45K3ZvkKY5Ue8D00Q5NDZBqtb8BxXBccDU1i0Wu1X5Xk',
+            status: 'active',
+            sort_order: 4,
         },
     ];
+
+    // Use database facilities if available, otherwise use fallback
+    const facilities =
+        dbFacilities && dbFacilities.length > 0
+            ? dbFacilities
+            : fallbackFacilities;
 
     return (
         <section className="bg-background-light py-16 dark:bg-background-dark md:py-24">
@@ -64,41 +160,11 @@ export default function Facilities() {
                 </div>
                 <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-6">
                     {facilities.map((facility, index) => (
-                        <div
-                            key={index}
-                            className={`group relative cursor-pointer overflow-hidden rounded-xl ${
-                                index === 0
-                                    ? 'col-span-2 h-[300px] md:col-span-2 md:h-[400px] lg:col-span-2'
-                                    : index === 3 || index === 4
-                                      ? 'col-span-1 h-[200px] md:col-span-1 md:h-[400px]'
-                                      : 'col-span-1 h-[200px] md:col-span-1 md:h-[400px]'
-                            }`}
-                        >
-                            <div
-                                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                                style={{
-                                    backgroundImage: `url("${facility.image}")`,
-                                }}
-                            ></div>
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
-                            <div className="absolute bottom-0 left-0 w-full p-4 md:p-8">
-                                <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-[#112217] md:mb-4 md:h-12 md:w-12">
-                                    <span className="material-symbols-outlined text-sm md:text-2xl">
-                                        {facility.icon}
-                                    </span>
-                                </div>
-                                <h3
-                                    className={`font-bold text-white ${index === 0 ? 'mb-2 text-xl md:text-2xl' : 'mb-1 text-sm md:mb-2 md:text-xl'}`}
-                                >
-                                    {facility.title}
-                                </h3>
-                                <p
-                                    className={`transform text-gray-300 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 ${index === 0 ? 'translate-y-2 text-sm md:text-base' : 'hidden md:block md:translate-y-2 md:text-sm'}`}
-                                >
-                                    {facility.description}
-                                </p>
-                            </div>
-                        </div>
+                        <FacilityCard
+                            key={facility.id}
+                            facility={facility}
+                            index={index}
+                        />
                     ))}
                 </div>
             </div>

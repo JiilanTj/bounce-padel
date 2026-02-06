@@ -1,7 +1,83 @@
+import { formatCurrency } from '@/utils/currency';
 import { Link } from '@inertiajs/react';
+import { useState } from 'react';
 
-export default function Shop() {
-    const products = [
+interface Product {
+    id: number;
+    category_id: number | null;
+    name: string;
+    sku: string | null;
+    description: string | null;
+    price_buy: number | null;
+    price_rent: number | null;
+    stock_buy: number;
+    stock_rent: number;
+    image_path: string | null;
+    type: string;
+    category?: {
+        id: number;
+        name: string;
+    };
+}
+
+interface ProductCardProps {
+    product: {
+        name: string;
+        description: string;
+        price: string;
+        image: string;
+        tag: string | null;
+    };
+}
+
+function ProductCard({ product }: ProductCardProps) {
+    const [imageLoaded, setImageLoaded] = useState(false);
+
+    return (
+        <div className="group rounded-xl border border-white/5 bg-[#112217] p-3 transition-all duration-300 hover:border-primary/50 md:p-4">
+            <div className="relative mb-3 flex aspect-square items-center justify-center overflow-hidden rounded-lg bg-[#1a2c21] md:mb-4">
+                {product.tag && (
+                    <span className="absolute left-2 top-2 rounded bg-white px-1.5 py-0.5 text-[10px] font-bold text-black md:left-3 md:top-3 md:px-2 md:py-1 md:text-xs">
+                        {product.tag}
+                    </span>
+                )}
+                {!imageLoaded && (
+                    <div className="absolute inset-0 animate-pulse bg-gray-800" />
+                )}
+                <img
+                    alt={product.name}
+                    className={`h-full w-full object-cover transition-all duration-700 group-hover:scale-105 ${
+                        imageLoaded ? 'opacity-100' : 'opacity-0'
+                    }`}
+                    src={product.image}
+                    loading="lazy"
+                    decoding="async"
+                    onLoad={() => setImageLoaded(true)}
+                />
+            </div>
+            <div className="mb-2 flex flex-col justify-between gap-1 md:flex-row md:items-start">
+                <div>
+                    <h3 className="truncate text-sm font-semibold text-white md:text-lg">
+                        {product.name}
+                    </h3>
+                    <p className="truncate text-xs text-gray-400 md:text-sm">
+                        {product.description}
+                    </p>
+                </div>
+                <span className="text-sm font-bold text-primary md:text-base">
+                    {product.price}
+                </span>
+            </div>
+            <button className="mt-2 w-full rounded border border-white/20 py-1.5 text-xs font-medium text-white transition-colors hover:bg-white hover:text-black md:mt-4 md:py-2 md:text-sm">
+                Add to Cart
+            </button>
+        </div>
+    );
+}
+
+export default function Shop({ products }: { products: Product[] }) {
+    // Fallback products if database is empty
+    const fallbackProducts = [
         {
             name: 'Nox AT10 Luxury',
             description: 'Professional Series',
@@ -32,69 +108,61 @@ export default function Shop() {
         },
     ];
 
+    // Map database products to display format
+    const displayProducts =
+        products && products.length > 0
+            ? products.map((p) => {
+                  // Determine price to display (prefer buy, fallback to rent)
+                  const price =
+                      p.price_buy && p.price_buy > 0
+                          ? formatCurrency(p.price_buy)
+                          : p.price_rent && p.price_rent > 0
+                            ? `${formatCurrency(p.price_rent)}/day`
+                            : 'Rp 0';
+
+                  // Determine tag based on type and stock
+                  let tag: string | null = null;
+                  if (p.stock_buy > 0 && p.stock_rent > 0) {
+                      tag = 'RENT & BUY';
+                  } else if (p.stock_buy > 0) {
+                      tag = 'BUY';
+                  } else if (p.stock_rent > 0) {
+                      tag = 'RENT';
+                  }
+
+                  return {
+                      name: p.name,
+                      description:
+                          p.description || 'High-quality padel equipment',
+                      price,
+                      image:
+                          p.image_path ||
+                          'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=800&auto=format&fit=crop&q=60',
+                      tag,
+                  };
+              })
+            : fallbackProducts;
+
+    // Don't render if no products
+    if (displayProducts.length === 0) return null;
+
     return (
         <section className="relative overflow-hidden bg-surface-dark py-16 md:py-24">
             {/* Abstract Background Pattern */}
             <div className="pointer-events-none absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-[#152e20] to-transparent"></div>
             <div className="relative z-10 mx-auto max-w-[1280px] px-6">
-                <div className="mb-12 flex flex-col items-start justify-between gap-6 md:mb-16 md:flex-row md:items-end">
-                    <div>
-                        <span className="mb-2 block text-sm font-bold uppercase tracking-widest text-primary">
-                            Official Retailer
-                        </span>
-                        <h2 className="text-3xl font-bold text-white md:text-5xl">
-                            The Pro Shop
-                        </h2>
-                    </div>
-                    <div className="flex gap-4">
-                        <button className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white transition-colors hover:bg-white hover:text-surface-dark">
-                            <span className="material-symbols-outlined">
-                                arrow_back
-                            </span>
-                        </button>
-                        <button className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white transition-colors hover:bg-white hover:text-surface-dark">
-                            <span className="material-symbols-outlined">
-                                arrow_forward
-                            </span>
-                        </button>
-                    </div>
+                <div className="mb-12 md:mb-16">
+                    <span className="mb-2 block text-sm font-bold uppercase tracking-widest text-primary">
+                        Official Retailer
+                    </span>
+                    <h2 className="text-3xl font-bold text-white md:text-5xl">
+                        The Pro Shop
+                    </h2>
                 </div>
                 {/* Shop Grid */}
                 <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-8">
-                    {products.map((product, index) => (
-                        <div
-                            key={index}
-                            className="group rounded-xl border border-white/5 bg-[#112217] p-3 transition-all duration-300 hover:border-primary/50 md:p-4"
-                        >
-                            <div className="relative mb-3 flex aspect-square items-center justify-center overflow-hidden rounded-lg bg-[#1a2c21] md:mb-4">
-                                {product.tag && (
-                                    <span className="absolute left-2 top-2 rounded bg-white px-1.5 py-0.5 text-[10px] font-bold text-black md:left-3 md:top-3 md:px-2 md:py-1 md:text-xs">
-                                        {product.tag}
-                                    </span>
-                                )}
-                                <img
-                                    alt={product.name}
-                                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                    src={product.image}
-                                />
-                            </div>
-                            <div className="mb-2 flex flex-col justify-between gap-1 md:flex-row md:items-start">
-                                <div>
-                                    <h3 className="truncate text-sm font-semibold text-white md:text-lg">
-                                        {product.name}
-                                    </h3>
-                                    <p className="truncate text-xs text-gray-400 md:text-sm">
-                                        {product.description}
-                                    </p>
-                                </div>
-                                <span className="text-sm font-bold text-primary md:text-base">
-                                    {product.price}
-                                </span>
-                            </div>
-                            <button className="mt-2 w-full rounded border border-white/20 py-1.5 text-xs font-medium text-white transition-colors hover:bg-white hover:text-black md:mt-4 md:py-2 md:text-sm">
-                                Add to Cart
-                            </button>
-                        </div>
+                    {displayProducts.map((product, index) => (
+                        <ProductCard key={index} product={product} />
                     ))}
                 </div>
                 <div className="mt-12 text-center">

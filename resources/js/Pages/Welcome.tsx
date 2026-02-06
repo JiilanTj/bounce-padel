@@ -15,15 +15,48 @@ export interface WebsiteSettings {
     facebook_link: string | null;
     instagram_link: string | null;
     twitter_link: string | null;
+    home_image_header: string | null;
     opening_hours: string | null;
     operating_days: string | null;
     holiday_notes: string | null;
 }
 
+export interface Facility {
+    id: number;
+    name: string;
+    description: string | null;
+    icon: string | null;
+    image_path: string | null;
+    status: string;
+    sort_order: number;
+}
+
+export interface Product {
+    id: number;
+    category_id: number | null;
+    name: string;
+    sku: string | null;
+    description: string | null;
+    price_buy: number | null;
+    price_rent: number | null;
+    stock_buy: number;
+    stock_rent: number;
+    image_path: string | null;
+    type: string;
+    category?: {
+        id: number;
+        name: string;
+    };
+}
+
 export default function Welcome({
     settings,
+    facilities,
+    products,
 }: {
     settings: WebsiteSettings | null;
+    facilities: Facility[];
+    products: Product[];
 }) {
     return (
         <div className="bg-background-light font-body text-slate-900 transition-colors duration-300 dark:bg-background-dark dark:text-white">
@@ -56,11 +89,11 @@ export default function Welcome({
             <Navbar settings={settings} />
 
             <main>
-                <Hero />
+                <Hero settings={settings} />
                 <Stats />
-                <Facilities />
-                <Shop />
-                <CTA />
+                <Facilities facilities={facilities} />
+                <Shop products={products} />
+                <CTA settings={settings} />
             </main>
 
             <Footer settings={settings} />

@@ -28,15 +28,15 @@ export default function Navbar({
     ];
 
     return (
-        <nav className="sticky top-0 z-50 w-full border-b border-landing-border bg-background-dark/95 backdrop-blur-md">
+        <nav className="sticky top-0 z-50 w-full border-b border-white/10 bg-black/95 backdrop-blur-md">
             <div className="mx-auto flex max-w-[1280px] items-center justify-between px-6 py-4 lg:px-10">
-                <div className="flex items-center gap-3 text-white">
+                <Link href="/" className="flex items-center gap-3 text-white">
                     <img
-                        src="/logowithtype.png"
+                        src="/logounguwithtype.png"
                         alt="Bounce Padel Logo"
                         className="h-10 w-auto"
                     />
-                </div>
+                </Link>
 
                 {/* Mobile Menu Button - Only visible when menu is CLOSED */}
                 {!isOpen && (
@@ -72,11 +72,13 @@ export default function Navbar({
             >
                 {/* Mobile Menu Header */}
                 <div className="flex shrink-0 items-center justify-between px-6 py-4">
-                    <img
-                        src="/logowithtype.png"
-                        alt="Bounce Padel Logo"
-                        className="h-10 w-auto"
-                    />
+                    <Link href="/" onClick={() => setIsOpen(false)}>
+                        <img
+                            src="/logowithtype.png"
+                            alt="Bounce Padel Logo"
+                            className="h-10 w-auto"
+                        />
+                    </Link>
                     <button
                         className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
                         onClick={() => setIsOpen(false)}

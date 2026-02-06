@@ -1,15 +1,49 @@
-export default function Hero() {
+import { WebsiteSettings } from '@/Pages/Welcome';
+import { useState } from 'react';
+
+export default function Hero({
+    settings,
+}: {
+    settings: WebsiteSettings | null;
+}) {
+    const [imageLoaded, setImageLoaded] = useState(false);
+
+    // Fallback image URL
+    const fallbackImage =
+        'https://lh3.googleusercontent.com/aida-public/AB6AXuAOnW-epr9MoxJ8I2Ta3O1prVPte_4rqrgYc8AMuKLSx6bopyZoIXWaZwfgVpMWwcXP9t4yg8lioRTIQ4oq7SqIWz9uwcm5D20A_aal3lfQ7jBhgTZFg6ZvQ05QJXDMOjtukj6rLBZ-p8VSdryj9qXl8-p7wQfMOBwcj08B1y1GaFYHFZBS4Bb1Q3FyJV8nLkRE2HvhYcYCSkRK1GwJ0MJaOmnbdkrOpyrZuxAcDlziK25GV2A7DaxtOimKc1yO0nIaPcjDIU9bBG0';
+
+    const heroImage = settings?.home_image_header || fallbackImage;
+
     return (
         <header className="relative flex h-[85vh] min-h-[600px] w-full items-center justify-center overflow-hidden">
             {/* Background Image with Gradient Overlay */}
-            <div
-                className="absolute inset-0 z-0 bg-cover bg-center"
-                data-alt="Dark moody cinematic shot of a professional indoor padel court with glass walls"
-                style={{
-                    backgroundImage:
-                        'linear-gradient(to bottom, rgba(17, 34, 23, 0.3) 0%, rgba(17, 34, 23, 0.8) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuAOnW-epr9MoxJ8I2Ta3O1prVPte_4rqrgYc8AMuKLSx6bopyZoIXWaZwfgVpMWwcXP9t4yg8lioRTIQ4oq7SqIWz9uwcm5D20A_aal3lfQ7jBhgTZFg6ZvQ05QJXDMOjtukj6rLBZ-p8VSdryj9qXl8-p7wQfMOBwcj08B1y1GaFYHFZBS4Bb1Q3FyJV8nLkRE2HvhYcYCSkRK1GwJ0MJaOmnbdkrOpyrZuxAcDlziK25GV2A7DaxtOimKc1yO0nIaPcjDIU9bBG0")',
-                }}
-            ></div>
+            <div className="absolute inset-0 z-0">
+                {/* Loading placeholder */}
+                {!imageLoaded && (
+                    <div className="absolute inset-0 animate-pulse bg-gray-800" />
+                )}
+
+                {/* Actual image with lazy loading */}
+                <img
+                    src={heroImage}
+                    alt="Bounce Padel - Professional Indoor Padel Court"
+                    loading="lazy"
+                    decoding="async"
+                    onLoad={() => setImageLoaded(true)}
+                    className={`h-full w-full object-cover transition-opacity duration-700 ${
+                        imageLoaded ? 'opacity-100' : 'opacity-0'
+                    }`}
+                />
+
+                {/* Gradient overlay */}
+                <div
+                    className="absolute inset-0"
+                    style={{
+                        background:
+                            'linear-gradient(to bottom, rgba(17, 34, 23, 0.3) 0%, rgba(17, 34, 23, 0.8) 100%)',
+                    }}
+                />
+            </div>
             <div className="relative z-10 max-w-4xl px-6 text-center">
                 <span className="mb-6 inline-block rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
                     Klub Padel Terbaik di Kota

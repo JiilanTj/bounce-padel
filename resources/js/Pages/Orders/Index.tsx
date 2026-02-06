@@ -342,7 +342,8 @@ export default function Index({ orders, filters, stats }: Props) {
                                                         <span className="font-medium">
                                                             Meja:
                                                         </span>{' '}
-                                                        {order.table?.number || '-'}
+                                                        {order.table?.number ||
+                                                            '-'}
                                                     </p>
                                                     <p>
                                                         <span className="font-medium">

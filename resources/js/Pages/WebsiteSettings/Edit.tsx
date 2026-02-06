@@ -13,9 +13,10 @@ import {
     LinkIcon,
     MapPinIcon,
     PhoneIcon,
+    PhotoIcon,
 } from '@heroicons/react/24/outline';
 import { Head, useForm } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
+import { ChangeEvent, FormEventHandler, useState } from 'react';
 import { toast } from 'sonner';
 
 interface WebsiteSettings {
@@ -26,13 +27,18 @@ interface WebsiteSettings {
     facebook_link: string | null;
     instagram_link: string | null;
     twitter_link: string | null;
+    home_image_header: string | null;
     opening_hours: string | null;
     operating_days: string | null;
     holiday_notes: string | null;
 }
 
 export default function Edit({ settings }: { settings?: WebsiteSettings }) {
-    const { data, setData, put, processing, errors } = useForm({
+    const [imagePreview, setImagePreview] = useState<string | null>(
+        settings?.home_image_header || null,
+    );
+
+    const { data, setData, post, processing, errors } = useForm({
         phone_number: settings?.phone_number || '',
         email: settings?.email || '',
         location: settings?.location || '',
@@ -40,14 +46,28 @@ export default function Edit({ settings }: { settings?: WebsiteSettings }) {
         facebook_link: settings?.facebook_link || '',
         instagram_link: settings?.instagram_link || '',
         twitter_link: settings?.twitter_link || '',
+        home_image_header: null as File | null,
         opening_hours: settings?.opening_hours || '',
         operating_days: settings?.operating_days || '',
         holiday_notes: settings?.holiday_notes || '',
+        _method: 'PUT',
     });
+
+    const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setData('home_image_header', file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        put(route('website-settings.update'), {
+        post(route('website-settings.update'), {
             onSuccess: () => {
                 toast.success('Website settings updated successfully');
             },
@@ -211,6 +231,79 @@ export default function Edit({ settings }: { settings?: WebsiteSettings }) {
                                 <InputError
                                     className="mt-2"
                                     message={errors.location_link}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Home Header Image Section */}
+                    <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-shadow hover:shadow-md">
+                        <div className="border-b border-gray-100 bg-gray-50/50 px-6 py-4">
+                            <div className="flex items-center gap-4">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-100 text-purple-600">
+                                    <PhotoIcon className="h-6 w-6" />
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-semibold text-gray-900">
+                                        Home Header Image
+                                    </h3>
+                                    <p className="text-sm text-gray-500">
+                                        Upload hero image for homepage header
+                                        (Max 5MB)
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="p-6">
+                            <div>
+                                <InputLabel
+                                    htmlFor="home_image_header"
+                                    value="Header Image"
+                                />
+                                <div className="mt-2 flex flex-col gap-4">
+                                    {/* Image Preview */}
+                                    {imagePreview && (
+                                        <div className="relative overflow-hidden rounded-lg border border-gray-200">
+                                            <img
+                                                src={imagePreview}
+                                                alt="Header preview"
+                                                className="h-48 w-full object-cover"
+                                            />
+                                        </div>
+                                    )}
+
+                                    {/* File Input */}
+                                    <div className="flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 px-6 py-4 hover:border-gray-400">
+                                        <div className="text-center">
+                                            <PhotoIcon className="mx-auto h-12 w-12 text-gray-400" />
+                                            <div className="mt-2">
+                                                <label
+                                                    htmlFor="home_image_header"
+                                                    className="cursor-pointer rounded-md font-medium text-blue-600 hover:text-blue-500"
+                                                >
+                                                    <span>Upload a file</span>
+                                                    <input
+                                                        id="home_image_header"
+                                                        name="home_image_header"
+                                                        type="file"
+                                                        accept="image/*"
+                                                        className="sr-only"
+                                                        onChange={
+                                                            handleImageChange
+                                                        }
+                                                    />
+                                                </label>
+                                                <p className="text-xs text-gray-500">
+                                                    PNG, JPG, WEBP up to 5MB
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <InputError
+                                    className="mt-2"
+                                    message={errors.home_image_header}
                                 />
                             </div>
                         </div>

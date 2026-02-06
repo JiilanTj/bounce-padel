@@ -31,6 +31,10 @@ Route::get('/', function () {
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
         'settings' => \App\Models\WebsiteSetting::first(),
+        'facilities' => \App\Models\Facility::active()->orderBy('sort_order')->get(),
+        'products' => \App\Models\Product::where(function($q) {
+            $q->where('stock_buy', '>', 0)->orWhere('stock_rent', '>', 0);
+        })->with('category')->take(4)->get(),
     ]);
 });
 

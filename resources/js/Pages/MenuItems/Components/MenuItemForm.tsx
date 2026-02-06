@@ -91,7 +91,7 @@ export default function MenuItemForm({
             }
             clearErrors();
         }
-    }, [show, menuItem, menus]);
+    }, [show, menuItem, menus, setData, reset, clearErrors]);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
