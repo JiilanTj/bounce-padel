@@ -20,6 +20,7 @@ use App\Http\Controllers\FacilityController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ProductSaleController;
 use App\Http\Controllers\EquipmentRentalController;
+use App\Http\Controllers\PublicMenuController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -35,6 +36,7 @@ Route::get('/', function () {
 Route::get('/lapangan', [PublicCourtController::class, 'index'])->name('public.courts.index');
 Route::get('/lapangan/{court}', [PublicCourtController::class, 'show'])->name('public.courts.show');
 Route::get('/fasilitas', [PublicFacilityController::class, 'index'])->name('public.facilities');
+Route::get('/cafe-resto', [PublicMenuController::class, 'index'])->name('public.cafe-resto');
 Route::get('/rental-alat', [PublicProductController::class, 'rental'])->name('public.rental');
 Route::get('/padel-store', [PublicProductController::class, 'store'])->name('public.store');
 Route::get('/kontak', [PublicContactController::class, 'index'])->name('public.contact');
