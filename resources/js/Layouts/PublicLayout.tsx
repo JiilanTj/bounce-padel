@@ -3,6 +3,7 @@ import Navbar from '@/Components/Landing/Navbar';
 import { WebsiteSettings } from '@/Pages/Welcome';
 import { Head } from '@inertiajs/react';
 import { PropsWithChildren } from 'react';
+import { Toaster } from 'sonner';
 
 export default function PublicLayout({
     title,
@@ -41,6 +42,8 @@ export default function PublicLayout({
             <main className="min-h-screen">{children}</main>
 
             <Footer settings={settings} />
+
+            <Toaster position="top-right" richColors />
         </div>
     );
 }

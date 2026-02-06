@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Table;
+use App\Models\MenuItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -16,7 +17,7 @@ class OrderController extends Controller
     public function index()
     {
         $query = Order::query()
-            ->with(['table', 'items.menuItem', 'user'])
+            ->with(['table', 'items.item', 'user'])
             ->where('type', 'dining');
 
         // Search
@@ -63,6 +64,17 @@ class OrderController extends Controller
     }
 
     /**
+     * Get stats for polling (lightweight endpoint)
+     */
+    public function stats()
+    {
+        return response()->json([
+            'new' => Order::where('type', 'dining')->where('status', 'new')->count(),
+            'total' => Order::where('type', 'dining')->count(),
+        ]);
+    }
+
+    /**
      * Store a newly created order from cafe resto
      */
     public function store(Request $request)
@@ -82,6 +94,7 @@ class OrderController extends Controller
             });
 
             $order = Order::create([
+                'user_id' => auth()->id(), // null for guest users
                 'table_id' => $request->table_id,
                 'customer_name' => $request->customer_name,
                 'type' => 'dining',
@@ -92,9 +105,11 @@ class OrderController extends Controller
             foreach ($request->items as $item) {
                 OrderItem::create([
                     'order_id' => $order->id,
-                    'menu_item_id' => $item['id'],
+                    'item_type' => MenuItem::class,
+                    'item_id' => $item['id'],
                     'quantity' => $item['quantity'],
                     'price' => $item['price'],
+                    'subtotal' => $item['price'] * $item['quantity'],
                 ]);
             }
         });

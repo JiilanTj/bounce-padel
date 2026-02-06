@@ -107,6 +107,7 @@ Route::middleware('auth')->group(function () {
         // Cafe Orders Routes
         Route::resource('orders', OrderController::class)->only(['index', 'show']);
         Route::patch('orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
+        Route::get('orders/stats/polling', [OrderController::class, 'stats'])->name('orders.stats');
     });
 });
 

@@ -2,7 +2,8 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { PageProps } from '@/types';
 import { formatCurrency } from '@/utils/currency';
 import { Head, router } from '@inertiajs/react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 
 interface MenuItem {
     id: number;
@@ -13,10 +14,11 @@ interface MenuItem {
 interface OrderItem {
     id: number;
     order_id: number;
-    menu_item_id: number;
+    item_id: number;
     quantity: number;
     price: number;
-    menu_item: MenuItem;
+    subtotal: number;
+    item: MenuItem;
 }
 
 interface Table {
@@ -85,6 +87,59 @@ export default function Index({ orders, filters, stats }: Props) {
     const [search, setSearch] = useState(filters.search || '');
     const [selectedStatus, setSelectedStatus] = useState(filters.status || '');
     const [expandedOrder, setExpandedOrder] = useState<number | null>(null);
+    const [lastOrderCount, setLastOrderCount] = useState(stats.new);
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+
+    // Initialize audio
+    useEffect(() => {
+        audioRef.current = new Audio('/bell.mp3');
+    }, []);
+
+    // Real-time polling for new orders
+    useEffect(() => {
+        const interval = setInterval(() => {
+            // Silently fetch latest stats
+            fetch(route('orders.stats'), {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    Accept: 'application/json',
+                },
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    const newOrderCount = data.new;
+
+                    // If there are more new orders than before
+                    if (newOrderCount > lastOrderCount) {
+                        // Play bell sound
+                        if (audioRef.current) {
+                            audioRef.current.play().catch(() => {
+                                // Ignore audio play errors (e.g., user hasn't interacted with page)
+                            });
+                        }
+
+                        // Show toast notification
+                        toast.success(
+                            `Ada ${newOrderCount - lastOrderCount} pesanan baru!`,
+                            {
+                                duration: 5000,
+                            },
+                        );
+
+                        // Update last count
+                        setLastOrderCount(newOrderCount);
+
+                        // Refresh the page data
+                        router.reload({ only: ['orders', 'stats'] });
+                    }
+                })
+                .catch(() => {
+                    // Silently fail
+                });
+        }, 5000); // Poll every 5 seconds
+
+        return () => clearInterval(interval);
+    }, [lastOrderCount]);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -333,11 +388,7 @@ export default function Index({ orders, filters, stats }: Props) {
                                                             className="flex justify-between text-sm"
                                                         >
                                                             <div className="text-gray-700 dark:text-gray-300">
-                                                                {
-                                                                    item
-                                                                        .menu_item
-                                                                        .name
-                                                                }{' '}
+                                                                {item.item.name}{' '}
                                                                 x{' '}
                                                                 {item.quantity}
                                                             </div>
