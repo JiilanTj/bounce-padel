@@ -1,0 +1,315 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Booking;
+use App\Models\Court;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+
+class BookingController extends Controller
+{
+    public function index(Request $request)
+    {
+        $query = Booking::with(['user', 'court'])
+            ->orderBy('start_time', 'desc');
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Filter by date
+        if ($request->filled('date')) {
+            $date = Carbon::parse($request->date);
+            $query->whereDate('start_time', $date);
+        }
+
+        // Filter by court
+        if ($request->filled('court_id')) {
+            $query->where('court_id', $request->court_id);
+        }
+
+        // Search by user name
+        if ($request->filled('search')) {
+            $query->whereHas('user', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        $bookings = $query->paginate(15)->withQueryString();
+
+        // Get all courts with operating hours
+        $courts = Court::with('operatingHours')->get();
+
+        // Get today's bookings for availability overview
+        $todayDate = $request->filled('date') ? Carbon::parse($request->date) : Carbon::today();
+        $todayBookings = Booking::whereDate('start_time', $todayDate)
+            ->whereIn('status', ['pending', 'confirmed', 'paid'])
+            ->get(['court_id', 'start_time', 'end_time', 'status']);
+
+        return Inertia::render('Bookings/Index', [
+            'bookings' => $bookings,
+            'courts' => $courts,
+            'todayBookings' => $todayBookings,
+            'overviewDate' => $todayDate->format('Y-m-d'),
+            'filters' => [
+                'search' => $request->search,
+                'status' => $request->status,
+                'date' => $request->date,
+                'court_id' => $request->court_id,
+            ],
+        ]);
+    }
+
+    public function create()
+    {
+        $courts = Court::where('status', 'active')->get();
+        $users = User::where('role', 'user')->orderBy('name')->get();
+
+        return Inertia::render('Bookings/Create', [
+            'courts' => $courts,
+            'users' => $users,
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'court_id' => 'required|exists:courts,id',
+            'start_time' => 'required|date|after:now',
+            'end_time' => 'required|date|after:start_time',
+            'notes' => 'nullable|string',
+        ]);
+
+        // Check availability
+        $conflict = $this->checkAvailability(
+            $validated['court_id'],
+            $validated['start_time'],
+            $validated['end_time']
+        );
+
+        if ($conflict) {
+            return back()->withErrors([
+                'time' => 'Court is not available for the selected time slot. There is a conflict with an existing booking.'
+            ]);
+        }
+
+        // Calculate price
+        $court = Court::findOrFail($validated['court_id']);
+        $start = Carbon::parse($validated['start_time']);
+        $end = Carbon::parse($validated['end_time']);
+        $hours = $start->diffInHours($end);
+        
+        // If minutes exist, round up to nearest hour
+        if ($start->diffInMinutes($end) % 60 > 0) {
+            $hours += 1;
+        }
+
+        $totalPrice = $hours * $court->price_per_hour;
+
+        $booking = Booking::create([
+            'user_id' => $validated['user_id'],
+            'court_id' => $validated['court_id'],
+            'start_time' => $validated['start_time'],
+            'end_time' => $validated['end_time'],
+            'total_price' => $totalPrice,
+            'notes' => $validated['notes'] ?? null,
+            'status' => 'confirmed', // Kasir creates confirmed bookings
+        ]);
+
+        return redirect()->route('bookings.index')
+            ->with('success', 'Booking created successfully!');
+    }
+
+    public function edit(Booking $booking)
+    {
+        $booking->load(['user', 'court']);
+        $courts = Court::where('status', 'active')->get();
+        $users = User::where('role', 'user')->orderBy('name')->get();
+
+        return Inertia::render('Bookings/Edit', [
+            'booking' => $booking,
+            'courts' => $courts,
+            'users' => $users,
+        ]);
+    }
+
+    public function update(Request $request, Booking $booking)
+    {
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'court_id' => 'required|exists:courts,id',
+            'start_time' => 'required|date',
+            'end_time' => 'required|date|after:start_time',
+            'status' => 'required|in:pending,confirmed,paid,cancelled,completed,no_show',
+            'notes' => 'nullable|string',
+        ]);
+
+        // Check availability (excluding current booking)
+        $conflict = $this->checkAvailability(
+            $validated['court_id'],
+            $validated['start_time'],
+            $validated['end_time'],
+            $booking->id
+        );
+
+        if ($conflict) {
+            return back()->withErrors([
+                'time' => 'Court is not available for the selected time slot.'
+            ]);
+        }
+
+        // Recalculate price if time or court changed
+        $court = Court::findOrFail($validated['court_id']);
+        $start = Carbon::parse($validated['start_time']);
+        $end = Carbon::parse($validated['end_time']);
+        $hours = $start->diffInHours($end);
+        
+        if ($start->diffInMinutes($end) % 60 > 0) {
+            $hours += 1;
+        }
+
+        $totalPrice = $hours * $court->price_per_hour;
+
+        $booking->update([
+            'user_id' => $validated['user_id'],
+            'court_id' => $validated['court_id'],
+            'start_time' => $validated['start_time'],
+            'end_time' => $validated['end_time'],
+            'total_price' => $totalPrice,
+            'status' => $validated['status'],
+            'notes' => $validated['notes'] ?? null,
+        ]);
+
+        return redirect()->route('bookings.index')
+            ->with('success', 'Booking updated successfully!');
+    }
+
+    public function destroy(Booking $booking)
+    {
+        $booking->delete();
+
+        return redirect()->route('bookings.index')
+            ->with('success', 'Booking deleted successfully!');
+    }
+
+    /**
+     * Check court availability for a given time slot
+     */
+    public function checkAvailability(
+        int $courtId,
+        string $startTime,
+        string $endTime,
+        ?int $excludeBookingId = null
+    ): bool {
+        $query = Booking::where('court_id', $courtId)
+            ->whereIn('status', ['pending', 'confirmed', 'paid'])
+            ->where(function ($q) use ($startTime, $endTime) {
+                // Check for any overlap
+                $q->where(function ($overlap) use ($startTime, $endTime) {
+                    // New booking starts during existing booking
+                    $overlap->where('start_time', '<=', $startTime)
+                        ->where('end_time', '>', $startTime);
+                })->orWhere(function ($overlap) use ($startTime, $endTime) {
+                    // New booking ends during existing booking
+                    $overlap->where('start_time', '<', $endTime)
+                        ->where('end_time', '>=', $endTime);
+                })->orWhere(function ($overlap) use ($startTime, $endTime) {
+                    // New booking completely contains existing booking
+                    $overlap->where('start_time', '>=', $startTime)
+                        ->where('end_time', '<=', $endTime);
+                });
+            });
+
+        if ($excludeBookingId) {
+            $query->where('id', '!=', $excludeBookingId);
+        }
+
+        return $query->exists();
+    }
+
+    /**
+     * Get available time slots for a court on a specific date
+     */
+    public function getAvailableSlots(Request $request)
+    {
+        $request->validate([
+            'court_id' => 'required|exists:courts,id',
+            'date' => 'required|date',
+        ]);
+
+        $court = Court::with('operatingHours')->findOrFail($request->court_id);
+        $date = Carbon::parse($request->date);
+        $dayOfWeek = $date->dayOfWeek; // 0 (Sunday) to 6 (Saturday)
+
+        // Get operating hours for this day
+        $operatingHour = $court->operatingHours()
+            ->where('day_of_week', $dayOfWeek)
+            ->where('is_closed', false)
+            ->first();
+
+        if (!$operatingHour) {
+            return response()->json([
+                'available' => false,
+                'message' => 'Court is closed on this day',
+                'slots' => [],
+            ]);
+        }
+
+        // Get all bookings for this court on this date
+        $bookings = Booking::where('court_id', $request->court_id)
+            ->whereIn('status', ['pending', 'confirmed', 'paid'])
+            ->whereDate('start_time', $date)
+            ->get(['start_time', 'end_time']);
+
+        // Generate hourly slots
+        $openTime = Carbon::parse($date->format('Y-m-d') . ' ' . $operatingHour->open_time);
+        $closeTime = Carbon::parse($date->format('Y-m-d') . ' ' . $operatingHour->close_time);
+        
+        $slots = [];
+        $currentSlot = $openTime->copy();
+
+        while ($currentSlot->lt($closeTime)) {
+            $slotEnd = $currentSlot->copy()->addHour();
+            
+            // Check if this slot is available
+            $isAvailable = true;
+            foreach ($bookings as $booking) {
+                $bookingStart = Carbon::parse($booking->start_time);
+                $bookingEnd = Carbon::parse($booking->end_time);
+
+                // Check for overlap
+                if (
+                    ($currentSlot->gte($bookingStart) && $currentSlot->lt($bookingEnd)) ||
+                    ($slotEnd->gt($bookingStart) && $slotEnd->lte($bookingEnd)) ||
+                    ($currentSlot->lte($bookingStart) && $slotEnd->gte($bookingEnd))
+                ) {
+                    $isAvailable = false;
+                    break;
+                }
+            }
+
+            $slots[] = [
+                'start_time' => $currentSlot->format('H:i'),
+                'end_time' => $slotEnd->format('H:i'),
+                'available' => $isAvailable,
+            ];
+
+            $currentSlot->addHour();
+        }
+
+        return response()->json([
+            'available' => true,
+            'operating_hours' => [
+                'open' => $operatingHour->open_time,
+                'close' => $operatingHour->close_time,
+            ],
+            'slots' => $slots,
+        ]);
+    }
+}

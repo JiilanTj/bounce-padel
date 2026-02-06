@@ -55,7 +55,7 @@ export default function Sidebar({ className = '' }: { className?: string }) {
             {
                 name: 'Master Data',
                 icon: Square2StackIcon,
-                roles: ['admin', 'owner', 'kasir', 'pelayan'],
+                roles: ['admin', 'owner'],
                 children: [
                     {
                         name: 'Courts',
@@ -108,6 +108,28 @@ export default function Sidebar({ className = '' }: { className?: string }) {
                 routeName: 'courts.index.direct', // Fake route to avoid conflict if any
                 icon: ChartBarIcon,
                 roles: [], // Hide by giving no roles
+            },
+            {
+                name: 'Booking & Product',
+                icon: CalendarDaysIcon,
+                roles: ['kasir', 'owner'],
+                children: [
+                    {
+                        name: 'Court Bookings',
+                        href: route('bookings.index'),
+                        routeName: 'bookings.*',
+                    },
+                    {
+                        name: 'Product Sales',
+                        href: '#',
+                        routeName: 'sales.*',
+                    },
+                    {
+                        name: 'Equipment Rental',
+                        href: '#',
+                        routeName: 'rentals.*',
+                    },
+                ],
             },
             {
                 name: 'POS',

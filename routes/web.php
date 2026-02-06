@@ -17,6 +17,7 @@ use App\Http\Controllers\PublicFacilityController;
 use App\Http\Controllers\PublicProductController;
 use App\Http\Controllers\PublicContactController;
 use App\Http\Controllers\FacilityController;
+use App\Http\Controllers\BookingController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -83,6 +84,12 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:owner')->group(function () {
         Route::get('/website-settings', [\App\Http\Controllers\WebsiteSettingController::class, 'edit'])->name('website-settings.edit');
         Route::put('/website-settings', [\App\Http\Controllers\WebsiteSettingController::class, 'update'])->name('website-settings.update');
+    });
+
+    // Booking Routes (Kasir & Owner)
+    Route::middleware('role:kasir,owner')->group(function () {
+        Route::resource('bookings', BookingController::class);
+        Route::get('/api/bookings/available-slots', [BookingController::class, 'getAvailableSlots'])->name('bookings.available-slots');
     });
 });
 
