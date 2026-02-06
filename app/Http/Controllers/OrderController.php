@@ -18,7 +18,7 @@ class OrderController extends Controller
     {
         $query = Order::query()
             ->with(['table', 'items.item', 'user'])
-            ->where('type', 'dining');
+            ->whereIn('type', ['dining', 'pos']);
 
         // Search
         if (request('search')) {
@@ -44,11 +44,11 @@ class OrderController extends Controller
 
         // Stats
         $stats = [
-            'total' => Order::where('type', 'dining')->count(),
-            'new' => Order::where('type', 'dining')->where('status', 'new')->count(),
-            'processing' => Order::where('type', 'dining')->where('status', 'processing')->count(),
-            'ready' => Order::where('type', 'dining')->where('status', 'ready')->count(),
-            'total_revenue' => Order::where('type', 'dining')->where('status', 'completed')->sum('total_amount'),
+            'total' => Order::whereIn('type', ['dining', 'pos'])->count(),
+            'new' => Order::whereIn('type', ['dining', 'pos'])->where('status', 'new')->count(),
+            'processing' => Order::whereIn('type', ['dining', 'pos'])->where('status', 'processing')->count(),
+            'ready' => Order::whereIn('type', ['dining', 'pos'])->where('status', 'ready')->count(),
+            'total_revenue' => Order::whereIn('type', ['dining', 'pos'])->where('status', 'completed')->sum('total_amount'),
         ];
 
         return inertia('Orders/Index', [
@@ -69,8 +69,8 @@ class OrderController extends Controller
     public function stats()
     {
         return response()->json([
-            'new' => Order::where('type', 'dining')->where('status', 'new')->count(),
-            'total' => Order::where('type', 'dining')->count(),
+            'new' => Order::whereIn('type', ['dining', 'pos'])->where('status', 'new')->count(),
+            'total' => Order::whereIn('type', ['dining', 'pos'])->count(),
         ]);
     }
 

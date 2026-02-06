@@ -22,6 +22,7 @@ use App\Http\Controllers\ProductSaleController;
 use App\Http\Controllers\EquipmentRentalController;
 use App\Http\Controllers\PublicMenuController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\POSController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -108,6 +109,10 @@ Route::middleware('auth')->group(function () {
         Route::resource('orders', OrderController::class)->only(['index', 'show']);
         Route::patch('orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
         Route::get('orders/stats/polling', [OrderController::class, 'stats'])->name('orders.stats');
+        
+        // POS Routes
+        Route::get('pos', [POSController::class, 'index'])->name('pos.index');
+        Route::post('pos', [POSController::class, 'store'])->name('pos.store');
     });
 });
 

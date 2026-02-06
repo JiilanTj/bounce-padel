@@ -133,7 +133,7 @@ export default function Sidebar({ className = '' }: { className?: string }) {
             },
             {
                 name: 'POS',
-                href: '#',
+                href: route('pos.index'),
                 routeName: 'pos.*',
                 icon: CreditCardIcon,
                 roles: ['kasir', 'owner'],

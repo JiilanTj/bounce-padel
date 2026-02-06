@@ -28,13 +28,13 @@ interface Table {
 
 interface Order {
     id: number;
-    table_id: number;
+    table_id: number | null;
     customer_name: string;
     type: string;
     status: string;
     total_amount: number;
     created_at: string;
-    table: Table;
+    table: Table | null;
     items: OrderItem[];
 }
 
@@ -321,6 +321,19 @@ export default function Index({ orders, filters, stats }: Props) {
                                                 <div className="mt-2 space-y-1 text-sm text-gray-600 dark:text-gray-400">
                                                     <p>
                                                         <span className="font-medium">
+                                                            Tipe:
+                                                        </span>{' '}
+                                                        <span
+                                                            className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${order.type === 'pos' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}`}
+                                                        >
+                                                            {order.type ===
+                                                            'pos'
+                                                                ? 'POS'
+                                                                : 'Dining'}
+                                                        </span>
+                                                    </p>
+                                                    <p>
+                                                        <span className="font-medium">
                                                             Customer:
                                                         </span>{' '}
                                                         {order.customer_name}
@@ -329,7 +342,7 @@ export default function Index({ orders, filters, stats }: Props) {
                                                         <span className="font-medium">
                                                             Meja:
                                                         </span>{' '}
-                                                        {order.table.number}
+                                                        {order.table?.number || '-'}
                                                     </p>
                                                     <p>
                                                         <span className="font-medium">
