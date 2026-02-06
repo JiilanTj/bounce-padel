@@ -15,6 +15,7 @@ class Court extends Model
         'status', // active, maintenance, closed
         'price_per_hour',
         'image_path',
+        'ayo_field_id', // AYO API field ID for sync
     ];
 
     protected $casts = [

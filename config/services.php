@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'ayo' => [
+        'api_key' => env('AYO_API_KEY'),
+        'private_key' => env('AYO_PRIVATE_KEY'),
+        'venue_code' => env('AYO_VENUE_CODE'),
+        'base_url' => env('AYO_BASE_URL', 'https://sandbox.ayodev.xyz/api/v2/third-party'),
+    ],
+
 ];

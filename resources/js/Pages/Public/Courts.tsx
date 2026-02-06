@@ -1,7 +1,7 @@
 import PublicLayout from '@/Layouts/PublicLayout';
 import { WebsiteSettings } from '@/Pages/Welcome';
 import { formatCurrency } from '@/utils/currency';
-import { Link, router } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { FormEvent, useState } from 'react';
 
 type Court = {
@@ -55,6 +55,27 @@ export default function Courts({ courts, filters, settings }: Props) {
                 preserveScroll: true,
             },
         );
+    };
+
+    const generateWhatsAppURL = (court: Court) => {
+        if (!settings?.phone_number) return '#';
+
+        // Format phone number (remove spaces, dashes, etc)
+        const phoneNumber = settings.phone_number.replace(/[\s\-()]/g, '');
+
+        // Create booking message in Indonesian
+        const message = `Halo Bounce Padel!
+
+Saya ingin melakukan booking untuk:
+
+ *Lapangan:* ${court.name}
+ *Tipe:* ${court.type === 'indoor' ? 'Indoor' : 'Outdoor'}
+ *Surface:* ${court.surface}
+ *Harga:* ${formatCurrency(court.price_per_hour)}/jam
+
+Mohon informasi ketersediaan jadwal dan konfirmasi booking. Terima kasih!`;
+
+        return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     };
 
     return (
@@ -233,18 +254,17 @@ export default function Courts({ courts, filters, settings }: Props) {
                                         </div>
 
                                         {/* Book Button */}
-                                        <Link
-                                            href={route(
-                                                'public.courts.show',
-                                                court.id,
-                                            )}
+                                        <a
+                                            href={generateWhatsAppURL(court)}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
                                             className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 font-bold text-black transition-all hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/25"
                                         >
-                                            <span>Booking Sekarang</span>
                                             <span className="material-symbols-outlined text-xl">
-                                                arrow_forward
+                                                chat
                                             </span>
-                                        </Link>
+                                            <span>Booking via WhatsApp</span>
+                                        </a>
                                     </div>
                                 </div>
                             ))}

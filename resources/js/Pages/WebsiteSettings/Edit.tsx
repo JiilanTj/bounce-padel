@@ -13,7 +13,6 @@ import {
     LinkIcon,
     MapPinIcon,
     PhoneIcon,
-    XCircleIcon,
 } from '@heroicons/react/24/outline';
 import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
@@ -32,11 +31,7 @@ interface WebsiteSettings {
     holiday_notes: string | null;
 }
 
-export default function Edit({
-    settings,
-}: {
-    settings?: WebsiteSettings;
-}) {
+export default function Edit({ settings }: { settings?: WebsiteSettings }) {
     const { data, setData, put, processing, errors } = useForm({
         phone_number: settings?.phone_number || '',
         email: settings?.email || '',
@@ -233,7 +228,8 @@ export default function Edit({
                                         Operational Hours
                                     </h3>
                                     <p className="text-sm text-gray-500">
-                                        Set your business hours and operating days.
+                                        Set your business hours and operating
+                                        days.
                                     </p>
                                 </div>
                             </div>
@@ -279,10 +275,7 @@ export default function Edit({
                                     value={data.opening_hours}
                                     placeholder="08:00 - 22:00 WIB"
                                     onChange={(e) =>
-                                        setData(
-                                            'opening_hours',
-                                            e.target.value,
-                                        )
+                                        setData('opening_hours', e.target.value)
                                     }
                                 />
                                 <p className="mt-1 text-sm text-gray-500">
@@ -307,15 +300,12 @@ export default function Edit({
                                     value={data.holiday_notes}
                                     placeholder="Tutup pada tanggal merah..."
                                     onChange={(e) =>
-                                        setData(
-                                            'holiday_notes',
-                                            e.target.value,
-                                        )
+                                        setData('holiday_notes', e.target.value)
                                     }
                                 />
                                 <p className="mt-1 text-sm text-gray-500">
-                                    Informasi tambahan tentang hari libur atau jam
-                                    operasional khusus.
+                                    Informasi tambahan tentang hari libur atau
+                                    jam operasional khusus.
                                 </p>
                                 <InputError
                                     className="mt-2"
@@ -444,10 +434,7 @@ export default function Edit({
                             <button
                                 type="button"
                                 onClick={() =>
-                                    window.open(
-                                        '/lapangan',
-                                        '_blank',
-                                    )
+                                    window.open('/lapangan', '_blank')
                                 }
                                 className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
                             >

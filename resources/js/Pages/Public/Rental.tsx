@@ -75,6 +75,27 @@ export default function Rental({
         );
     };
 
+    const generateWhatsAppURL = (product: Product) => {
+        if (!settings?.phone_number) return '#';
+
+        // Format phone number (remove spaces, dashes, etc)
+        const phoneNumber = settings.phone_number.replace(/[\s\-()]/g, '');
+
+        // Create rental message in Indonesian
+        const message = `Halo Bounce Padel!
+
+Saya ingin menyewa peralatan:
+
+ *Produk:* ${product.name}
+ *Kategori:* ${product.category?.name || 'Umum'}
+ *Harga:* ${formatCurrency(product.price_rent)}/hari
+ *Stok Tersedia:* ${product.stock_rent}${product.description ? `\n *Deskripsi:* ${product.description}` : ''}
+
+Mohon informasi ketersediaan dan cara penyewaan. Terima kasih!`;
+
+        return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    };
+
     return (
         <PublicLayout title="Rental Alat - Bounce Padel" settings={settings}>
             {/* Hero Section */}
@@ -251,12 +272,17 @@ export default function Rental({
                                         </div>
 
                                         {/* Rent Button */}
-                                        <button className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 font-bold text-black transition-all hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/25">
-                                            <span>Sewa Sekarang</span>
+                                        <a
+                                            href={generateWhatsAppURL(product)}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 font-bold text-black transition-all hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/25"
+                                        >
                                             <span className="material-symbols-outlined text-xl">
-                                                shopping_cart
+                                                chat
                                             </span>
-                                        </button>
+                                            <span>Sewa via WhatsApp</span>
+                                        </a>
                                     </div>
                                 </div>
                             ))}

@@ -1,5 +1,17 @@
 import PublicLayout from '@/Layouts/PublicLayout';
-import { WebsiteSettings } from '@/Pages/Welcome';
+
+export interface WebsiteSettings {
+    phone_number: string | null;
+    email: string | null;
+    location: string | null;
+    location_link: string | null;
+    facebook_link: string | null;
+    instagram_link: string | null;
+    twitter_link: string | null;
+    opening_hours: string | null;
+    operating_days: string | null;
+    holiday_notes: string | null;
+}
 
 type Props = {
     settings: WebsiteSettings | null;
@@ -264,37 +276,73 @@ export default function Contact({ settings }: Props) {
                     </div>
 
                     {/* Operating Hours */}
-                    <div className="mt-12 rounded-2xl border border-landing-border bg-surface-dark p-8 text-center">
-                        <h2 className="mb-6 text-2xl font-bold text-white">
-                            Jam Operasional
-                        </h2>
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                            <div>
-                                <h3 className="font-semibold text-primary">
-                                    Senin - Jumat
-                                </h3>
-                                <p className="text-gray-400">
-                                    06:00 - 23:00 WIB
-                                </p>
-                            </div>
-                            <div>
-                                <h3 className="font-semibold text-primary">
-                                    Sabtu
-                                </h3>
-                                <p className="text-gray-400">
-                                    06:00 - 24:00 WIB
-                                </p>
-                            </div>
-                            <div>
-                                <h3 className="font-semibold text-primary">
-                                    Minggu
-                                </h3>
-                                <p className="text-gray-400">
-                                    07:00 - 23:00 WIB
-                                </p>
+                    {(settings?.opening_hours ||
+                        settings?.operating_days ||
+                        settings?.holiday_notes) && (
+                        <div className="mt-12">
+                            <h2 className="mb-8 text-center text-2xl font-bold text-white">
+                                Jam Operasional
+                            </h2>
+
+                            <div className="mx-auto max-w-4xl">
+                                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                    {settings?.opening_hours && (
+                                        <div className="group rounded-2xl border border-landing-border bg-surface-dark p-8 text-center transition-all hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10">
+                                            <div className="mb-4 flex justify-center">
+                                                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/20 transition-transform group-hover:scale-110">
+                                                    <span className="material-symbols-outlined text-3xl text-primary">
+                                                        schedule
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <h3 className="mb-2 text-lg font-semibold text-white">
+                                                Jam Buka
+                                            </h3>
+                                            <p className="text-xl font-bold text-primary">
+                                                {settings.opening_hours}
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    {settings?.operating_days && (
+                                        <div className="group rounded-2xl border border-landing-border bg-surface-dark p-8 text-center transition-all hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10">
+                                            <div className="mb-4 flex justify-center">
+                                                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/20 transition-transform group-hover:scale-110">
+                                                    <span className="material-symbols-outlined text-3xl text-primary">
+                                                        calendar_month
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <h3 className="mb-2 text-lg font-semibold text-white">
+                                                Hari Operasional
+                                            </h3>
+                                            <p className="text-xl font-bold text-primary">
+                                                {settings.operating_days}
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    {settings?.holiday_notes && (
+                                        <div className="group rounded-2xl border border-landing-border bg-surface-dark p-8 text-center transition-all hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 md:col-span-2">
+                                            <div className="mb-4 flex justify-center">
+                                                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/20 transition-transform group-hover:scale-110">
+                                                    <span className="material-symbols-outlined text-3xl text-primary">
+                                                        info
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <h3 className="mb-2 text-lg font-semibold text-white">
+                                                Catatan Khusus
+                                            </h3>
+                                            <p className="text-lg text-gray-300">
+                                                {settings.holiday_notes}
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             </section>
         </PublicLayout>

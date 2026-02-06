@@ -15,6 +15,9 @@ export interface WebsiteSettings {
     facebook_link: string | null;
     instagram_link: string | null;
     twitter_link: string | null;
+    opening_hours: string | null;
+    operating_days: string | null;
+    holiday_notes: string | null;
 }
 
 export default function Welcome({
