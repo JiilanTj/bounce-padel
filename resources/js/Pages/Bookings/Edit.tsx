@@ -52,7 +52,7 @@ export default function Edit({ booking, courts }: Props) {
     const startDate = new Date(booking.start_time);
     const endDate = new Date(booking.end_time);
 
-    const { data, setData, put, processing, errors } = useForm<{
+    const { data, setData, processing, errors } = useForm<{
         customer_name: string;
         customer_email: string;
         customer_phone: string;

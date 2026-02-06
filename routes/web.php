@@ -18,6 +18,8 @@ use App\Http\Controllers\PublicProductController;
 use App\Http\Controllers\PublicContactController;
 use App\Http\Controllers\FacilityController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\ProductSaleController;
+use App\Http\Controllers\EquipmentRentalController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -90,6 +92,12 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:kasir,owner')->group(function () {
         Route::resource('bookings', BookingController::class);
         Route::get('/api/bookings/available-slots', [BookingController::class, 'getAvailableSlots'])->name('bookings.available-slots');
+        
+        // Product Sales Routes
+        Route::resource('product-sales', ProductSaleController::class)->except(['edit', 'update']);
+        
+        // Equipment Rental Routes
+        Route::resource('equipment-rentals', EquipmentRentalController::class)->except(['edit']);
     });
 });
 

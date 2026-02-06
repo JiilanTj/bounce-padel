@@ -22,7 +22,7 @@ type Props = PageProps & {
 };
 
 export default function Create({ courts }: Props) {
-    const { data, setData, post, processing, errors } = useForm<{
+    const { data, setData, processing, errors } = useForm<{
         customer_name: string;
         customer_email: string;
         customer_phone: string;

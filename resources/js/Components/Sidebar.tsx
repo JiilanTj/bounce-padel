@@ -121,13 +121,13 @@ export default function Sidebar({ className = '' }: { className?: string }) {
                     },
                     {
                         name: 'Product Sales',
-                        href: '#',
-                        routeName: 'sales.*',
+                        href: route('product-sales.index'),
+                        routeName: 'product-sales.*',
                     },
                     {
                         name: 'Equipment Rental',
-                        href: '#',
-                        routeName: 'rentals.*',
+                        href: route('equipment-rentals.index'),
+                        routeName: 'equipment-rentals.*',
                     },
                 ],
             },
