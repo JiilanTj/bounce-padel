@@ -140,7 +140,7 @@ export default function Sidebar({ className = '' }: { className?: string }) {
             },
             {
                 name: 'Orders',
-                href: '#',
+                href: route('orders.index'),
                 routeName: 'orders.*',
                 icon: ShoppingBagIcon,
                 roles: ['pelayan', 'kasir', 'owner'],

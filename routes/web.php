@@ -21,6 +21,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ProductSaleController;
 use App\Http\Controllers\EquipmentRentalController;
 use App\Http\Controllers\PublicMenuController;
+use App\Http\Controllers\OrderController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -38,6 +39,7 @@ Route::get('/lapangan/{court}', [PublicCourtController::class, 'show'])->name('p
 Route::get('/fasilitas', [PublicFacilityController::class, 'index'])->name('public.facilities');
 Route::get('/cafe-resto', [PublicMenuController::class, 'index'])->name('public.cafe-resto');
 Route::post('/validate-table-qr', [TableController::class, 'validateQrCode'])->name('validate.table.qr');
+Route::post('/cafe-orders', [OrderController::class, 'store'])->name('cafe-orders.store');
 Route::get('/rental-alat', [PublicProductController::class, 'rental'])->name('public.rental');
 Route::get('/padel-store', [PublicProductController::class, 'store'])->name('public.store');
 Route::get('/kontak', [PublicContactController::class, 'index'])->name('public.contact');
@@ -101,6 +103,10 @@ Route::middleware('auth')->group(function () {
         
         // Equipment Rental Routes
         Route::resource('equipment-rentals', EquipmentRentalController::class)->except(['edit']);
+        
+        // Cafe Orders Routes
+        Route::resource('orders', OrderController::class)->only(['index', 'show']);
+        Route::patch('orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
     });
 });
 

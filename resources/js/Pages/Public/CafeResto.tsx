@@ -191,20 +191,49 @@ export default function CafeResto({ menus, categories, settings }: Props) {
             const data = await response.json();
 
             if (data.valid) {
-                toast.success(
-                    `Pesanan berhasil! Meja ${data.table.number} - ${customerName}`,
-                );
-                // TODO: Send order to backend
-                console.log('Order:', {
-                    table: data.table,
-                    customer: customerName,
-                    items: cart,
-                    total: getTotalPrice(),
-                });
-                setCart([]);
-                setShowCart(false);
-                setCustomerName('');
-                setQrCode('');
+                // Submit order to backend
+                try {
+                    const orderResponse = await fetch(
+                        route('cafe-orders.store'),
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN':
+                                    document
+                                        .querySelector(
+                                            'meta[name="csrf-token"]',
+                                        )
+                                        ?.getAttribute('content') || '',
+                            },
+                            body: JSON.stringify({
+                                table_id: data.table.id,
+                                customer_name: customerName,
+                                items: cart.map((item) => ({
+                                    id: item.id,
+                                    quantity: item.quantity,
+                                    price: item.price,
+                                })),
+                            }),
+                        },
+                    );
+
+                    const orderData = await orderResponse.json();
+
+                    if (orderData.success) {
+                        toast.success(
+                            `Pesanan berhasil! Meja ${data.table.number} - ${customerName}`,
+                        );
+                        setCart([]);
+                        setShowCart(false);
+                        setCustomerName('');
+                        setQrCode('');
+                    } else {
+                        toast.error('Gagal membuat pesanan');
+                    }
+                } catch (orderError) {
+                    toast.error('Gagal membuat pesanan');
+                }
             } else {
                 toast.error(data.message || 'Kode QR tidak valid');
             }
