@@ -369,14 +369,14 @@ export default function CafeResto({ menus, categories, settings }: Props) {
                             </p>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                        <div className="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
                             {filteredItems.map((item) => (
                                 <div
                                     key={item.id}
-                                    className="group overflow-hidden rounded-2xl border border-landing-border bg-surface-dark transition-all hover:border-primary/50"
+                                    className="group overflow-hidden rounded-xl border border-landing-border bg-surface-dark transition-all hover:border-primary/50 sm:rounded-2xl"
                                 >
                                     {/* Image */}
-                                    <div className="relative h-48 overflow-hidden bg-gray-800">
+                                    <div className="relative aspect-square overflow-hidden bg-gray-800">
                                         {item.image_url ? (
                                             <img
                                                 src={item.image_url}
@@ -385,38 +385,36 @@ export default function CafeResto({ menus, categories, settings }: Props) {
                                             />
                                         ) : (
                                             <div className="flex h-full items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5">
-                                                <span className="material-symbols-outlined text-6xl text-primary/50">
+                                                <span className="material-symbols-outlined text-4xl text-primary/50 sm:text-6xl">
                                                     restaurant
                                                 </span>
                                             </div>
                                         )}
+
+                                        {/* Category badge */}
+                                        <span className="absolute right-2 top-2 rounded-lg bg-primary/90 px-1.5 py-0.5 text-[10px] font-medium text-black sm:right-3 sm:top-3 sm:px-2 sm:py-1 sm:text-xs">
+                                            {item.category?.name || 'Lainnya'}
+                                        </span>
 
                                         {/* Overlay gradient */}
                                         <div className="absolute inset-0 bg-gradient-to-t from-surface-dark/80 via-transparent to-transparent" />
                                     </div>
 
                                     {/* Content */}
-                                    <div className="p-6">
-                                        <div className="mb-2">
-                                            <span className="rounded-lg bg-primary/20 px-2 py-1 text-xs font-medium text-primary">
-                                                {item.category?.name ||
-                                                    'Lainnya'}
-                                            </span>
-                                        </div>
-
-                                        <h3 className="text-xl font-bold text-white">
+                                    <div className="p-3 sm:p-6">
+                                        <h3 className="truncate text-sm font-bold text-white sm:text-xl">
                                             {item.name}
                                         </h3>
 
                                         {item.description && (
-                                            <p className="mt-2 line-clamp-2 text-sm text-gray-400">
+                                            <p className="mt-1 line-clamp-2 text-xs text-gray-400 sm:mt-2 sm:text-sm">
                                                 {item.description}
                                             </p>
                                         )}
 
                                         {/* Price */}
-                                        <div className="mt-4 flex items-baseline gap-1">
-                                            <span className="text-2xl font-bold text-primary">
+                                        <div className="mt-2 flex items-baseline gap-1 sm:mt-4">
+                                            <span className="text-lg font-bold text-primary sm:text-2xl">
                                                 {formatCurrency(item.price)}
                                             </span>
                                         </div>
@@ -424,9 +422,9 @@ export default function CafeResto({ menus, categories, settings }: Props) {
                                         {/* Order Button */}
                                         <button
                                             onClick={() => addToCart(item)}
-                                            className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 font-semibold text-black transition-all hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/25"
+                                            className="mt-3 flex w-full items-center justify-center gap-1 rounded-full bg-primary px-3 py-2 text-sm font-semibold text-black transition-all hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/25 sm:mt-5 sm:gap-2 sm:px-4 sm:py-2.5"
                                         >
-                                            <span className="material-symbols-outlined text-lg">
+                                            <span className="material-symbols-outlined text-base sm:text-lg">
                                                 add_shopping_cart
                                             </span>
                                             Tambah
