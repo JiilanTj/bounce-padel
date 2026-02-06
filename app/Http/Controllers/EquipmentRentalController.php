@@ -149,34 +149,38 @@ class EquipmentRentalController extends Controller
         }
     }
 
-    public function show(Order $order)
+    public function show(Order $equipment_rental)
     {
-        $order->load(['user', 'items.item']);
+        $equipment_rental->load(['user', 'items.item']);
 
         return Inertia::render('EquipmentRentals/Show', [
-            'rental' => $order,
+            'rental' => $equipment_rental,
         ]);
     }
 
-    public function update(Request $request, Order $order)
+    public function update(Request $request, Order $equipment_rental)
     {
         // Complete rental - return equipment
         $validated = $request->validate([
             'status' => 'required|in:completed,cancelled',
+            'return_notes' => 'nullable|string|max:1000',
         ]);
 
         DB::beginTransaction();
         try {
             // If completing or cancelling, restore stock
             if (in_array($validated['status'], ['completed', 'cancelled'])) {
-                foreach ($order->items as $item) {
+                foreach ($equipment_rental->items as $item) {
                     if ($item->item_type === 'App\Models\Product') {
                         $item->item->increment('stock_rent', $item->quantity);
                     }
                 }
             }
 
-            $order->update(['status' => $validated['status']]);
+            $equipment_rental->update([
+                'status' => $validated['status'],
+                'return_notes' => $validated['return_notes'] ?? null,
+            ]);
 
             DB::commit();
 
@@ -188,18 +192,18 @@ class EquipmentRentalController extends Controller
         }
     }
 
-    public function destroy(Order $order)
+    public function destroy(Order $equipment_rental)
     {
         DB::beginTransaction();
         try {
             // Restore stock for each item
-            foreach ($order->items as $item) {
+            foreach ($equipment_rental->items as $item) {
                 if ($item->item_type === 'App\Models\Product') {
                     $item->item->increment('stock_rent', $item->quantity);
                 }
             }
 
-            $order->delete();
+            $equipment_rental->delete();
 
             DB::commit();
 

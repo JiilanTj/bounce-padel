@@ -15,6 +15,7 @@ class Order extends Model
         'status',
         'total_amount',
         'type',
+        'return_notes',
     ];
 
     public function user()
