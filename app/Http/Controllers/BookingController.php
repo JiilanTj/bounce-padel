@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Booking;
 use App\Models\Court;
 use App\Models\User;
+use App\Services\BookingSyncService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
@@ -12,8 +13,43 @@ use Carbon\Carbon;
 
 class BookingController extends Controller
 {
+    protected BookingSyncService $bookingSyncService;
+
+    public function __construct(BookingSyncService $bookingSyncService)
+    {
+        $this->bookingSyncService = $bookingSyncService;
+    }
+
     public function index(Request $request)
     {
+        // Sync bookings from AYO API
+        $syncFilters = [];
+        if ($request->filled('date')) {
+            $syncFilters['date'] = $request->date;
+        }
+        
+        // Perform sync in background (non-blocking)
+        try {
+            $syncResult = $this->bookingSyncService->syncFromAyo($syncFilters);
+            
+            // Flash sync results
+            if ($syncResult['success']) {
+                $message = "Synced from AYO: ";
+                $message .= "{$syncResult['created']} created, ";
+                $message .= "{$syncResult['updated']} updated, ";
+                $message .= "{$syncResult['skipped']} unchanged";
+                
+                if (!empty($syncResult['errors'])) {
+                    session()->flash('warning', $message . " (with some errors)");
+                } else {
+                    session()->flash('success', $message);
+                }
+            }
+        } catch (\Exception $e) {
+            // Don't block the page if sync fails
+            session()->flash('warning', 'Could not sync with AYO API: ' . $e->getMessage());
+        }
+
         $query = Booking::with(['user', 'court'])
             ->orderBy('start_time', 'desc');
 
@@ -68,18 +104,18 @@ class BookingController extends Controller
     public function create()
     {
         $courts = Court::where('status', 'active')->get();
-        $users = User::where('role', 'user')->orderBy('name')->get();
-
+ 
         return Inertia::render('Bookings/Create', [
             'courts' => $courts,
-            'users' => $users,
         ]);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
+            'customer_name' => 'required|string|max:255',
+            'customer_email' => 'required|email|max:255',
+            'customer_phone' => 'required|string|max:20',
             'court_id' => 'required|exists:courts,id',
             'start_time' => 'required|date|after:now',
             'end_time' => 'required|date|after:start_time',
@@ -99,6 +135,22 @@ class BookingController extends Controller
             ]);
         }
 
+        // Find or create user
+        $user = User::firstOrCreate(
+            ['email' => $validated['customer_email']],
+            [
+                'name' => $validated['customer_name'],
+                'phone' => $validated['customer_phone'],
+                'password' => bcrypt(str()->random(16)), // Random password
+                'role' => 'user',
+            ]
+        );
+
+        // Update phone if user exists but phone changed
+        if ($user->phone !== $validated['customer_phone']) {
+            $user->update(['phone' => $validated['customer_phone']]);
+        }
+
         // Calculate price
         $court = Court::findOrFail($validated['court_id']);
         $start = Carbon::parse($validated['start_time']);
@@ -113,7 +165,7 @@ class BookingController extends Controller
         $totalPrice = $hours * $court->price_per_hour;
 
         $booking = Booking::create([
-            'user_id' => $validated['user_id'],
+            'user_id' => $user->id,
             'court_id' => $validated['court_id'],
             'start_time' => $validated['start_time'],
             'end_time' => $validated['end_time'],
@@ -130,25 +182,41 @@ class BookingController extends Controller
     {
         $booking->load(['user', 'court']);
         $courts = Court::where('status', 'active')->get();
-        $users = User::where('role', 'user')->orderBy('name')->get();
 
         return Inertia::render('Bookings/Edit', [
             'booking' => $booking,
             'courts' => $courts,
-            'users' => $users,
         ]);
     }
 
     public function update(Request $request, Booking $booking)
     {
         $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
+            'customer_name' => 'required|string|max:255',
+            'customer_email' => 'required|email|max:255',
+            'customer_phone' => 'required|string|max:20',
             'court_id' => 'required|exists:courts,id',
             'start_time' => 'required|date',
             'end_time' => 'required|date|after:start_time',
             'status' => 'required|in:pending,confirmed,paid,cancelled,completed,no_show',
             'notes' => 'nullable|string',
         ]);
+
+        // Find or create user (same as store)
+        $user = User::firstOrCreate(
+            ['email' => $validated['customer_email']],
+            [
+                'name' => $validated['customer_name'],
+                'phone' => $validated['customer_phone'],
+                'password' => bcrypt(str()->random(16)),
+                'role' => 'user',
+            ]
+        );
+
+        // Update phone if user exists but phone changed
+        if ($user->phone !== $validated['customer_phone']) {
+            $user->update(['phone' => $validated['customer_phone']]);
+        }
 
         // Check availability (excluding current booking)
         $conflict = $this->checkAvailability(
@@ -177,7 +245,7 @@ class BookingController extends Controller
         $totalPrice = $hours * $court->price_per_hour;
 
         $booking->update([
-            'user_id' => $validated['user_id'],
+            'user_id' => $user->id,
             'court_id' => $validated['court_id'],
             'start_time' => $validated['start_time'],
             'end_time' => $validated['end_time'],

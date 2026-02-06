@@ -1,14 +1,8 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { PageProps } from '@/types';
 import { formatCurrency } from '@/utils/currency';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, router } from '@inertiajs/react';
 import { FormEvent, useCallback, useEffect, useState } from 'react';
-
-type User = {
-    id: number;
-    name: string;
-    email: string;
-};
 
 type Court = {
     id: number;
@@ -25,12 +19,13 @@ type TimeSlot = {
 
 type Props = PageProps & {
     courts: Court[];
-    users: User[];
 };
 
-export default function Create({ courts, users }: Props) {
+export default function Create({ courts }: Props) {
     const { data, setData, post, processing, errors } = useForm<{
-        user_id: string;
+        customer_name: string;
+        customer_email: string;
+        customer_phone: string;
         court_id: string;
         date: string;
         start_time: string;
@@ -38,7 +33,9 @@ export default function Create({ courts, users }: Props) {
         notes: string;
         time?: string; // Server-side validation error
     }>({
-        user_id: '',
+        customer_name: '',
+        customer_email: '',
+        customer_phone: '',
         court_id: '',
         date: '',
         start_time: '',
@@ -50,6 +47,7 @@ export default function Create({ courts, users }: Props) {
     const [loadingSlots, setLoadingSlots] = useState(false);
     const [selectedCourt, setSelectedCourt] = useState<Court | null>(null);
     const [totalPrice, setTotalPrice] = useState(0);
+    const [selectedSlots, setSelectedSlots] = useState<number[]>([]);
 
     const loadAvailableSlots = useCallback(async () => {
         setLoadingSlots(true);
@@ -90,6 +88,7 @@ export default function Create({ courts, users }: Props) {
             loadAvailableSlots();
         } else {
             setAvailableSlots([]);
+            setSelectedSlots([]);
         }
     }, [data.court_id, data.date, loadAvailableSlots]);
 
@@ -112,24 +111,67 @@ export default function Create({ courts, users }: Props) {
         }
     }, [data.start_time, data.end_time, selectedCourt, calculatePrice]);
 
+    const handleSlotClick = (index: number) => {
+        const slot = availableSlots[index];
+        
+        // Can't select unavailable slots
+        if (!slot.available) return;
+
+        let newSelectedSlots: number[];
+
+        if (selectedSlots.length === 0) {
+            // First selection
+            newSelectedSlots = [index];
+        } else if (selectedSlots.includes(index)) {
+            // Deselect if already selected
+            newSelectedSlots = selectedSlots.filter(i => i !== index);
+        } else {
+            // Add to selection - create range from min to max
+            const allSlots = [...selectedSlots, index].sort((a, b) => a - b);
+            const minIndex = allSlots[0];
+            const maxIndex = allSlots[allSlots.length - 1];
+            
+            // Create continuous range and check if all are available
+            newSelectedSlots = [];
+            for (let i = minIndex; i <= maxIndex; i++) {
+                if (!availableSlots[i]?.available) {
+                    // If any slot in range is unavailable, just select the clicked one
+                    newSelectedSlots = [index];
+                    break;
+                }
+                newSelectedSlots.push(i);
+            }
+        }
+
+        setSelectedSlots(newSelectedSlots);
+
+        // Update start and end times based on selection
+        if (newSelectedSlots.length > 0) {
+            const sortedSlots = newSelectedSlots.sort((a, b) => a - b);
+            const firstSlot = availableSlots[sortedSlots[0]];
+            const lastSlot = availableSlots[sortedSlots[sortedSlots.length - 1]];
+            
+            setData('start_time', firstSlot.start_time);
+            setData('end_time', lastSlot.end_time);
+        } else {
+            setData('start_time', '');
+            setData('end_time', '');
+        }
+    };
+
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
 
-        // Combine date and time
+        // Combine date and time for submission
         const startDateTime = `${data.date} ${data.start_time}`;
         const endDateTime = `${data.date} ${data.end_time}`;
 
-        // Update form data with combined datetime before submission
-        setData({
+        // Submit with transformed data using router.post
+        router.post(route('bookings.store'), {
             ...data,
             start_time: startDateTime,
             end_time: endDateTime,
         });
-
-        // Submit after state update
-        setTimeout(() => {
-            post(route('bookings.store'));
-        }, 0);
     };
 
     return (
@@ -155,36 +197,74 @@ export default function Create({ courts, users }: Props) {
                     <div className="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
                         <form onSubmit={handleSubmit} className="p-6">
                             <div className="space-y-6">
-                                {/* Customer Selection */}
-                                <div>
-                                    <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Customer *
-                                    </label>
-                                    <select
-                                        value={data.user_id}
-                                        onChange={(e) =>
-                                            setData('user_id', e.target.value)
-                                        }
-                                        className="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                                        required
-                                    >
-                                        <option value="">
-                                            Select Customer
-                                        </option>
-                                        {users.map((user) => (
-                                            <option
-                                                key={user.id}
-                                                value={user.id}
-                                            >
-                                                {user.name} ({user.email})
-                                            </option>
-                                        ))}
-                                    </select>
-                                    {errors.user_id && (
-                                        <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-                                            {errors.user_id}
-                                        </p>
-                                    )}
+                                {/* Customer Information */}
+                                <div className="space-y-4 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900">
+                                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                        Customer Information
+                                    </h3>
+                                    
+                                    <div>
+                                        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            Name *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={data.customer_name}
+                                            onChange={(e) =>
+                                                setData('customer_name', e.target.value)
+                                            }
+                                            className="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                                            placeholder="e.g. John Doe"
+                                            required
+                                        />
+                                        {errors.customer_name && (
+                                            <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                                                {errors.customer_name}
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    <div>
+                                        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            Email *
+                                        </label>
+                                        <input
+                                            type="email"
+                                            value={data.customer_email}
+                                            onChange={(e) =>
+                                                setData('customer_email', e.target.value)
+                                            }
+                                            className="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                                            placeholder="e.g. john@example.com"
+                                            required
+                                        />
+                                        {errors.customer_email && (
+                                            <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                                                {errors.customer_email}
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    <div>
+                                        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            Phone *
+                                        </label>
+                                        <input
+                                            type="tel"
+                                            value={data.customer_phone}
+                                            onChange={(e) =>
+                                                setData('customer_phone', e.target.value)
+                                            }
+                                            className="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                                            placeholder="e.g. 08123456789"
+                                            required
+                                        />
+                                        {errors.customer_phone && (
+                                            <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                                                {errors.customer_phone}
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
 
                                 {/* Court Selection */}
@@ -263,40 +343,34 @@ export default function Create({ courts, users }: Props) {
                                         ) : availableSlots.length > 0 ? (
                                             <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
                                                 {availableSlots.map(
-                                                    (slot, index) => (
-                                                        <button
-                                                            key={index}
-                                                            type="button"
-                                                            disabled={
-                                                                !slot.available
-                                                            }
-                                                            onClick={() => {
-                                                                setData(
-                                                                    'start_time',
-                                                                    slot.start_time,
-                                                                );
-                                                                setData(
-                                                                    'end_time',
-                                                                    slot.end_time,
-                                                                );
-                                                            }}
-                                                            className={`rounded-lg border px-3 py-2 text-sm font-medium transition ${
-                                                                data.start_time ===
-                                                                slot.start_time
-                                                                    ? 'border-primary bg-primary text-black'
-                                                                    : slot.available
-                                                                      ? 'border-gray-300 bg-white text-gray-700 hover:border-primary dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300'
-                                                                      : 'cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400 dark:border-gray-700 dark:bg-gray-800'
-                                                            }`}
-                                                        >
-                                                            {slot.start_time}
-                                                            {!slot.available && (
-                                                                <span className="ml-1 text-xs">
-                                                                    ✕
-                                                                </span>
-                                                            )}
-                                                        </button>
-                                                    ),
+                                                    (slot, index) => {
+                                                        const isSelected = selectedSlots.includes(index);
+                                                        
+                                                        return (
+                                                            <button
+                                                                key={index}
+                                                                type="button"
+                                                                disabled={
+                                                                    !slot.available
+                                                                }
+                                                                onClick={() => handleSlotClick(index)}
+                                                                className={`rounded-lg border px-3 py-2 text-sm font-medium transition ${
+                                                                    isSelected
+                                                                        ? 'border-primary bg-primary text-black'
+                                                                        : slot.available
+                                                                          ? 'border-gray-300 bg-white text-gray-700 hover:border-primary dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300'
+                                                                          : 'cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400 dark:border-gray-700 dark:bg-gray-800'
+                                                                }`}
+                                                            >
+                                                                {slot.start_time}
+                                                                {!slot.available && (
+                                                                    <span className="ml-1 text-xs">
+                                                                        ✕
+                                                                    </span>
+                                                                )}
+                                                            </button>
+                                                        );
+                                                    }
                                                 )}
                                             </div>
                                         ) : (
