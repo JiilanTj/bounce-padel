@@ -18,10 +18,11 @@ class EquipmentRentalController extends Controller
         $query = Order::with(['user', 'items.item'])
             ->where('type', 'pos')
             ->whereHas('items', function ($q) {
-                $q->where('item_type', 'App\Models\Product')
-                    ->whereHas('item', function ($q2) {
-                        $q2->where('stock_rent', '>', 0);
-                    });
+                // Use whereHasMorph to specifically check Product items and avoid querying MenuItems
+                // Filter by price_rent > 0 to identify rental products, regardless of current stock level
+                $q->whereHasMorph('item', [\App\Models\Product::class], function ($q2) {
+                    $q2->where('price_rent', '>', 0);
+                });
             })
             ->orderBy('created_at', 'desc');
 

@@ -116,7 +116,11 @@ export default function IngredientForm({
                 });
             } else {
                 reset();
-                setData((prev) => ({ ...prev, _method: 'POST', is_active: '1' }));
+                setData((prev) => ({
+                    ...prev,
+                    _method: 'POST',
+                    is_active: '1',
+                }));
             }
             clearErrors();
         }

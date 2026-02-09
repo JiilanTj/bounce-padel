@@ -85,6 +85,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('categories', CategoryController::class)->only(['index', 'show']);
         Route::resource('products', ProductController::class)->only(['index', 'show']);
         Route::resource('tables', TableController::class)->only(['index', 'show']);
+        Route::get('tables/{table}/print-qr', [TableController::class, 'printQr'])->name('tables.print-qr');
         Route::resource('menus', MenuController::class)->only(['index', 'show']);
         Route::resource('menu-items', MenuItemController::class)->only(['index', 'show']);
         Route::resource('inventories', InventoryController::class)->only(['index', 'show']);

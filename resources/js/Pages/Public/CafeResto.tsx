@@ -57,6 +57,17 @@ export default function CafeResto({ menus, categories, settings }: Props) {
         if (savedCart) {
             setCart(JSON.parse(savedCart));
         }
+
+        // Check for table query param (Deep Linking)
+        const params = new URLSearchParams(window.location.search);
+        const tableCode = params.get('table');
+        if (tableCode) {
+            setQrCode(tableCode);
+            setShowCart(true);
+            toast.info(
+                'Meja terdeteksi. Silakan masukkan nama Anda untuk memesan.',
+            );
+        }
     }, []);
 
     // Save cart to localStorage whenever it changes

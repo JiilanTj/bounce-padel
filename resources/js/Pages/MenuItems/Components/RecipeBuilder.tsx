@@ -4,7 +4,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import TextInput from '@/Components/TextInput';
 import { formatCurrency } from '@/utils/currency';
-import { router } from '@inertiajs/react';
+import axios from 'axios';
 import {
     AlertTriangle,
     BeakerIcon,
@@ -18,7 +18,6 @@ import {
     X,
 } from 'lucide-react';
 import { FormEvent, useEffect, useState } from 'react';
-import axios from 'axios';
 import { toast } from 'sonner';
 
 type Category = {
@@ -424,7 +423,9 @@ export default function RecipeBuilder({
                                                             <p className="text-xs text-gray-500">
                                                                 {ing.unit} •{' '}
                                                                 {formatCurrency(
-                                                                    Number(ing.unit_price),
+                                                                    Number(
+                                                                        ing.unit_price,
+                                                                    ),
                                                                 )}{' '}
                                                                 / {ing.unit}
                                                             </p>

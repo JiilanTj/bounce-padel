@@ -8,6 +8,7 @@ import {
     MagnifyingGlassIcon,
     PencilIcon,
     PlusIcon,
+    PrinterIcon,
     QrCodeIcon,
     TrashIcon,
 } from '@heroicons/react/24/outline';
@@ -245,11 +246,19 @@ export default function Index() {
                                 table,
                             })
                         }
-                        className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
                         title="Delete"
                     >
                         <TrashIcon className="h-4 w-4" />
                     </button>
+                    <a
+                        href={route('tables.print-qr', table.id)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-purple-600"
+                        title="Print QR"
+                    >
+                        <PrinterIcon className="h-4 w-4" />
+                    </a>
                 </div>
             ),
         },

@@ -414,11 +414,14 @@ export default function Index() {
                                 render: (item: Ingredient) => (
                                     <div>
                                         <div className="text-sm font-medium text-gray-900">
-                                            {Number(item.current_stock).toFixed(3)}{' '}
+                                            {Number(item.current_stock).toFixed(
+                                                3,
+                                            )}{' '}
                                             {item.unit}
                                         </div>
                                         <div className="text-xs text-gray-500">
-                                            Min: {Number(item.min_stock).toFixed(3)}
+                                            Min:{' '}
+                                            {Number(item.min_stock).toFixed(3)}
                                         </div>
                                     </div>
                                 ),
@@ -429,7 +432,9 @@ export default function Index() {
                                 sortable: true,
                                 render: (item: Ingredient) => (
                                     <span className="text-sm text-gray-900">
-                                        {formatCurrency(Number(item.unit_price))}
+                                        {formatCurrency(
+                                            Number(item.unit_price),
+                                        )}
                                     </span>
                                 ),
                             },

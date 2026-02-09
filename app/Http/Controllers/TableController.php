@@ -128,4 +128,13 @@ class TableController extends Controller
             ],
         ]);
     }
+    /**
+     * Show QR Code print view
+     */
+    public function printQr(Table $table)
+    {
+        return inertia('Tables/PrintQr', [
+            'table' => $table
+        ]);
+    }
 }
