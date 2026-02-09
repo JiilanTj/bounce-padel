@@ -1,3 +1,4 @@
+import CalculatorWidget from '@/Components/CalculatorWidget';
 import Sidebar from '@/Components/Sidebar';
 import { useOrderNotifications } from '@/hooks/useOrderNotifications';
 import { PageProps } from '@/types';
@@ -161,6 +162,11 @@ export default function Authenticated({
                                     )}
                                 </div>
                             </div>
+
+                            {/* Calculator Widget - Only for Cashier/Owner/Admin */}
+                            {['kasir', 'owner', 'admin'].includes(
+                                user.role,
+                            ) && <CalculatorWidget />}
 
                             {/* Notifications */}
                             {enableNotifications ? (
