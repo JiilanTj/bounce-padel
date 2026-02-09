@@ -54,9 +54,8 @@ Route::get('/rental-alat', [PublicProductController::class, 'rental'])->name('pu
 Route::get('/padel-store', [PublicProductController::class, 'store'])->name('public.store');
 Route::get('/kontak', [PublicContactController::class, 'index'])->name('public.contact');
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

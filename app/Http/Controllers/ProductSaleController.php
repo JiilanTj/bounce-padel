@@ -17,6 +17,10 @@ class ProductSaleController extends Controller
     {
         $query = Order::with(['user', 'items.item'])
             ->where('type', 'pos')
+            ->whereNotIn('status', ['processing', 'completed'])
+            ->whereDoesntHave('items', function ($q) {
+                $q->where('notes', 'like', 'Rental:%');
+            })
             ->whereHas('items', function ($q) {
                 $q->where('item_type', 'App\Models\Product');
             })
