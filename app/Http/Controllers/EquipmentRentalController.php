@@ -195,6 +195,10 @@ class EquipmentRentalController extends Controller
 
     public function destroy(Order $equipment_rental)
     {
+        if (auth()->user()->role === 'kasir') {
+            abort(403, 'Cashiers are not allowed to delete rentals.');
+        }
+
         DB::beginTransaction();
         try {
             // Restore stock for each item

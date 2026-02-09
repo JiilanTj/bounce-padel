@@ -58,7 +58,7 @@ type Props = PageProps & {
 };
 
 export default function Index({ rentals, filters }: Props) {
-    const { flash } = usePage<PageProps>().props;
+    const { flash, auth } = usePage<PageProps>().props;
 
     const [searchQuery, setSearchQuery] = useState(filters.search || '');
     const [selectedStatus, setSelectedStatus] = useState(
@@ -372,14 +372,16 @@ export default function Index({ rentals, filters }: Props) {
                                                     </button>
                                                 </>
                                             )}
-                                            <button
-                                                onClick={() =>
-                                                    handleDelete(rental.id)
-                                                }
-                                                className="text-red-600 hover:text-red-900"
-                                            >
-                                                Delete
-                                            </button>
+                                            {auth.user.role !== 'kasir' && (
+                                                <button
+                                                    onClick={() =>
+                                                        handleDelete(rental.id)
+                                                    }
+                                                    className="text-red-600 hover:text-red-900"
+                                                >
+                                                    Delete
+                                                </button>
+                                            )}
                                         </td>
                                     </tr>
                                 ))

@@ -155,6 +155,10 @@ class ProductSaleController extends Controller
 
     public function destroy(Order $product_sale)
     {
+        if (auth()->user()->role === 'kasir') {
+            abort(403, 'Cashiers are not allowed to delete product sales.');
+        }
+
         DB::beginTransaction();
         try {
             // Restore stock for each item
