@@ -6,6 +6,8 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Table;
 use App\Models\MenuItem;
+use App\Models\Notification;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -88,7 +90,9 @@ class OrderController extends Controller
             'items.*.price' => 'required|numeric|min:0',
         ]);
 
-        DB::transaction(function () use ($request) {
+        $order = null;
+
+        DB::transaction(function () use ($request, &$order) {
             $totalAmount = collect($request->items)->sum(function ($item) {
                 return $item['price'] * $item['quantity'];
             });
@@ -113,6 +117,32 @@ class OrderController extends Controller
                 ]);
             }
         });
+
+        // Create notifications ONLY for cashier users
+        if ($order) {
+            $table = Table::find($request->table_id);
+            $itemsCount = collect($request->items)->sum('quantity');
+
+            // Get all cashier users only (NOT owner, NOT admin)
+            $cashierIds = User::where('role', 'kasir')->pluck('id');
+
+            foreach ($cashierIds as $cashierId) {
+                Notification::create([
+                    'user_id' => $cashierId, // Specific user, not broadcast
+                    'type' => 'order_created',
+                    'title' => "Order baru dari {$request->customer_name}",
+                    'message' => "Meja {$table->number} • {$itemsCount} item",
+                    'data' => [
+                        'order_id' => $order->id,
+                        'customer_name' => $request->customer_name,
+                        'table_number' => $table->number,
+                        'order_type' => 'dining',
+                        'total_amount' => $order->total_amount,
+                        'items_count' => $itemsCount,
+                    ],
+                ]);
+            }
+        }
 
         return response()->json([
             'success' => true,

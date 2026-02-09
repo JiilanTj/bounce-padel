@@ -23,6 +23,8 @@ use App\Http\Controllers\EquipmentRentalController;
 use App\Http\Controllers\PublicMenuController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\POSController;
+use App\Http\Controllers\OrderNotificationController;
+use App\Http\Controllers\NotificationController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -57,6 +59,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Notifications Routes (KASIR ONLY)
+    Route::middleware('role:kasir')->prefix('notifications')->group(function () {
+        Route::get('/', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::get('/count', [NotificationController::class, 'count'])->name('notifications.count');
+        Route::patch('{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
+        Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+        Route::delete('/read', [NotificationController::class, 'deleteRead'])->name('notifications.delete-read');
+    });
 
     // User Management Routes (Owner & Admin only)
     Route::middleware('role:owner,admin')->group(function () {
@@ -113,7 +124,10 @@ Route::middleware('auth')->group(function () {
         Route::resource('orders', OrderController::class)->only(['index', 'show']);
         Route::patch('orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
         Route::get('orders/stats/polling', [OrderController::class, 'stats'])->name('orders.stats');
-        
+
+        // SSE Order Notifications (Real-time)
+        Route::get('orders/notifications/stream', [OrderNotificationController::class, 'stream'])->name('orders.notifications.stream');
+
         // POS Routes
         Route::get('pos', [POSController::class, 'index'])->name('pos.index');
         Route::post('pos', [POSController::class, 'store'])->name('pos.store');

@@ -8,6 +8,8 @@ use App\Models\MenuItem;
 use App\Models\Menu;
 use App\Models\Category;
 use App\Models\Table;
+use App\Models\Notification;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -46,7 +48,9 @@ class POSController extends Controller
             'items.*.price' => 'required|numeric|min:0',
         ]);
 
-        DB::transaction(function () use ($request) {
+        $order = null;
+
+        DB::transaction(function () use ($request, &$order) {
             $totalAmount = collect($request->items)->sum(function ($item) {
                 return $item['price'] * $item['quantity'];
             });
@@ -71,6 +75,35 @@ class POSController extends Controller
                 ]);
             }
         });
+
+        // Create notifications ONLY for other cashier users
+        if ($order) {
+            $table = Table::find($request->table_id);
+            $itemsCount = collect($request->items)->sum('quantity');
+            $currentUserId = auth()->id();
+
+            // Get all cashier users EXCEPT the current user
+            $cashierIds = User::where('role', 'kasir')
+                ->where('id', '!=', $currentUserId)
+                ->pluck('id');
+
+            foreach ($cashierIds as $cashierId) {
+                Notification::create([
+                    'user_id' => $cashierId, // Specific user, not broadcast
+                    'type' => 'order_created',
+                    'title' => "Order baru dari {$request->customer_name}",
+                    'message' => "Meja {$table->number} • {$itemsCount} item • POS",
+                    'data' => [
+                        'order_id' => $order->id,
+                        'customer_name' => $request->customer_name,
+                        'table_number' => $table->number,
+                        'order_type' => 'pos',
+                        'total_amount' => $order->total_amount,
+                        'items_count' => $itemsCount,
+                    ],
+                ]);
+            }
+        }
 
         return redirect()->back()->with('success', 'Pesanan berhasil dibuat');
     }
