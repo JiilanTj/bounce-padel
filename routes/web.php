@@ -25,6 +25,9 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\POSController;
 use App\Http\Controllers\OrderNotificationController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\IngredientController;
+use App\Http\Controllers\IngredientStockController;
+use App\Http\Controllers\MenuItemRecipeController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -86,22 +89,50 @@ Route::middleware('auth')->group(function () {
         Route::resource('menu-items', MenuItemController::class)->only(['index', 'show']);
         Route::resource('inventories', InventoryController::class)->only(['index', 'show']);
         Route::resource('facilities', FacilityController::class)->only(['index', 'show']);
+
+        // F&B Inventory Routes - Read Only
+        Route::resource('ingredients', IngredientController::class)->only(['index', 'show']);
+        Route::get('ingredients/low-stock', [IngredientController::class, 'getLowStock'])->name('ingredients.low-stock');
+        Route::get('ingredients/stats', [IngredientController::class, 'getStats'])->name('ingredients.stats');
+        Route::get('stock-movements', [IngredientStockController::class, 'movements'])->name('stock-movements.index');
+        Route::get('stock-movements/stats', [IngredientStockController::class, 'getStats'])->name('stock-movements.stats');
+        Route::get('ingredients/{ingredient}/stock-history', [IngredientStockController::class, 'getHistory'])->name('ingredients.stock-history');
+
+        // Recipe Management - Read Only
+        Route::get('menu-items/{menu_item}/recipe', [MenuItemRecipeController::class, 'index'])->name('menu-items.recipe.index');
+        Route::get('menu-items/{menu_item}/recipe/cost', [MenuItemRecipeController::class, 'calculateCost'])->name('menu-items.recipe.cost');
+        Route::get('menu-items/{menu_item}/recipe/check-stock', [MenuItemRecipeController::class, 'checkStockAvailability'])->name('menu-items.recipe.check-stock');
+        Route::get('recipe/available-ingredients', [MenuItemRecipeController::class, 'getAvailableIngredients'])->name('recipe.available-ingredients');
     });
 
     // Master Data - Write Access (Owner & Admin only)
     Route::middleware('role:owner,admin')->group(function () {
         Route::resource('courts', CourtController::class)->except(['index', 'show']);
         Route::put('operating-hours/{court}', [OperatingHourController::class, 'update'])->name('operating-hours.update');
-        
+
         Route::resource('categories', CategoryController::class)->except(['index', 'show']);
         Route::resource('products', ProductController::class)->except(['index', 'show']);
-        
+
         Route::resource('tables', TableController::class)->except(['index', 'show']);
         Route::resource('menus', MenuController::class)->except(['index', 'show']);
-        
+
         Route::resource('inventories', InventoryController::class)->except(['index', 'show']);
         Route::resource('menu-items', MenuItemController::class)->except(['index', 'show']);
         Route::resource('facilities', FacilityController::class)->except(['index', 'show']);
+
+        // F&B Inventory Routes - Write Access
+        Route::resource('ingredients', IngredientController::class)->except(['index', 'show']);
+
+        // Stock Management Routes
+        Route::post('ingredients/{ingredient}/stock/add', [IngredientStockController::class, 'addStock'])->name('ingredients.stock.add');
+        Route::post('ingredients/{ingredient}/stock/deduct', [IngredientStockController::class, 'deductStock'])->name('ingredients.stock.deduct');
+        Route::post('ingredients/{ingredient}/stock/adjust', [IngredientStockController::class, 'adjustStock'])->name('ingredients.stock.adjust');
+
+        // Recipe Management Routes - Write Access
+        Route::post('menu-items/{menu_item}/recipe', [MenuItemRecipeController::class, 'store'])->name('menu-items.recipe.store');
+        Route::post('menu-items/{menu_item}/recipe/add', [MenuItemRecipeController::class, 'addIngredient'])->name('menu-items.recipe.add');
+        Route::patch('menu-items/{menu_item}/recipe/{ingredient}', [MenuItemRecipeController::class, 'updateIngredient'])->name('menu-items.recipe.update');
+        Route::delete('menu-items/{menu_item}/recipe/{ingredient}', [MenuItemRecipeController::class, 'removeIngredient'])->name('menu-items.recipe.remove');
     });
     // Owner Only Routes
     Route::middleware('role:owner')->group(function () {

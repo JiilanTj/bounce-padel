@@ -78,6 +78,11 @@ export default function Sidebar({ className = '' }: { className?: string }) {
                         routeName: 'inventories.*',
                     },
                     {
+                        name: 'Ingredients',
+                        href: route('ingredients.index'),
+                        routeName: 'ingredients.*',
+                    },
+                    {
                         name: 'Tables',
                         href: route('tables.index'),
                         routeName: 'tables.*',
@@ -239,7 +244,7 @@ export default function Sidebar({ className = '' }: { className?: string }) {
                     <div className="flex h-16 items-center px-6">
                         <Link href="/" className="flex items-center space-x-3">
                             <img
-                                src="/textlogoblack.png"
+                                src="/textlogoungu.png"
                                 alt="Bounce Padel"
                                 className="h-8 w-auto"
                             />

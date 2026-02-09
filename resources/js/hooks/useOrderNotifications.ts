@@ -78,7 +78,9 @@ export function useOrderNotifications(
         if (!enabled) return;
 
         try {
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const csrfToken = document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute('content');
 
             const response = await fetch(
                 route('notifications.index', { unread_only: false }),
@@ -130,7 +132,11 @@ export function useOrderNotifications(
                 setUnreadCount(data.unread_count);
                 setIsConnected(true);
             } else {
-                console.error('Failed to fetch notifications:', response.status, await response.text());
+                console.error(
+                    'Failed to fetch notifications:',
+                    response.status,
+                    await response.text(),
+                );
                 setIsConnected(false);
             }
         } catch (error) {
@@ -181,7 +187,9 @@ export function useOrderNotifications(
             console.log('URL:', url);
 
             // Get CSRF token from meta tag
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const csrfToken = document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute('content');
 
             const response = await fetch(url, {
                 method: 'PATCH',
@@ -199,7 +207,11 @@ export function useOrderNotifications(
             console.log('Response text:', responseText);
 
             if (!response.ok) {
-                console.error('Failed to mark as read:', response.status, responseText);
+                console.error(
+                    'Failed to mark as read:',
+                    response.status,
+                    responseText,
+                );
                 throw new Error(`HTTP ${response.status}: ${responseText}`);
             }
 
@@ -228,7 +240,9 @@ export function useOrderNotifications(
             console.log('URL:', url);
 
             // Get CSRF token from meta tag
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const csrfToken = document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute('content');
 
             const response = await fetch(url, {
                 method: 'POST',
@@ -246,7 +260,11 @@ export function useOrderNotifications(
             console.log('Response text:', responseText);
 
             if (!response.ok) {
-                console.error('Failed to mark all as read:', response.status, responseText);
+                console.error(
+                    'Failed to mark all as read:',
+                    response.status,
+                    responseText,
+                );
                 throw new Error(`HTTP ${response.status}: ${responseText}`);
             }
 
@@ -266,7 +284,9 @@ export function useOrderNotifications(
     // Clear (delete) read notifications
     const clearRead = useCallback(async () => {
         try {
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const csrfToken = document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute('content');
 
             await fetch(route('notifications.delete-read'), {
                 method: 'DELETE',

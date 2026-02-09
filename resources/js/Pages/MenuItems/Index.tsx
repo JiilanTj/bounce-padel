@@ -11,10 +11,11 @@ import {
     TrashIcon,
 } from '@heroicons/react/24/outline';
 import { Head, router, usePage } from '@inertiajs/react';
-import { ChefHat, DollarSign, List, Utensils } from 'lucide-react';
+import { BeakerIcon, ChefHat, DollarSign, List, Utensils } from 'lucide-react';
 import { FormEvent, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import MenuItemForm from './Components/MenuItemForm';
+import RecipeBuilder from './Components/RecipeBuilder';
 
 type Menu = {
     id: number;
@@ -72,7 +73,7 @@ interface MenuItemsIndexProps extends PageProps {
 export default function Index() {
     const { menuItems, menus, categories, filters, stats } =
         usePage<MenuItemsIndexProps>().props;
-    const { flash } = usePage<PageProps>().props;
+    const { flash, auth } = usePage<PageProps>().props;
 
     // State
     const [searchQuery, setSearchQuery] = useState(filters.search || '');
@@ -84,6 +85,8 @@ export default function Index() {
         item: MenuItem | null;
     }>({ show: false, item: null });
     const [deleting, setDeleting] = useState(false);
+    const [showRecipeModal, setShowRecipeModal] = useState(false);
+    const [recipeMenuItem, setRecipeMenuItem] = useState<MenuItem | null>(null);
 
     // Show flash messages as toast
     useEffect(() => {
@@ -167,6 +170,16 @@ export default function Index() {
     const closeModal = () => {
         setShowModal(false);
         setSelectedItem(null);
+    };
+
+    const openRecipeModal = (item: MenuItem) => {
+        setRecipeMenuItem(item);
+        setShowRecipeModal(true);
+    };
+
+    const closeRecipeModal = () => {
+        setShowRecipeModal(false);
+        setRecipeMenuItem(null);
     };
 
     // Delete item
@@ -273,29 +286,41 @@ export default function Index() {
             key: 'actions',
             label: 'Actions',
             className: 'text-right',
-            render: (item: MenuItem) => (
-                <div className="flex items-center justify-end space-x-2">
-                    <button
-                        onClick={() => openEditModal(item)}
-                        className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-blue-600"
-                        title="Edit"
-                    >
-                        <PencilIcon className="h-4 w-4" />
-                    </button>
-                    <button
-                        onClick={() =>
-                            setDeleteModal({
-                                show: true,
-                                item,
-                            })
-                        }
-                        className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
-                        title="Delete"
-                    >
-                        <TrashIcon className="h-4 w-4" />
-                    </button>
-                </div>
-            ),
+            render: (item: MenuItem) => {
+                const canManage = ['owner', 'admin'].includes(auth.user.role);
+                return (
+                    <div className="flex items-center justify-end space-x-2">
+                        {canManage && (
+                            <button
+                                onClick={() => openRecipeModal(item)}
+                                className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-orange-50 hover:text-orange-600"
+                                title="Recipe"
+                            >
+                                <BeakerIcon className="h-4 w-4" />
+                            </button>
+                        )}
+                        <button
+                            onClick={() => openEditModal(item)}
+                            className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-blue-600"
+                            title="Edit"
+                        >
+                            <PencilIcon className="h-4 w-4" />
+                        </button>
+                        <button
+                            onClick={() =>
+                                setDeleteModal({
+                                    show: true,
+                                    item,
+                                })
+                            }
+                            className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                            title="Delete"
+                        >
+                            <TrashIcon className="h-4 w-4" />
+                        </button>
+                    </div>
+                );
+            },
         },
     ];
 
@@ -417,6 +442,13 @@ export default function Index() {
                 cancelText="Cancel"
                 variant="danger"
                 loading={deleting}
+            />
+
+            {/* Recipe Builder Modal */}
+            <RecipeBuilder
+                show={showRecipeModal}
+                onClose={closeRecipeModal}
+                menuItem={recipeMenuItem}
             />
         </AuthenticatedLayout>
     );

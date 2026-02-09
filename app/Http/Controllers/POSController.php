@@ -16,6 +16,34 @@ use Illuminate\Support\Facades\DB;
 class POSController extends Controller
 {
     /**
+     * Deduct ingredients stock for menu items
+     */
+    private function deductIngredientsStock(Order $order): void
+    {
+        foreach ($order->items as $orderItem) {
+            if ($orderItem->item_type === MenuItem::class) {
+                $menuItem = MenuItem::find($orderItem->item_id);
+                if ($menuItem) {
+                    foreach ($menuItem->ingredients as $ingredient) {
+                        $quantityNeeded = $ingredient->pivot->quantity * $orderItem->quantity;
+                        try {
+                            $ingredient->deductStock($quantityNeeded, 'sale', [
+                                'reference_type' => 'order',
+                                'reference_id' => $order->id,
+                                'notes' => "Order #{$order->id} - {$menuItem->name} x{$orderItem->quantity}",
+                            ]);
+                        } catch (\Exception $e) {
+                            // Log warning but don't fail the order
+                            // Stock will go negative but we can track it
+                            \Log::warning("Stock deduction failed: " . $e->getMessage());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Display POS interface
      */
     public function index()
@@ -74,6 +102,9 @@ class POSController extends Controller
                     'subtotal' => $item['price'] * $item['quantity'],
                 ]);
             }
+
+            // Auto deduct ingredients stock
+            $this->deductIngredientsStock($order);
         });
 
         // Create notifications ONLY for other cashier users
