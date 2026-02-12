@@ -36,6 +36,7 @@ class WebsiteSettingController extends Controller
             'facebook_link' => 'nullable|url|max:255',
             'instagram_link' => 'nullable|url|max:255',
             'twitter_link' => 'nullable|url|max:255',
+            'tiktok_url' => 'nullable|url|max:255',
             'home_image_header' => 'nullable|image|max:5120',
             'opening_hours' => 'nullable|string|max:255',
             'operating_days' => 'nullable|string|max:255',

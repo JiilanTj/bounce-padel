@@ -15,6 +15,7 @@ export interface WebsiteSettings {
     facebook_link: string | null;
     instagram_link: string | null;
     twitter_link: string | null;
+    tiktok_url: string | null;
     home_image_header: string | null;
     opening_hours: string | null;
     operating_days: string | null;

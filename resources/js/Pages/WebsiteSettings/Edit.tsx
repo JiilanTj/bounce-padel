@@ -27,6 +27,7 @@ interface WebsiteSettings {
     facebook_link: string | null;
     instagram_link: string | null;
     twitter_link: string | null;
+    tiktok_url: string | null;
     home_image_header: string | null;
     opening_hours: string | null;
     operating_days: string | null;
@@ -46,6 +47,7 @@ export default function Edit({ settings }: { settings?: WebsiteSettings }) {
         facebook_link: settings?.facebook_link || '',
         instagram_link: settings?.instagram_link || '',
         twitter_link: settings?.twitter_link || '',
+        tiktok_url: settings?.tiktok_url || '',
         home_image_header: null as File | null,
         opening_hours: settings?.opening_hours || '',
         operating_days: settings?.operating_days || '',
@@ -511,6 +513,35 @@ export default function Edit({ settings }: { settings?: WebsiteSettings }) {
                                 <InputError
                                     className="mt-2"
                                     message={errors.twitter_link}
+                                />
+                            </div>
+
+                            {/* Tiktok */}
+                            <div>
+                                <InputLabel
+                                    htmlFor="tiktok_url"
+                                    value="Tiktok URL"
+                                />
+                                <div className="relative mt-1 rounded-md shadow-sm">
+                                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                        <HashtagIcon className="h-5 w-5 text-black" />
+                                    </div>
+                                    <TextInput
+                                        id="tiktok_url"
+                                        className="block w-full pl-10"
+                                        value={data.tiktok_url}
+                                        placeholder="https://tiktok.com/@..."
+                                        onChange={(e) =>
+                                            setData(
+                                                'tiktok_url',
+                                                e.target.value,
+                                            )
+                                        }
+                                    />
+                                </div>
+                                <InputError
+                                    className="mt-2"
+                                    message={errors.tiktok_url}
                                 />
                             </div>
                         </div>

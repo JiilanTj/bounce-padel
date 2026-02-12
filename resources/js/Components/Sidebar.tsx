@@ -182,7 +182,7 @@ export default function Sidebar({ className = '' }: { className?: string }) {
                 href: route('profile.edit'),
                 routeName: 'profile.*',
                 icon: Cog6ToothIcon,
-                roles: ['user', 'kasir', 'pelayan', 'admin', 'owner'],
+                roles: ['user', 'pelayan', 'admin', 'owner'],
             },
         ],
         [],

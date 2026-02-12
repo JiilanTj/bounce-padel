@@ -14,6 +14,7 @@ class WebsiteSetting extends Model
         'facebook_link',
         'instagram_link',
         'twitter_link',
+        'tiktok_url',
         'home_image_header',
         'opening_hours',
         'operating_days',
