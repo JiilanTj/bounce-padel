@@ -1,7 +1,10 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { PageProps } from '@/types';
 import { formatCurrency } from '@/utils/currency';
-import { Head, router } from '@inertiajs/react';
+import { printOrderReceipt } from '@/utils/printOrderReceipt';
+import { printTableReceipt } from '@/utils/printTableReceipt';
+import { PrinterIcon } from '@heroicons/react/24/outline';
+import { Head, router, usePage } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -83,11 +86,30 @@ const statusLabels = {
     paid: 'Lunas',
 };
 
-export default function Index({ orders, filters, stats }: Props) {
+export default function Index({
+    orders,
+    filters,
+    stats,
+    tables,
+}: Props & { tables: Table[] }) {
+    const { auth } = usePage<PageProps>().props;
     const [search, setSearch] = useState(filters.search || '');
     const [selectedStatus, setSelectedStatus] = useState(filters.status || '');
     const [expandedOrder, setExpandedOrder] = useState<number | null>(null);
     const [lastOrderCount, setLastOrderCount] = useState(stats.new);
+    const [printModal, setPrintModal] = useState<{
+        isOpen: boolean;
+        tableId: string;
+        startTime: string;
+        endTime: string;
+        loading: boolean;
+    }>({
+        isOpen: false,
+        tableId: '',
+        startTime: '',
+        endTime: '',
+        loading: false,
+    });
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
     // Initialize audio
@@ -176,6 +198,44 @@ export default function Index({ orders, filters, stats }: Props) {
         setExpandedOrder(expandedOrder === orderId ? null : orderId);
     };
 
+    const handlePrintReceipt = async () => {
+        if (
+            !printModal.tableId ||
+            !printModal.startTime ||
+            !printModal.endTime
+        ) {
+            toast.error('Mohon lengkapi semua field');
+            return;
+        }
+
+        setPrintModal((prev) => ({ ...prev, loading: true }));
+
+        try {
+            const response = await fetch(
+                `/orders/table-receipt?table_id=${printModal.tableId}&start_time=${printModal.startTime}&end_time=${printModal.endTime}`,
+            );
+            const data = await response.json();
+
+            if (data.orders && data.orders.length > 0) {
+                printTableReceipt(
+                    data.orders,
+                    data.table.number,
+                    printModal.startTime,
+                    printModal.endTime,
+                    auth.user.name,
+                );
+                setPrintModal((prev) => ({ ...prev, isOpen: false }));
+            } else {
+                toast.error('Tidak ada pesanan pada rentang waktu tersebut');
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error('Gagal mengambil data pesanan');
+        } finally {
+            setPrintModal((prev) => ({ ...prev, loading: false }));
+        }
+    };
+
     return (
         <AuthenticatedLayout
             header={
@@ -252,36 +312,178 @@ export default function Index({ orders, filters, stats }: Props) {
                             </div>
                         </form>
 
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                            <div className="flex flex-wrap gap-2">
+                                <button
+                                    onClick={() => handleStatusFilter('')}
+                                    className={`rounded-md px-4 py-2 ${
+                                        selectedStatus === ''
+                                            ? 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300'
+                                    }`}
+                                >
+                                    Semua
+                                </button>
+                                {Object.entries(statusLabels).map(
+                                    ([status, label]) => (
+                                        <button
+                                            key={status}
+                                            onClick={() =>
+                                                handleStatusFilter(status)
+                                            }
+                                            className={`rounded-md px-4 py-2 ${
+                                                selectedStatus === status
+                                                    ? 'bg-primary text-white'
+                                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300'
+                                            }`}
+                                        >
+                                            {label}
+                                        </button>
+                                    ),
+                                )}
+                            </div>
+
                             <button
-                                onClick={() => handleStatusFilter('')}
-                                className={`rounded-md px-4 py-2 ${
-                                    selectedStatus === ''
-                                        ? 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300'
-                                }`}
+                                onClick={() =>
+                                    setPrintModal((prev) => ({
+                                        ...prev,
+                                        isOpen: true,
+                                    }))
+                                }
+                                className="inline-flex items-center rounded-md bg-gray-600 px-4 py-2 text-white hover:bg-gray-700"
                             >
-                                Semua
+                                <PrinterIcon className="mr-2 h-5 w-5" />
+                                Print Receipt Meja
                             </button>
-                            {Object.entries(statusLabels).map(
-                                ([status, label]) => (
-                                    <button
-                                        key={status}
-                                        onClick={() =>
-                                            handleStatusFilter(status)
-                                        }
-                                        className={`rounded-md px-4 py-2 ${
-                                            selectedStatus === status
-                                                ? 'bg-primary text-white'
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300'
-                                        }`}
-                                    >
-                                        {label}
-                                    </button>
-                                ),
-                            )}
                         </div>
                     </div>
+
+                    {/* Print Modal */}
+                    {printModal.isOpen && (
+                        <div className="fixed inset-0 z-50 overflow-y-auto">
+                            <div className="flex min-h-screen items-center justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0">
+                                <div
+                                    className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+                                    onClick={() =>
+                                        setPrintModal((prev) => ({
+                                            ...prev,
+                                            isOpen: false,
+                                        }))
+                                    }
+                                />
+                                <div className="relative inline-block transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:align-middle">
+                                    <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                                        <h3 className="mb-4 text-lg font-medium leading-6 text-gray-900">
+                                            Print Receipt Meja
+                                        </h3>
+                                        <div className="space-y-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700">
+                                                    Pilih Meja
+                                                </label>
+                                                <select
+                                                    value={printModal.tableId}
+                                                    onChange={(e) =>
+                                                        setPrintModal(
+                                                            (prev) => ({
+                                                                ...prev,
+                                                                tableId:
+                                                                    e.target
+                                                                        .value,
+                                                            }),
+                                                        )
+                                                    }
+                                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+                                                >
+                                                    <option value="">
+                                                        -- Pilih Meja --
+                                                    </option>
+                                                    {tables.map((table) => (
+                                                        <option
+                                                            key={table.id}
+                                                            value={table.id}
+                                                        >
+                                                            {table.number}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700">
+                                                        Waktu Mulai
+                                                    </label>
+                                                    <input
+                                                        type="datetime-local"
+                                                        value={
+                                                            printModal.startTime
+                                                        }
+                                                        onChange={(e) =>
+                                                            setPrintModal(
+                                                                (prev) => ({
+                                                                    ...prev,
+                                                                    startTime:
+                                                                        e.target
+                                                                            .value,
+                                                                }),
+                                                            )
+                                                        }
+                                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700">
+                                                        Waktu Selesai
+                                                    </label>
+                                                    <input
+                                                        type="datetime-local"
+                                                        value={
+                                                            printModal.endTime
+                                                        }
+                                                        onChange={(e) =>
+                                                            setPrintModal(
+                                                                (prev) => ({
+                                                                    ...prev,
+                                                                    endTime:
+                                                                        e.target
+                                                                            .value,
+                                                                }),
+                                                            )
+                                                        }
+                                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                                        <button
+                                            type="button"
+                                            disabled={printModal.loading}
+                                            onClick={handlePrintReceipt}
+                                            className="inline-flex w-full justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 sm:ml-3 sm:w-auto"
+                                        >
+                                            {printModal.loading
+                                                ? 'Processing...'
+                                                : 'Print Receipt'}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                setPrintModal((prev) => ({
+                                                    ...prev,
+                                                    isOpen: false,
+                                                }))
+                                            }
+                                            className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:ml-3 sm:mt-0 sm:w-auto"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Orders List */}
                     <div className="space-y-4">
@@ -353,6 +555,7 @@ export default function Index({ orders, filters, stats }: Props) {
                                                             order.created_at,
                                                         ).toLocaleString(
                                                             'id-ID',
+                                                            { timeZone: 'UTC' },
                                                         )}
                                                     </p>
                                                     <p>
@@ -374,18 +577,33 @@ export default function Index({ orders, filters, stats }: Props) {
                                                         order.total_amount,
                                                     )}
                                                 </div>
-                                                <button
-                                                    onClick={() =>
-                                                        toggleOrderDetails(
-                                                            order.id,
-                                                        )
-                                                    }
-                                                    className="mt-2 text-sm text-primary hover:underline"
-                                                >
-                                                    {expandedOrder === order.id
-                                                        ? 'Tutup Detail'
-                                                        : 'Lihat Detail'}
-                                                </button>
+                                                <div className="mt-2 flex flex-col items-end gap-2">
+                                                    <button
+                                                        onClick={() =>
+                                                            toggleOrderDetails(
+                                                                order.id,
+                                                            )
+                                                        }
+                                                        className="text-sm text-primary hover:underline"
+                                                    >
+                                                        {expandedOrder ===
+                                                        order.id
+                                                            ? 'Tutup Detail'
+                                                            : 'Lihat Detail'}
+                                                    </button>
+                                                    <button
+                                                        onClick={() =>
+                                                            printOrderReceipt(
+                                                                order,
+                                                                auth.user.name,
+                                                            )
+                                                        }
+                                                        className="text-gray-600 hover:text-gray-900"
+                                                        title="Print Receipt"
+                                                    >
+                                                        <PrinterIcon className="h-5 w-5" />
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
 

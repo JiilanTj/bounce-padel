@@ -1,9 +1,12 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { PageProps } from '@/types';
 import { formatCurrency } from '@/utils/currency';
+import { printReceipt } from '@/utils/printReceipt';
 import {
     ArrowLeftIcon,
     MagnifyingGlassIcon,
+    PencilSquareIcon,
+    PrinterIcon,
 } from '@heroicons/react/24/outline';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { FormEvent, useEffect, useState } from 'react';
@@ -13,6 +16,7 @@ type User = {
     id: number;
     name: string;
     email: string;
+    phone: string | null;
 };
 
 type Court = {
@@ -56,7 +60,7 @@ type Props = PageProps & {
 };
 
 export default function History({ bookings, filters }: Props) {
-    const { flash } = usePage<PageProps>().props;
+    const { flash, auth } = usePage<PageProps>().props;
     const [searchQuery, setSearchQuery] = useState(filters.search || '');
     const [selectedStatus, setSelectedStatus] = useState(
         filters.status || 'all',
@@ -101,6 +105,7 @@ export default function History({ bookings, filters }: Props) {
             year: 'numeric',
             hour: '2-digit',
             minute: '2-digit',
+            timeZone: 'UTC',
         });
     };
 
@@ -205,6 +210,9 @@ export default function History({ bookings, filters }: Props) {
                                     <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
                                         Total Price
                                     </th>
+                                    <th className="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
+                                        Actions
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200 bg-white">
@@ -260,6 +268,32 @@ export default function History({ bookings, filters }: Props) {
                                                 {formatCurrency(
                                                     booking.total_price,
                                                 )}
+                                            </td>
+                                            <td className="whitespace-nowrap px-6 py-4 text-center text-sm font-medium">
+                                                <div className="flex justify-center gap-3">
+                                                    <Link
+                                                        href={route(
+                                                            'bookings.edit',
+                                                            booking.id,
+                                                        )}
+                                                        className="text-blue-600 hover:text-blue-900"
+                                                        title="Edit Booking"
+                                                    >
+                                                        <PencilSquareIcon className="h-5 w-5" />
+                                                    </Link>
+                                                    <button
+                                                        onClick={() =>
+                                                            printReceipt(
+                                                                booking,
+                                                                auth.user.name,
+                                                            )
+                                                        }
+                                                        className="text-gray-600 hover:text-gray-900"
+                                                        title="Print Receipt"
+                                                    >
+                                                        <PrinterIcon className="h-5 w-5" />
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     ))

@@ -90,6 +90,7 @@ class OrderController extends Controller
                 'sort_order' => $sortOrder,
             ],
             'stats' => $stats,
+            'tables' => Table::select('id', 'number')->get(),
         ]);
     }
 
@@ -195,5 +196,28 @@ class OrderController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Status pesanan berhasil diubah');
+    }
+
+    /**
+     * Get orders for a specific table and time range (for printing)
+     */
+    public function getTableOrders(Request $request)
+    {
+        $request->validate([
+            'table_id' => 'required|exists:tables,id',
+            'start_time' => 'required|date',
+            'end_time' => 'required|date|after:start_time',
+        ]);
+
+        $orders = Order::with(['items.item', 'table'])
+            ->where('table_id', $request->table_id)
+            ->whereBetween('created_at', [$request->start_time, $request->end_time])
+            ->where('status', '!=', 'cancelled')
+            ->get();
+
+        return response()->json([
+            'orders' => $orders,
+            'table' => Table::find($request->table_id),
+        ]);
     }
 }

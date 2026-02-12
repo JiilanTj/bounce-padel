@@ -1,9 +1,11 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { PageProps } from '@/types';
 import { formatCurrency } from '@/utils/currency';
+import { printRentalReceipt } from '@/utils/printRentalReceipt';
 import {
     MagnifyingGlassIcon,
     PlusIcon,
+    PrinterIcon,
     TrashIcon,
 } from '@heroicons/react/24/outline';
 import { Head, Link, router, usePage } from '@inertiajs/react';
@@ -14,6 +16,7 @@ type User = {
     id: number;
     name: string;
     email: string;
+    phone: string | null;
 };
 
 type Product = {
@@ -172,6 +175,7 @@ export default function Index({ rentals, filters }: Props) {
         return new Intl.DateTimeFormat('id-ID', {
             dateStyle: 'medium',
             timeStyle: 'short',
+            timeZone: 'UTC',
         }).format(date);
     };
 
@@ -346,6 +350,18 @@ export default function Index({ rentals, filters }: Props) {
                                             >
                                                 View
                                             </Link>
+                                            <button
+                                                onClick={() =>
+                                                    printRentalReceipt(
+                                                        rental,
+                                                        auth.user.name,
+                                                    )
+                                                }
+                                                className="mr-3 text-gray-600 hover:text-gray-900"
+                                                title="Print Receipt"
+                                            >
+                                                <PrinterIcon className="h-5 w-5" />
+                                            </button>
                                             {rental.status === 'processing' && (
                                                 <>
                                                     <button

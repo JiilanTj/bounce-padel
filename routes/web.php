@@ -153,9 +153,10 @@ Route::middleware('auth')->group(function () {
         Route::resource('equipment-rentals', EquipmentRentalController::class)->except(['edit']);
         
         // Cafe Orders Routes
+        Route::get('/orders/table-receipt', [OrderController::class, 'getTableOrders'])->name('orders.table-receipt');
+        Route::get('orders/stats/polling', [OrderController::class, 'stats'])->name('orders.stats');
         Route::resource('orders', OrderController::class)->only(['index', 'show']);
         Route::patch('orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
-        Route::get('orders/stats/polling', [OrderController::class, 'stats'])->name('orders.stats');
 
         // SSE Order Notifications (Real-time)
         Route::get('orders/notifications/stream', [OrderNotificationController::class, 'stream'])->name('orders.notifications.stream');

@@ -105,11 +105,8 @@ class BookingController extends Controller
 
     public function history(Request $request)
     {
+        // Show all bookings, ordered by latest first
         $query = Booking::with(['user', 'court'])
-            ->where(function ($q) {
-                $q->where('end_time', '<', now())
-                  ->orWhereIn('status', ['completed', 'cancelled', 'no_show']);
-            })
             ->orderBy('start_time', 'desc');
 
         // Search by customer name
@@ -260,7 +257,7 @@ class BookingController extends Controller
             'start_time' => 'required|date',
             'end_time' => 'required|date|after:start_time',
             'status' => 'required|in:pending,confirmed,paid,cancelled,completed,no_show',
-            'notes' => 'nullable|string',
+            'notes' => 'required|string',
         ]);
 
         // Find or create user (same as store)
