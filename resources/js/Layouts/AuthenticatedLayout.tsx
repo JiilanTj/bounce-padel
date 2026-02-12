@@ -1,13 +1,20 @@
 import CalculatorWidget from '@/Components/CalculatorWidget';
 import Sidebar from '@/Components/Sidebar';
-import { useOrderNotifications } from '@/hooks/useOrderNotifications';
+import {
+    AppNotification,
+    useOrderNotifications,
+} from '@/hooks/useOrderNotifications';
 import { PageProps } from '@/types';
 import { formatCurrency } from '@/utils/currency';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import {
     BellIcon,
+    CalendarIcon,
     ChevronDownIcon,
+    ClockIcon,
     MagnifyingGlassIcon,
+    ShoppingBagIcon,
+    ShoppingCartIcon,
     XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { ArrowRightOnRectangleIcon, UserIcon } from '@heroicons/react/24/solid';
@@ -33,37 +40,66 @@ export default function Authenticated({
     // Enable order notifications ONLY for cashier (kasir)
     const enableNotifications = user.role === 'kasir';
 
-    // Handler untuk new order - menampilkan toast sekali per order baru
-    const handleNewOrder = useCallback(
-        (order: {
-            customer_name: string;
-            table_number?: string;
-            items_count: number;
-            total_amount: number;
-        }) => {
-            toast.success(
-                `Order baru dari ${order.customer_name}${order.table_number ? ` - Meja ${order.table_number}` : ''}`,
-                {
-                    description: `${order.items_count} item • ${formatCurrency(order.total_amount)}`,
-                    duration: 5000,
-                    action: {
-                        label: 'Lihat',
-                        onClick: () => router.visit(route('orders.index')),
-                    },
+    // Helper to get notification details based on type
+    const getNotificationDetails = (type: string) => {
+        switch (type) {
+            case 'booking_created':
+                return {
+                    icon: CalendarIcon,
+                    color: 'text-blue-500',
+                    bgColor: 'bg-blue-100',
+                    link: 'bookings.index',
+                };
+            case 'sale_created':
+                return {
+                    icon: ShoppingCartIcon,
+                    color: 'text-green-500',
+                    bgColor: 'bg-green-100',
+                    link: 'product-sales.index',
+                };
+            case 'rental_created':
+                return {
+                    icon: ClockIcon,
+                    color: 'text-orange-500',
+                    bgColor: 'bg-orange-100',
+                    link: 'equipment-rentals.index',
+                };
+            case 'order_created':
+            default:
+                return {
+                    icon: ShoppingBagIcon,
+                    color: 'text-purple-500',
+                    bgColor: 'bg-purple-100',
+                    link: 'orders.index',
+                };
+        }
+    };
+
+    // Handler untuk new notification
+    const handleNewNotification = useCallback(
+        (notification: AppNotification) => {
+            const { link } = getNotificationDetails(notification.type);
+
+            toast.success(notification.title, {
+                description: notification.message,
+                duration: 5000,
+                action: {
+                    label: 'Lihat',
+                    onClick: () => router.visit(route(link)),
                 },
-            );
+            });
         },
         [],
     );
 
     const {
-        newOrdersCount,
+        unreadCount,
         notifications,
         isConnected,
         markAsRead,
         markAllAsRead,
         clearRead,
-    } = useOrderNotifications(enableNotifications, handleNewOrder);
+    } = useOrderNotifications(enableNotifications, handleNewNotification);
 
     useEffect(() => {
         if (searchOpen && searchInputRef.current) {
@@ -173,11 +209,11 @@ export default function Authenticated({
                                 <Menu as="div" className="relative">
                                     <MenuButton className="relative rounded-xl p-2.5 text-gray-400 transition-colors hover:bg-gray-50 hover:text-gray-600">
                                         <BellIcon className="h-5 w-5" />
-                                        {newOrdersCount > 0 && (
+                                        {unreadCount > 0 && (
                                             <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
-                                                {newOrdersCount > 9
+                                                {unreadCount > 9
                                                     ? '9+'
-                                                    : newOrdersCount}
+                                                    : unreadCount}
                                             </span>
                                         )}
                                         {/* Connection status indicator */}
@@ -198,8 +234,7 @@ export default function Authenticated({
                                     <MenuItems className="absolute right-0 z-50 mt-2 w-80 origin-top-right rounded-lg bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
                                         <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
                                             <h3 className="text-sm font-semibold text-gray-900">
-                                                Notifikasi Pesanan (
-                                                {newOrdersCount})
+                                                Notifikasi ({unreadCount})
                                             </h3>
                                             {notifications.filter(
                                                 (n) => !n.read,
@@ -228,7 +263,8 @@ export default function Authenticated({
                                                 <div className="px-4 py-8 text-center text-sm text-gray-500">
                                                     <BellIcon className="mx-auto mb-2 h-8 w-8 text-gray-300" />
                                                     <p>
-                                                        Belum ada pesanan baru
+                                                        Belum ada notifikasi
+                                                        baru
                                                     </p>
                                                 </div>
                                             ) : (
@@ -236,84 +272,102 @@ export default function Authenticated({
                                                     {notifications
                                                         .filter((n) => !n.read) // Hanya tampilkan yang belum dibaca
                                                         .slice(0, 10)
-                                                        .map((notification) => (
-                                                            <MenuItem
-                                                                key={
-                                                                    notification.id
-                                                                }
-                                                            >
-                                                                {({
-                                                                    focus,
-                                                                }) => (
-                                                                    <Link
-                                                                        href={route(
-                                                                            'orders.index',
-                                                                        )}
-                                                                        onClick={() =>
-                                                                            markAsRead(
-                                                                                notification.id,
-                                                                            )
-                                                                        }
-                                                                        className={`block px-4 py-3 text-sm ${
-                                                                            focus
-                                                                                ? 'bg-gray-50'
-                                                                                : 'bg-blue-50/50'
-                                                                        }`}
-                                                                    >
-                                                                        <div className="flex items-start justify-between">
-                                                                            <div className="flex-1">
-                                                                                <div className="flex items-center gap-2">
-                                                                                    <p className="font-medium text-gray-900">
-                                                                                        {
-                                                                                            notification.customer_name
-                                                                                        }
-                                                                                    </p>
-                                                                                    {!notification.read && (
-                                                                                        <span className="flex h-2 w-2 rounded-full bg-blue-500" />
-                                                                                    )}
-                                                                                </div>
-                                                                                <div className="mt-1 flex items-center gap-2 text-xs text-gray-500">
-                                                                                    {notification.table_number && (
-                                                                                        <span>
-                                                                                            Meja{' '}
-                                                                                            {
-                                                                                                notification.table_number
-                                                                                            }
-                                                                                        </span>
-                                                                                    )}
-                                                                                    <span>
-                                                                                        •
-                                                                                    </span>
-                                                                                    <span
-                                                                                        className={`inline-flex items-center rounded-full px-2 py-0.5 ${
-                                                                                            notification.type ===
-                                                                                            'pos'
-                                                                                                ? 'bg-purple-100 text-purple-800'
-                                                                                                : 'bg-blue-100 text-blue-800'
-                                                                                        }`}
+                                                        .map((notification) => {
+                                                            const details =
+                                                                getNotificationDetails(
+                                                                    notification.type,
+                                                                );
+                                                            const Icon =
+                                                                details.icon;
+                                                            const amount =
+                                                                'total_amount' in
+                                                                notification.data
+                                                                    ? notification
+                                                                          .data
+                                                                          .total_amount
+                                                                    : 'total_price' in
+                                                                        notification.data
+                                                                      ? notification
+                                                                            .data
+                                                                            .total_price
+                                                                      : 0;
+
+                                                            return (
+                                                                <MenuItem
+                                                                    key={
+                                                                        notification.id
+                                                                    }
+                                                                >
+                                                                    {({
+                                                                        focus,
+                                                                    }) => (
+                                                                        <Link
+                                                                            href={route(
+                                                                                details.link,
+                                                                            )}
+                                                                            onClick={() =>
+                                                                                markAsRead(
+                                                                                    notification.id,
+                                                                                )
+                                                                            }
+                                                                            className={`block px-4 py-3 text-sm ${
+                                                                                focus
+                                                                                    ? 'bg-gray-50'
+                                                                                    : 'bg-blue-50/50'
+                                                                            }`}
+                                                                        >
+                                                                            <div className="flex items-start justify-between">
+                                                                                <div className="flex items-start gap-3">
+                                                                                    <div
+                                                                                        className={`mt-1 flex-shrink-0 rounded-full p-1.5 ${details.bgColor}`}
                                                                                     >
-                                                                                        {notification.type.toUpperCase()}
-                                                                                    </span>
+                                                                                        <Icon
+                                                                                            className={`h-4 w-4 ${details.color}`}
+                                                                                        />
+                                                                                    </div>
+                                                                                    <div>
+                                                                                        <p className="font-medium text-gray-900">
+                                                                                            {
+                                                                                                notification.title
+                                                                                            }
+                                                                                        </p>
+                                                                                        <p className="text-xs text-gray-500">
+                                                                                            {
+                                                                                                notification.message
+                                                                                            }
+                                                                                        </p>
+                                                                                        <div className="mt-1 text-xs text-gray-400">
+                                                                                            {new Date(
+                                                                                                notification.created_at,
+                                                                                            ).toLocaleTimeString(
+                                                                                                [],
+                                                                                                {
+                                                                                                    hour: '2-digit',
+                                                                                                    minute: '2-digit',
+                                                                                                },
+                                                                                            )}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div className="ml-2 flex flex-col items-end gap-1">
+                                                                                    {!notification.read && (
+                                                                                        <span className="h-2 w-2 rounded-full bg-blue-500" />
+                                                                                    )}
+                                                                                    {amount >
+                                                                                        0 && (
+                                                                                        <p className="text-xs font-semibold text-gray-900">
+                                                                                            {formatCurrency(
+                                                                                                amount,
+                                                                                            )}
+                                                                                        </p>
+                                                                                    )}
                                                                                 </div>
                                                                             </div>
-                                                                            <div className="ml-4 text-right">
-                                                                                <p className="text-xs text-gray-500">
-                                                                                    {
-                                                                                        notification.items_count
-                                                                                    }{' '}
-                                                                                    item
-                                                                                </p>
-                                                                                <p className="text-sm font-semibold text-gray-900">
-                                                                                    {formatCurrency(
-                                                                                        notification.total_amount,
-                                                                                    )}
-                                                                                </p>
-                                                                            </div>
-                                                                        </div>
-                                                                    </Link>
-                                                                )}
-                                                            </MenuItem>
-                                                        ))}
+                                                                        </Link>
+                                                                    )}
+                                                                </MenuItem>
+                                                            );
+                                                        })}
                                                 </div>
                                             )}
                                         </div>
@@ -321,10 +375,12 @@ export default function Authenticated({
                                         {notifications.length > 0 && (
                                             <div className="border-t border-gray-100 px-4 py-2">
                                                 <Link
-                                                    href={route('orders.index')}
+                                                    href={route(
+                                                        'notifications.index',
+                                                    )}
                                                     className="block text-center text-xs font-medium text-blue-600 hover:text-blue-700"
                                                 >
-                                                    Lihat semua pesanan →
+                                                    Lihat semua notifikasi →
                                                 </Link>
                                             </div>
                                         )}

@@ -7,6 +7,7 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\User;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
@@ -141,6 +142,26 @@ class EquipmentRentalController extends Controller
             $order->update(['total_amount' => $totalAmount]);
 
             DB::commit();
+
+            // Create notifications for cashiers
+            $cashierIds = User::where('role', 'kasir')->pluck('id');
+            $itemsCount = collect($validated['items'])->sum('quantity');
+
+            foreach ($cashierIds as $cashierId) {
+                Notification::create([
+                    'user_id' => $cashierId,
+                    'type' => 'rental_created',
+                    'title' => "Rental Equipment Baru",
+                    'message' => "{$validated['customer_name']} • {$validated['rental_duration']} jam",
+                    'data' => [
+                        'rental_id' => $order->id,
+                        'customer_name' => $validated['customer_name'],
+                        'items_count' => $itemsCount,
+                        'duration' => $validated['rental_duration'],
+                        'total_amount' => $totalAmount,
+                    ],
+                ]);
+            }
 
             return redirect()->route('equipment-rentals.index')
                 ->with('success', 'Equipment rental created successfully!');

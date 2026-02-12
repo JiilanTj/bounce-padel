@@ -142,6 +142,7 @@ Route::middleware('auth')->group(function () {
 
     // Booking Routes (Kasir & Owner)
     Route::middleware('role:kasir,owner')->group(function () {
+        Route::get('/bookings/history', [BookingController::class, 'history'])->name('bookings.history');
         Route::resource('bookings', BookingController::class);
         Route::get('/api/bookings/available-slots', [BookingController::class, 'getAvailableSlots'])->name('bookings.available-slots');
         

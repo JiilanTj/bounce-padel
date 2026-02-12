@@ -7,6 +7,7 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\User;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
@@ -139,6 +140,26 @@ class ProductSaleController extends Controller
             $order->update(['total_amount' => $totalAmount]);
 
             DB::commit();
+
+            // Create notifications for cashiers (Outside transaction to ensure it runs even if transaction commits but logic fails - though here we are safe)
+            // Actually better to keep it after commit to only notify if success
+            $cashierIds = User::where('role', 'kasir')->pluck('id');
+            $itemsCount = collect($validated['items'])->sum('quantity');
+
+            foreach ($cashierIds as $cashierId) {
+                Notification::create([
+                    'user_id' => $cashierId,
+                    'type' => 'sale_created',
+                    'title' => "Penjualan Produk Baru",
+                    'message' => "{$validated['customer_name']} • {$itemsCount} item",
+                    'data' => [
+                        'sale_id' => $order->id,
+                        'customer_name' => $validated['customer_name'],
+                        'total_amount' => $totalAmount,
+                        'items_count' => $itemsCount,
+                    ],
+                ]);
+            }
 
             return redirect()->route('product-sales.index')
                 ->with('success', 'Product sale created successfully!');

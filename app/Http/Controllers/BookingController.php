@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Booking;
 use App\Models\Court;
 use App\Models\User;
+use App\Models\Notification;
 use App\Services\BookingSyncService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -102,6 +103,45 @@ class BookingController extends Controller
         ]);
     }
 
+    public function history(Request $request)
+    {
+        $query = Booking::with(['user', 'court'])
+            ->where(function ($q) {
+                $q->where('end_time', '<', now())
+                  ->orWhereIn('status', ['completed', 'cancelled', 'no_show']);
+            })
+            ->orderBy('start_time', 'desc');
+
+        // Search by customer name
+        if ($request->filled('search')) {
+            $query->whereHas('user', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Filter by date
+        if ($request->filled('date')) {
+            $date = Carbon::parse($request->date);
+            $query->whereDate('start_time', $date);
+        }
+
+        $bookings = $query->paginate(20)->withQueryString();
+
+        return Inertia::render('Bookings/History', [
+            'bookings' => $bookings,
+            'filters' => [
+                'search' => $request->search,
+                'status' => $request->status,
+                'date' => $request->date,
+            ],
+        ]);
+    }
+
     public function create()
     {
         $courts = Court::where('status', 'active')->get();
@@ -174,6 +214,26 @@ class BookingController extends Controller
             'notes' => $validated['notes'] ?? null,
             'status' => 'confirmed', // Kasir creates confirmed bookings
         ]);
+
+        // Create notifications for cashiers
+        $cashierIds = User::where('role', 'kasir')->pluck('id');
+        
+        foreach ($cashierIds as $cashierId) {
+            Notification::create([
+                'user_id' => $cashierId,
+                'type' => 'booking_created',
+                'title' => "Booking baru dari {$validated['customer_name']}",
+                'message' => "{$court->name} • " . Carbon::parse($validated['start_time'])->format('d M H:i'),
+                'data' => [
+                    'booking_id' => $booking->id,
+                    'customer_name' => $validated['customer_name'],
+                    'court_name' => $court->name,
+                    'date' => Carbon::parse($validated['start_time'])->format('Y-m-d'),
+                    'time' => Carbon::parse($validated['start_time'])->format('H:i') . ' - ' . Carbon::parse($validated['end_time'])->format('H:i'),
+                    'total_price' => $totalPrice,
+                ],
+            ]);
+        }
 
         return redirect()->route('bookings.index')
             ->with('success', 'Booking created successfully!');

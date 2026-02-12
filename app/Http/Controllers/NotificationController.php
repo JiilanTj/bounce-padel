@@ -8,11 +8,6 @@ use Illuminate\Http\JsonResponse;
 
 class NotificationController extends Controller
 {
-    public function __construct()
-    {
-        // Only allow kasir role to access notifications
-        $this->middleware('role:kasir');
-    }
 
     /**
      * Get notifications for the authenticated user.
@@ -22,9 +17,12 @@ class NotificationController extends Controller
     {
         $user = auth()->user();
 
-        // Get notifications for this user only (no broadcast)
+        // Get notifications for this user or broadcast
         $query = Notification::query()
-            ->where('user_id', $user->id)
+            ->where(function ($q) use ($user) {
+                $q->where('user_id', $user->id)
+                  ->orWhereNull('user_id');
+            })
             ->orderBy('created_at', 'desc');
 
         // Filter by read status if requested

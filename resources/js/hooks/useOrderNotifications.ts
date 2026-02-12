@@ -1,38 +1,68 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+export interface BookingData {
+    booking_id: number;
+    customer_name: string;
+    court_name: string;
+    date: string;
+    time: string;
+    total_price: number;
+}
+
+export interface SaleData {
+    sale_id: number;
+    customer_name: string;
+    total_amount: number;
+    items_count: number;
+}
+
+export interface RentalData {
+    rental_id: number;
+    customer_name: string;
+    items_count: number;
+    duration: number;
+    total_amount: number;
+}
+
+export interface OrderData {
+    order_id: number;
+    customer_name: string;
+    table_number?: string;
+    order_type: string;
+    total_amount: number;
+    items_count: number;
+}
+
+export type NotificationPayload =
+    | BookingData
+    | SaleData
+    | RentalData
+    | OrderData;
+
 interface NotificationData {
     id: number;
     user_id: number | null;
     type: string;
     title: string;
     message: string | null;
-    data: {
-        order_id: number;
-        customer_name: string;
-        table_number?: string;
-        order_type: string;
-        total_amount: number;
-        items_count: number;
-    } | null;
+    data: NotificationPayload;
     read_at: string | null;
     created_at: string;
 }
 
-interface OrderNotification {
+export interface AppNotification {
     id: number;
-    customer_name: string;
-    table_number?: string;
     type: string;
-    total_amount: number;
-    items_count: number;
-    created_at: string;
+    title: string;
+    message: string;
+    data: NotificationPayload;
     read: boolean;
+    created_at: string;
 }
 
-interface UseOrderNotificationsReturn {
-    newOrdersCount: number;
-    notifications: OrderNotification[];
+interface UseNotificationsReturn {
     unreadCount: number;
+    notifications: AppNotification[];
     isConnected: boolean;
     isLoading: boolean;
     markAsRead: (notificationId: number) => Promise<void>;
@@ -43,9 +73,9 @@ interface UseOrderNotificationsReturn {
 
 export function useOrderNotifications(
     enabled: boolean,
-    onNewOrder?: (order: OrderNotification) => void,
-): UseOrderNotificationsReturn {
-    const [notifications, setNotifications] = useState<OrderNotification[]>([]);
+    onNewNotification?: (notification: AppNotification) => void,
+): UseNotificationsReturn {
+    const [notifications, setNotifications] = useState<AppNotification[]>([]);
     const [unreadCount, setUnreadCount] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
     const [isConnected, setIsConnected] = useState(false);
@@ -97,14 +127,13 @@ export function useOrderNotifications(
             if (response.ok) {
                 const data = await response.json();
 
-                const transformedNotifications: OrderNotification[] =
+                const transformedNotifications: AppNotification[] =
                     data.notifications.map((notif: NotificationData) => ({
                         id: notif.id,
-                        customer_name: notif.data?.customer_name || '',
-                        table_number: notif.data?.table_number,
-                        type: notif.data?.order_type || notif.type,
-                        total_amount: notif.data?.total_amount || 0,
-                        items_count: notif.data?.items_count || 0,
+                        type: notif.type, // Keep original type
+                        title: notif.title,
+                        message: notif.message || '',
+                        data: notif.data,
                         created_at: notif.created_at,
                         read: notif.read_at !== null,
                     }));
@@ -118,9 +147,9 @@ export function useOrderNotifications(
                     // Play sound for each new notification
                     newNotifs.forEach(() => playNotificationSound());
 
-                    // Trigger callback for new orders
-                    if (onNewOrder) {
-                        newNotifs.forEach((notif) => onNewOrder(notif));
+                    // Trigger callback for new notifications
+                    if (onNewNotification) {
+                        newNotifs.forEach((notif) => onNewNotification(notif));
                     }
 
                     // Update last notification ID
@@ -143,7 +172,7 @@ export function useOrderNotifications(
             console.error('Failed to fetch notifications:', error);
             setIsConnected(false);
         }
-    }, [enabled, playNotificationSound, onNewOrder]);
+    }, [enabled, playNotificationSound, onNewNotification]);
 
     // Refresh notifications (manual trigger)
     const refresh = useCallback(async () => {
@@ -304,12 +333,9 @@ export function useOrderNotifications(
         }
     }, []);
 
-    const newOrdersCount = unreadCount;
-
     return {
-        newOrdersCount,
+        unreadCount, // Exposed directly as it's more generic than newOrdersCount
         notifications,
-        unreadCount,
         isConnected,
         isLoading,
         markAsRead,

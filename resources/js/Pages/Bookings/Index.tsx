@@ -118,7 +118,9 @@ function CourtAvailabilityTable({
         courtId: number,
         slotTime: string,
     ): TodayBooking | null => {
-        const slotStart = new Date(`${overviewDate}T${slotTime}:00`);
+        // Laravel serializes datetimes in UTC (e.g. "2026-02-12T18:00:00.000000Z")
+        // We need to compare in UTC to be consistent
+        const slotStart = new Date(`${overviewDate}T${slotTime}:00Z`);
         const slotEnd = new Date(slotStart.getTime() + 60 * 60 * 1000);
 
         return (
@@ -458,6 +460,14 @@ export default function Index({
                             ))}
                         </select>
                     </div>
+
+                    {/* History Button */}
+                    <Link
+                        href={route('bookings.history')}
+                        className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                    >
+                        History
+                    </Link>
 
                     {/* Add Button */}
                     <Link
